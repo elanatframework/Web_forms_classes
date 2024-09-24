@@ -1,5 +1,3 @@
-namespace CodeBehind;
-
 use \ArrayObject;
 
 class WebForms
