@@ -20,3 +20,5 @@ The pull request should include a directory with the same name as the programmin
 We encourage web professionals to module the WebForms Core technology so that it is easily available in web frameworks. The contents of the module must be added in a directory with the same name as the corresponding framework in the framework's programming language.
 
 > Note: You do not need to use the CodeBehind namespace to create a WebForms class for programming languages. If you are creating a new module to be used in web frameworks, you must add the namespace for the relevant web framework.
+
+Please do not pull request to add new feature. The new features require a coordination between the WebFormsJS library and the WebForms class. So first, new features are added in the CodeBehind framework, and then you can pull requests for these new features in WebForms classes or WebForms modules.
