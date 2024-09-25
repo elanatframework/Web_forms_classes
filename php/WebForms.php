@@ -1,4 +1,4 @@
-use \ArrayObject;
+<?php
 
 class WebForms
 {
@@ -513,3 +513,5 @@ class ExtensionWebFormsMethods
         return substr($text, 0, $start) . substr($text, $end + strlen($endString));
     }
 }
+
+?>
