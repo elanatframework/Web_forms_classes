@@ -1,6 +1,6 @@
 ## How to work with WebForms Core in PHP
 
-To use WebForms Core, first copy the WebForms class file in this directory to your project. Then create a new view similar to the one below.
+To use WebForms Core, first copy the WebForms class file in this directory to your project. Then create a new View file similar to the one below.
 
 ```php
 <?php
@@ -25,7 +25,12 @@ if (!empty($_POST['btn_SetBodyValue']))
     exit();
 }
 ?>
-
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Using WebForms Core</title>
+  <script type="text/javascript" src="/script/web-forms.js"></script>
+</head>
 <body>
     <form method="post" action="/" >
 
