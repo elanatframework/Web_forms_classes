@@ -10,7 +10,7 @@ if (!empty($_POST['btn_SetBodyValue']))
 {
     $Name = $_POST['txt_Name'];
     $BackgroundColor = $_POST['txt_BackgroundColor'];
-    $FontSize = (int) $_POST['txt_FontSize']; // Convert to integer
+    $FontSize = (int) $_POST['txt_FontSize'];
 
     $form = new WebForms();
 
