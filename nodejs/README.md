@@ -48,13 +48,12 @@ app.post('/', (req, res) => {
 
         const form = new WebForms();
 
-        // Assuming InputPlace is also defined and imported, similar to WebForms
-        form.SetFontSize(InputPlace.Tag('form'), FontSize);
-        form.SetBackgroundColor(InputPlace.Tag('form'), BackgroundColor);
-        form.SetDisabled(InputPlace.Name('btn_SetBodyValue'), true);
+        form.SetFontSize(InputPlace.tag('form'), FontSize);
+        form.SetBackgroundColor(InputPlace.tag('form'), BackgroundColor);
+        form.SetDisabled(InputPlace.name('btn_SetBodyValue'), true);
 
-        form.AddTag(InputPlace.Tag('form'), 'h3');
-        form.SetText(InputPlace.Tag('h3'), `Welcome ${Name}!`);
+        form.AddTag(InputPlace.tag('form'), 'h3');
+        form.SetText(InputPlace.tag('h3'), `Welcome ${Name}!`);
 
         res.send(form.response());
     } else {
