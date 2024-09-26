@@ -57,7 +57,7 @@ app.post('/', (req, res) => {
 
         res.send(form.response());
     } else {
-        res.redirect('/'); // Redirect to the form if not a post request
+        res.redirect('/');
     }
 });
 
