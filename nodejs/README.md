@@ -48,12 +48,12 @@ app.post('/', (req, res) => {
 
         const form = new WebForms();
 
-        form.SetFontSize(InputPlace.tag('form'), FontSize);
-        form.SetBackgroundColor(InputPlace.tag('form'), BackgroundColor);
-        form.SetDisabled(InputPlace.name('btn_SetBodyValue'), true);
+        form.setFontSize(InputPlace.tag('form'), FontSize);
+        form.setBackgroundColor(InputPlace.tag('form'), BackgroundColor);
+        form.setDisabled(InputPlace.name('btn_SetBodyValue'), true);
 
-        form.AddTag(InputPlace.tag('form'), 'h3');
-        form.SetText(InputPlace.tag('h3'), `Welcome ${Name}!`);
+        form.addTag(InputPlace.tag('form'), 'h3');
+        form.setText(InputPlace.tag('h3'), `Welcome ${Name}!`);
 
         res.send(form.response());
     } else {
