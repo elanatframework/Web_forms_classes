@@ -14,12 +14,12 @@ if (!empty($_POST['btn_SetBodyValue']))
 
     $form = new WebForms();
 
-    $form->SetFontSize(InputPlace::Tag('form'), $FontSize);
-    $form->SetBackgroundColor(InputPlace::Tag('form'), $BackgroundColor);
-    $form->SetDisabled(InputPlace::Name('btn_SetBodyValue'), true);
+    $form->setFontSize(InputPlace::tag('form'), $FontSize);
+    $form->setBackgroundColor(InputPlace::tag('form'), $BackgroundColor);
+    $form->setDisabled(InputPlace::name('btn_SetBodyValue'), true);
 
-    $form->AddTag(InputPlace::Tag('form'), 'h3');
-    $form->SetText(InputPlace::Tag('h3'), "Welcome " . $Name . "!");
+    $form->addTag(InputPlace::tag('form'), 'h3');
+    $form->setText(InputPlace::tag('h3'), "Welcome " . $Name . "!");
 
     echo $form->response();
     exit();
