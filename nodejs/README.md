@@ -56,8 +56,6 @@ app.post('/', (req, res) => {
         form.setText(InputPlace.tag('h3'), `Welcome ${Name}!`);
 
         res.send(form.response());
-    } else {
-        res.redirect('/');
     }
 });
 
