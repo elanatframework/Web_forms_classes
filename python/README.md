@@ -17,12 +17,12 @@ def index():
 
         form = WebForms()
 
-        form.SetFontSize(InputPlace.Tag('form'), font_size)
-        form.SetBackgroundColor(InputPlace.Tag('form'), background_color)
-        form.SetDisabled(InputPlace.Name('btn_SetBodyValue'), True)
+        form.set_font_size(InputPlace.tag('form'), font_size)
+        form.set_background_color(InputPlace.tag('form'), background_color)
+        form.set_disabled(InputPlace.name('btn_SetBodyValue'), True)
 
-        form.AddTag(InputPlace.Tag('form'), 'h3')
-        form.SetText(InputPlace.Tag('h3'), f"Welcome {name}!")
+        form.add_tag(InputPlace.tag('form'), 'h3')
+        form.set_text(InputPlace.tag('h3'), f"Welcome {name}!")
 
         return form.response()
         
