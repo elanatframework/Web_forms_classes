@@ -1,3 +1,4 @@
+![ ](https://github.com/user-attachments/assets/164a7efc-66a2-494a-bc26-614c2c53ce00)
 # WebForms Classes
 
 WebForms Core technology was created by [Elanat](https://elanat.net). It is a two-way protocol between the WebForms class on the server side and the [web-forms.js](https://github.com/elanatframework/Web_forms/blob/elanat_framework/web-forms.js) library on the client side, where processing is done on the client side and the server sends Action Control commands to [WebFormsJS](https://github.com/elanatframework/Web_forms).
