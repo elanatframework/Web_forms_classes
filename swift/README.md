@@ -5,8 +5,6 @@ To use WebForms Core, first copy the WebForms class file in this directory to yo
 ```swift
 import Vapor
 
-// Assuming WebForms.swift is already defined in the project
-
 func routes(_ app: Application) throws {
     app.post { req -> Response in
         guard let data = try? req.content.decode(FormData.self) else {
@@ -30,7 +28,6 @@ func routes(_ app: Application) throws {
     }
 }
 
-// Struct to decode form data
 struct FormData: Content {
     var txt_Name: String
     var txt_BackgroundColor: String
@@ -64,7 +61,6 @@ func renderForm() -> String {
     """
 }
 
-// To render the form for a get request.
 app.get { req in
     return Response(status: .ok, body: .init(string: renderForm()))
 }
