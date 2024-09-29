@@ -34,7 +34,6 @@ struct FormData: Content {
     var txt_FontSize: Int
 }
 
-// HTML form generation function
 func renderForm() -> String {
     return """
     <!DOCTYPE html>
