@@ -14,7 +14,7 @@ if (!empty($_POST['btn_SetBodyValue']))
 
     $form = new WebForms();
 
-    $form->setFontSize(InputPlace::tag('form'), $FontSize);
+    $form->setFontSize(InputPlace::tag('form'), $FontSize . 'px');
     $form->setBackgroundColor(InputPlace::tag('form'), $BackgroundColor);
     $form->setDisabled(InputPlace::name('btn_SetBodyValue'), true);
 
