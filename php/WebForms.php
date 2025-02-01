@@ -8,733 +8,729 @@ class WebForms
 
     public function __construct()
     {
-        $this->webFormsData = new ArrayObject();
+        $this->webFormsData = new NameValueCollection();
     }
 
     // Add
     public function addId($inputPlace, $id)
     {
-        $this->webFormsData["ai" . $inputPlace] = $id;
+        $this->webFormsData->add("ai" . $inputPlace, $id);
     }
 
     public function addName($inputPlace, $name)
     {
-        $this->webFormsData["an" . $inputPlace] = $name;
+        $this->webFormsData->add("an" . $inputPlace, $name);
     }
 
     public function addValue($inputPlace, $value)
     {
-        $this->webFormsData["av" . $inputPlace] = $value;
+        $this->webFormsData->add("av" . $inputPlace, $value);
     }
 
     public function addClass($inputPlace, $class)
     {
-        $this->webFormsData["ac" . $inputPlace] = $class;
+        $this->webFormsData->add("ac" . $inputPlace, $class);
     }
 
     public function addStyle($inputPlace, $style)
     {
-        $this->webFormsData["as" . $inputPlace] = $style;
+        $this->webFormsData->add("as" . $inputPlace, $style);
     }
 
     public function addStyleWithNameValue($inputPlace, $name, $value)
     {
-        $this->webFormsData["as" . $inputPlace] = $name . ':' . $value;
+        $this->webFormsData->add("as" . $inputPlace, $name . ':' . $value);
     }
 
     public function addOptionTag($inputPlace, $text, $value, $selected = false)
     {
-        $this->webFormsData["ao" . $inputPlace] = $value . '|' . $text . ($selected ? '|1' : '');
+        $this->webFormsData->add("ao" . $inputPlace, $value . '|' . $text . ($selected ? '|1' : ''));
     }
 
     public function addCheckBoxTag($inputPlace, $text, $value, $checked = false)
     {
-        $this->webFormsData["ak" . $inputPlace] = $value . '|' . $text . ($checked ? '|1' : '');
+        $this->webFormsData->add("ak" . $inputPlace, $value . '|' . $text . ($checked ? '|1' : ''));
     }
 
     public function addTitle($inputPlace, $title)
     {
-        $this->webFormsData["al" . $inputPlace] = $title;
+        $this->webFormsData->add("al" . $inputPlace, $title);
     }
 
     public function addText($inputPlace, $text)
     {
-        $this->webFormsData["at" . $inputPlace] = str_replace("\n", "$[ln];", $text);
+        $this->webFormsData->add("at" . $inputPlace, str_replace("\n", "$[ln];", $text));
     }
 
     public function addTextToUp($inputPlace, $text)
     {
-        $this->webFormsData["pt" . $inputPlace] = str_replace("\n", "$[ln];", $text);
+        $this->webFormsData->add("pt" . $inputPlace, str_replace("\n", "$[ln];", $text));
     }
 
     public function addAttribute($inputPlace, $attribute, $value = "")
     {
-        $this->webFormsData["aa" . $inputPlace] = $attribute . '|' . $value;
+        $this->webFormsData->add("aa" . $inputPlace, $attribute . '|' . $value);
     }
 
     public function addTag($inputPlace, $tagName, $id = "")
     {
-        $this->webFormsData["nt" . $inputPlace] = $tagName . (!empty($id) ? '|' . $id : '');
+        $this->webFormsData->add("nt" . $inputPlace, $tagName . (!empty($id) ? '|' . $id : ''));
     }
 
     public function addTagToUp($inputPlace, $tagName, $id = "")
     {
-        $this->webFormsData["ut" . $inputPlace] = $tagName . (!empty($id) ? '|' . $id : '');
+        $this->webFormsData->add("ut" . $inputPlace, $tagName . (!empty($id) ? '|' . $id : ''));
     }
 
     public function addTagBefore($inputPlace, $tagName, $id = "")
     {
-        $this->webFormsData["bt" . $inputPlace] = $tagName . (!empty($id) ? '|' . $id : '');
+        $this->webFormsData->add("bt" . $inputPlace, $tagName . (!empty($id) ? '|' . $id : ''));
     }
 
     public function addTagAfter($inputPlace, $tagName, $id = "")
     {
-        $this->webFormsData["ft" . $inputPlace] = $tagName . (!empty($id) ? '|' . $id : '');
+        $this->webFormsData->add("ft" . $inputPlace, $tagName . (!empty($id) ? '|' . $id : ''));
     }
 
     // Set
     public function setId($inputPlace, $id)
     {
-        $this->webFormsData["si" . $inputPlace] = $id;
+        $this->webFormsData->add("si" . $inputPlace, $id);
     }
 
     public function setName($inputPlace, $name)
     {
-        $this->webFormsData["sn" . $inputPlace] = $name;
+        $this->webFormsData->add("sn" . $inputPlace, $name);
     }
 
     public function setValue($inputPlace, $value)
     {
-        $this->webFormsData["sv" . $inputPlace] = $value;
+        $this->webFormsData->add("sv" . $inputPlace, $value);
     }
 
     public function setClass($inputPlace, $class)
     {
-        $this->webFormsData["sc" . $inputPlace] = $class;
+        $this->webFormsData->add("sc" . $inputPlace, $class);
     }
 
     public function setStyle($inputPlace, $style)
     {
-        $this->webFormsData["ss" . $inputPlace] = $style;
+        $this->webFormsData->add("ss" . $inputPlace, $style);
     }
 
     public function setStyleWithNameValue($inputPlace, $name, $value)
     {
-        $this->webFormsData["ss" . $inputPlace] = $name . ':' . $value;
+        $this->webFormsData->add("ss" . $inputPlace, $name . ':' . $value);
     }
 
     public function setOptionTag($inputPlace, $text, $value, $selected = false)
     {
-        $this->webFormsData["so" . $inputPlace] = $value . '|' . $text . ($selected ? '|1' : '');
+        $this->webFormsData->add("so" . $inputPlace, $value . '|' . $text . ($selected ? '|1' : ''));
     }
 
     public function setChecked($inputPlace, $checked = false)
     {
-        $this->webFormsData["sk" . $inputPlace] = $checked ? "1" : "0";
+        $this->webFormsData->add("sk" . $inputPlace, $checked ? "1" : "0");
     }
 
     public function setCheckBoxTagToList($inputPlace, $text, $value, $checked = false)
     {
-        $this->webFormsData["sk" . $inputPlace] = $value . '|' . $text . ($checked ? '|1' : '');
+        $this->webFormsData->add("sk" . $inputPlace, $value . '|' . $text . ($checked ? '|1' : ''));
     }
 
     public function setTitle($inputPlace, $title)
     {
-        $this->webFormsData["sl" . $inputPlace] = $title;
+        $this->webFormsData->add("sl" . $inputPlace, $title);
     }
 
     public function setText($inputPlace, $text)
     {
-        $this->webFormsData["st" . $inputPlace] = str_replace("\n", "$[ln];", $text);
+        $this->webFormsData->add("st" . $inputPlace, str_replace("\n", "$[ln];", $text));
     }
 
     public function setAttribute($inputPlace, $attribute, $value = "")
     {
-        $this->webFormsData["sa" . $inputPlace] = $attribute . (!empty($value) ? '|' . $value : '');
+        $this->webFormsData->add("sa" . $inputPlace, $attribute . (!empty($value) ? '|' . $value : ''));
     }
 
     public function setWidth($inputPlace, $width)
     {
-        $this->webFormsData["sw" . $inputPlace] = $width;
+        $this->webFormsData->add("sw" . $inputPlace, $width);
     }
 
     public function setHeight($inputPlace, $height)
     {
-        $this->webFormsData["sh" . $inputPlace] = $height;
+        $this->webFormsData->add("sh" . $inputPlace, $height);
     }
 
     // Insert
     public function insertId($inputPlace, $id)
     {
-        $this->webFormsData["ii" . $inputPlace] = $id;
+        $this->webFormsData->add("ii" . $inputPlace, $id);
     }
 
     public function insertName($inputPlace, $name)
     {
-        $this->webFormsData["in" . $inputPlace] = $name;
+        $this->webFormsData->add("in" . $inputPlace, $name);
     }
 
     public function insertValue($inputPlace, $value)
     {
-        $this->webFormsData["iv" . $inputPlace] = $value;
+        $this->webFormsData->add("iv" . $inputPlace, $value);
     }
 
     public function insertClass($inputPlace, $class)
     {
-        $this->webFormsData["ic" . $inputPlace] = $class;
+        $this->webFormsData->add("ic" . $inputPlace, $class);
     }
 
     public function insertStyle($inputPlace, $style)
     {
-        $this->webFormsData["is" . $inputPlace] = $style;
+        $this->webFormsData->add("is" . $inputPlace, $style);
     }
 
     public function insertStyleWithNameValue($inputPlace, $name, $value)
     {
-        $this->webFormsData["is" . $inputPlace] = $name . ':' . $value;
+        $this->webFormsData->add("is" . $inputPlace, $name . ':' . $value);
     }
 
     public function insertOptionTag($inputPlace, $text, $value, $selected = false)
     {
-        $this->webFormsData["io" . $inputPlace] = $value . '|' . $text . ($selected ? '|1' : '');
+        $this->webFormsData->add("io" . $inputPlace, $value . '|' . $text . ($selected ? '|1' : ''));
     }
 
     public function insertCheckBoxTag($inputPlace, $text, $value, $checked = false)
     {
-        $this->webFormsData["ik" . $inputPlace] = $value . '|' . $text . ($checked ? '|1' : '');
+        $this->webFormsData->add("ik" . $inputPlace, $value . '|' . $text . ($checked ? '|1' : ''));
     }
 
     public function insertTitle($inputPlace, $title)
     {
-        $this->webFormsData["il" . $inputPlace] = $title;
+        $this->webFormsData->add("il" . $inputPlace, $title);
     }
 
     public function insertText($inputPlace, $text)
     {
-        $this->webFormsData["it" . $inputPlace] = str_replace("\n", "$[ln];", $text);
+        $this->webFormsData->add("it" . $inputPlace, str_replace("\n", "$[ln];", $text));
     }
 
     public function insertAttribute($inputPlace, $attribute, $value = "")
     {
-        $this->webFormsData["ia" . $inputPlace] = $attribute . (!empty($value) ? '|' . $value : '');
+        $this->webFormsData->add("ia" . $inputPlace, $attribute . (!empty($value) ? '|' . $value : ''));
     }
 
     // Delete
     public function deleteId($inputPlace)
     {
-        $this->webFormsData["di" . $inputPlace] = "1";
+        $this->webFormsData->add("di" . $inputPlace, "1");
     }
 
     public function deleteName($inputPlace)
     {
-        $this->webFormsData["dn" . $inputPlace] = "1";
+        $this->webFormsData->add("dn" . $inputPlace, "1");
     }
 
     public function deleteValue($inputPlace)
     {
-        $this->webFormsData["dv" . $inputPlace] = "1";
+        $this->webFormsData->add("dv" . $inputPlace, "1");
     }
 
     public function deleteClass($inputPlace, $className)
     {
-        $this->webFormsData["dc" . $inputPlace] = $className;
+        $this->webFormsData->add("dc" . $inputPlace, $className);
     }
 
     public function deleteStyle($inputPlace, $styleName)
     {
-        $this->webFormsData["ds" . $inputPlace] = $styleName;
+        $this->webFormsData->add("ds" . $inputPlace, $styleName);
     }
 
     public function deleteOptionTag($inputPlace, $value)
     {
-        $this->webFormsData["do" . $inputPlace] = $value;
+        $this->webFormsData->add("do" . $inputPlace, $value);
     }
 
     public function deleteAllOptionTag($inputPlace)
     {
-        $this->webFormsData["do" . $inputPlace] = "*";
+        $this->webFormsData->add("do" . $inputPlace, "*");
     }
 
     public function deleteCheckBoxTag($inputPlace, $value)
     {
-        $this->webFormsData["dk" . $inputPlace] = $value;
+        $this->webFormsData->add("dk" . $inputPlace, $value);
     }
 
     public function deleteAllCheckBoxTag($inputPlace)
     {
-        $this->webFormsData["dk" . $inputPlace] = "*";
+        $this->webFormsData->add("dk" . $inputPlace, "*");
     }
 
     public function deleteTitle($inputPlace)
     {
-        $this->webFormsData["dl" . $inputPlace] = "1";
+        $this->webFormsData->add("dl" . $inputPlace, "1");
     }
 
     public function deleteText($inputPlace)
     {
-        $this->webFormsData["dt" . $inputPlace] = "1";
+        $this->webFormsData->add("dt" . $inputPlace, "1");
     }
 
     public function deleteAttribute($inputPlace, $attribute)
     {
-        $this->webFormsData["da" . $inputPlace] = $attribute;
+        $this->webFormsData->add("da" . $inputPlace, $attribute);
     }
 
     public function delete($inputPlace)
     {
-        $this->webFormsData["de" . $inputPlace] = "1";
+        $this->webFormsData->add("de" . $inputPlace, "1");
     }
 
     public function deleteParent($inputPlace)
     {
-        $this->webFormsData["dp" . $inputPlace] = "1";
+        $this->webFormsData->add("dp" . $inputPlace, "1");
     }
 
     // Other
     public function setBackgroundColor($inputPlace, $color)
     {
-        $this->webFormsData["bc" . $inputPlace] = $color;
+        $this->webFormsData->add("bc" . $inputPlace, $color);
     }
 
     public function setTextColor($inputPlace, $color)
     {
-        $this->webFormsData["tc" . $inputPlace] = $color;
+        $this->webFormsData->add("tc" . $inputPlace, $color);
     }
 
     public function setFontName($inputPlace, $name)
     {
-        $this->webFormsData["fn" . $inputPlace] = $name;
+        $this->webFormsData->add("fn" . $inputPlace, $name);
     }
 
     public function setFontSize($inputPlace, $size)
     {
-        $this->webFormsData["fs" . $inputPlace] = $size;
+        $this->webFormsData->add("fs" . $inputPlace, $size);
     }
 
     public function setFontBold($inputPlace, $bold)
     {
-        $this->webFormsData["fb" . $inputPlace] = $bold ? "1" : "0";
+        $this->webFormsData->add("fb" . $inputPlace, $bold ? "1" : "0");
     }
 
     public function setVisible($inputPlace, $visible)
     {
-        $this->webFormsData["vi" . $inputPlace] = $visible ? "1" : "0";
+        $this->webFormsData->add("vi" . $inputPlace, $visible ? "1" : "0");
     }
 
     public function setTextAlign($inputPlace, $align)
     {
-        $this->webFormsData["ta" . $inputPlace] = $align;
+        $this->webFormsData->add("ta" . $inputPlace, $align);
     }
 
     public function setReadOnly($inputPlace, $readOnly)
     {
-        $this->webFormsData["sr" . $inputPlace] = $readOnly ? "1" : "0";
+        $this->webFormsData->add("sr" . $inputPlace, $readOnly ? "1" : "0");
     }
 
     public function setDisabled($inputPlace, $disabled)
     {
-        $this->webFormsData["sd" . $inputPlace] = $disabled ? "1" : "0";
+        $this->webFormsData->add("sd" . $inputPlace, $disabled ? "1" : "0");
     }
 
     public function setFocus($inputPlace, $focus)
     {
-        $this->webFormsData["sf" . $inputPlace] = $focus ? "1" : "0";
+        $this->webFormsData->add("sf" . $inputPlace, $focus ? "1" : "0");
     }
 
     public function setMinLength($inputPlace, $length)
     {
-        $this->webFormsData["mn" . $inputPlace] = (string)$length;
+        $this->webFormsData->add("mn" . $inputPlace, (string)$length);
     }
 
     public function setMaxLength($inputPlace, $length)
     {
-        $this->webFormsData["mx" . $inputPlace] = (string)$length;
+        $this->webFormsData->add("mx" . $inputPlace, (string)$length);
     }
 
     public function setSelectedValue($inputPlace, $value)
     {
-        $this->webFormsData["ts" . $inputPlace] = $value;
+        $this->webFormsData->add("ts" . $inputPlace, $value);
     }
 
     public function setSelectedIndex($inputPlace, $index)
     {
-        $this->webFormsData["ti" . $inputPlace] = (string)$index;
+        $this->webFormsData->add("ti" . $inputPlace, (string)$index);
     }
 
     public function setCheckedValue($inputPlace, $value, $selected)
     {
-        $this->webFormsData["ks" . $inputPlace] = $value . "|" . ($selected ? "1" : "0");
+        $this->webFormsData->add("ks" . $inputPlace, $value . "|" . ($selected ? "1" : "0"));
     }
 
     public function setCheckedIndex($inputPlace, $index, $selected)
     {
-        $this->webFormsData["ki" . $inputPlace] = $index . "|" . ($selected ? "1" : "0");
+        $this->webFormsData->add("ki" . $inputPlace, $index . "|" . ($selected ? "1" : "0"));
     }
 
     public function callScript($scriptText)
     {
-        $this->webFormsData["_"] = str_replace("\n", "$[ln];", $scriptText);
+        $this->webFormsData->add("_", str_replace("\n", "$[ln];", $scriptText));
     }
 
     public function loadUrl($inputPlace, $url)
     {
-        $this->webFormsData["lu" . $inputPlace] = $url;
+        $this->webFormsData->add("lu" . $inputPlace, $url);
     }
 
     public function changeUrl($url)
     {
-        $this->webFormsData["cu"] = $url;
+        $this->webFormsData->add("cu", $url);
     }
 
     public function removeSessionCache($cacheKey)
     {
-        $this->webFormsData["rs"] = $cacheKey;
+        $this->webFormsData->add("rs", $cacheKey);
     }
 
     public function removeAllSessionCache()
     {
-        $this->webFormsData["rs"] = "*";
+        $this->webFormsData->add("rs", "*");
     }
 
     public function removeCache($cacheKey)
     {
-        $this->webFormsData["rd"] = $cacheKey;
+        $this->webFormsData->add("rd", $cacheKey);
     }
 
     public function removeAllCache()
     {
-        $this->webFormsData["rd"] = "*";
+        $this->webFormsData->add("rd", "*");
     }
 
     public function setSessionCache()
     {
-        $this->webFormsData["cs"] = "1";
+        $this->webFormsData->add("cs", "1");
     }
 
     public function setCache($second)
     {
-        $this->webFormsData["cd"] = $second;
+        $this->webFormsData->add("cd", $second);
     }
 
     public function setCacheAll()
     {
-        $this->webFormsData["cd"] = "*";
+        $this->webFormsData->add("cd", "*");
     }
 
     // Increase
     public function increaseMinLength($inputPlace, $value)
     {
-        $this->webFormsData["+n" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("+n" . $inputPlace, (string)$value);
     }
 
     public function increaseMaxLength($inputPlace, $value)
     {
-        $this->webFormsData["+x" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("+x" . $inputPlace, (string)$value);
     }
 
     public function increaseFontSize($inputPlace, $value)
     {
-        $this->webFormsData["+f" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("+f" . $inputPlace, (string)$value);
     }
 
     public function increaseWidth($inputPlace, $value)
     {
-        $this->webFormsData["+w" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("+w" . $inputPlace, (string)$value);
     }
 
     public function increaseHeight($inputPlace, $value)
     {
-        $this->webFormsData["+h" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("+h" . $inputPlace, (string)$value);
     }
 
     public function increaseValue($inputPlace, $value)
     {
-        $this->webFormsData["+v" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("+v" . $inputPlace, (string)$value);
     }
 
     // Decrease
     public function decreaseMinLength($inputPlace, $value)
     {
-        $this->webFormsData["-n" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("-n" . $inputPlace, (string)$value);
     }
 
     public function decreaseMaxLength($inputPlace, $value)
     {
-        $this->webFormsData["-x" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("-x" . $inputPlace, (string)$value);
     }
 
     public function decreaseFontSize($inputPlace, $value)
     {
-        $this->webFormsData["-f" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("-f" . $inputPlace, (string)$value);
     }
 
     public function decreaseWidth($inputPlace, $value)
     {
-        $this->webFormsData["-w" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("-w" . $inputPlace, (string)$value);
     }
 
     public function decreaseHeight($inputPlace, $value)
     {
-        $this->webFormsData["-h" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("-h" . $inputPlace, (string)$value);
     }
 
     public function decreaseValue($inputPlace, $value)
     {
-        $this->webFormsData["-v" . $inputPlace] = (string)$value;
+        $this->webFormsData->add("-v" . $inputPlace, (string)$value);
     }
 
     // Event
     public function setPostEvent($inputPlace, $htmlEvent)
     {
-        $this->webFormsData["Ep" . $inputPlace] = $htmlEvent;
+        $this->webFormsData->add("Ep" . $inputPlace, $htmlEvent);
     }
 
     public function setPostEventAdding($inputPlace, $htmlEvent)
     {
-        $this->webFormsData["Ep" . $inputPlace] = $htmlEvent . "|+";
+        $this->webFormsData->add("Ep" . $inputPlace, $htmlEvent . "|+");
     }
 
     public function setPostEventTo($inputPlace, $htmlEvent, $outputPlace)
     {
-        $this->webFormsData["Ep" . $inputPlace] = $htmlEvent . "|" . $outputPlace;
+        $this->webFormsData->add("Ep" . $inputPlace, $htmlEvent . "|" . $outputPlace);
     }
 
     public function setPostEventListener($inputPlace, $htmlEventListener)
     {
-        $this->webFormsData["EP" . $inputPlace] = $htmlEventListener;
+        $this->webFormsData->add("EP" . $inputPlace, $htmlEventListener);
     }
 
     public function setPostEventListenerAdding($inputPlace, $htmlEventListener)
     {
-        $this->webFormsData["EP" . $inputPlace] = $htmlEventListener . "|+";
+        $this->webFormsData->add("EP" . $inputPlace, $htmlEventListener . "|+");
     }
 
     public function setPostEventListenerTo($inputPlace, $htmlEventListener, $outputPlace)
     {
-        $this->webFormsData["EP" . $inputPlace] = $htmlEventListener . "|" . $outputPlace;
+        $this->webFormsData->add("EP" . $inputPlace, $htmlEventListener . "|" . $outputPlace);
     }
 
     public function setGetEvent($inputPlace, $htmlEvent, $path = null)
     {
-        $this->webFormsData["Eg" . $inputPlace] = $htmlEvent . "|" . ($path ? $path : "#");
+        $this->webFormsData->add("Eg" . $inputPlace, $htmlEvent . "|" . ($path ? $path : "#"));
     }
 
     public function setGetEventWithOutputPlace($inputPlace, $htmlEvent, $outputPlace, $path = null)
     {
-        $this->webFormsData["Eg" . $inputPlace] = $htmlEvent . "|" . ($path ? $path : "#") . "|" . $outputPlace;
+        $this->webFormsData->add("Eg" . $inputPlace, $htmlEvent . "|" . ($path ? $path : "#") . "|" . $outputPlace);
     }
 
     public function setGetEventInForm($inputPlace, $htmlEvent)
     {
-        $this->webFormsData["Eg" . $inputPlace] = $htmlEvent;
+        $this->webFormsData->add("Eg" . $inputPlace, $htmlEvent);
     }
 
     public function setGetEventInFormWithOutputPlace($inputPlace, $htmlEvent, $outputPlace)
     {
-        $this->webFormsData["Eg" . $inputPlace] = $htmlEvent . "|" . $outputPlace;
+        $this->webFormsData->add("Eg" . $inputPlace, $htmlEvent . "|" . $outputPlace);
     }
 
     public function setGetEventListener($inputPlace, $htmlEventListener, $path = null)
     {
-        $this->webFormsData["EG" . $inputPlace] = $htmlEventListener . "|" . ($path ? $path : "#");
+        $this->webFormsData->add("EG" . $inputPlace, $htmlEventListener . "|" . ($path ? $path : "#"));
     }
 
     public function setGetEventListenerWithOutputPlace($inputPlace, $htmlEventListener, $outputPlace, $path = null)
     {
-        $this->webFormsData["EG" . $inputPlace] = $htmlEventListener . "|" . ($path ? $path : "#") . "|" . $outputPlace;
+        $this->webFormsData->add("EG" . $inputPlace, $htmlEventListener . "|" . ($path ? $path : "#") . "|" . $outputPlace);
     }
 
     public function setGetEventInFormListener($inputPlace, $htmlEventListener)
     {
-        $this->webFormsData["EG" . $inputPlace] = $htmlEventListener;
+        $this->webFormsData->add("EG" . $inputPlace, $htmlEventListener);
     }
 
     public function setGetEventInFormListenerWithOutputPlace($inputPlace, $htmlEventListener, $outputPlace)
     {
-        $this->webFormsData["EG" . $inputPlace] = $htmlEventListener . "|" . $outputPlace;
+        $this->webFormsData->add("EG" . $inputPlace, $htmlEventListener . "|" . $outputPlace);
     }
 
     public function setTagEvent($inputPlace, $htmlEvent, $outputPlace)
     {
-        $this->webFormsData["Et" . $inputPlace] = $htmlEvent . "|" . $outputPlace;
+        $this->webFormsData->add("Et" . $inputPlace, $htmlEvent . "|" . $outputPlace);
     }
 
     public function setTagEventListener($inputPlace, $htmlEvent, $outputPlace)
     {
-        $this->webFormsData["ET" . $inputPlace] = $htmlEvent . "|" . $outputPlace;
+        $this->webFormsData->add("ET" . $inputPlace, $htmlEvent . "|" . $outputPlace);
     }
 
     public function removePostEvent($inputPlace, $htmlEvent)
     {
-        $this->webFormsData["Rp" . $inputPlace] = $htmlEvent;
+        $this->webFormsData->add("Rp" . $inputPlace, $htmlEvent);
     }
 
     public function removeGetEvent($inputPlace, $htmlEvent)
     {
-        $this->webFormsData["Rg" . $inputPlace] = $htmlEvent;
+        $this->webFormsData->add("Rg" . $inputPlace, $htmlEvent);
     }
 
     public function removeTagEvent($inputPlace, $htmlEvent)
     {
-        $this->webFormsData["Rt" . $inputPlace] = $htmlEvent;
+        $this->webFormsData->add("Rt" . $inputPlace, $htmlEvent);
     }
 
     public function removePostEventListener($inputPlace, $htmlEventListener)
     {
-        $this->webFormsData["RP" . $inputPlace] = $htmlEventListener;
+        $this->webFormsData->add("RP" . $inputPlace, $htmlEventListener);
     }
 
     public function removeGetEventListener($inputPlace, $htmlEventListener)
     {
-        $this->webFormsData["RG" . $inputPlace] = $htmlEventListener;
+        $this->webFormsData->add("RG" . $inputPlace, $htmlEventListener);
     }
 
     public function removeTagEventListener($inputPlace, $htmlEventListener)
     {
-        $this->webFormsData["RT" . $inputPlace] = $htmlEventListener;
+        $this->webFormsData->add("RT" . $inputPlace, $htmlEventListener);
     }
 
     // Save
     public function saveId($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gi" . $inputPlace] = $key;
+        $this->webFormsData->add("@gi" . $inputPlace, $key);
     }
 
     public function saveName($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gn" . $inputPlace] = $key;
+        $this->webFormsData->add("@gn" . $inputPlace, $key);
     }
 
     public function saveValue($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gv" . $inputPlace] = $key;
+        $this->webFormsData->add("@gv" . $inputPlace, $key);
     }
 
     public function saveValueLength($inputPlace, $key = ".")
     {
-        $this->webFormsData["@ge" . $inputPlace] = $key;
+        $this->webFormsData->add("@ge" . $inputPlace, $key);
     }
 
     public function saveClass($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gc" . $inputPlace] = $key;
+        $this->webFormsData->add("@gc" . $inputPlace, $key);
     }
 
     public function saveStyle($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gs" . $inputPlace] = $key;
+        $this->webFormsData->add("@gs" . $inputPlace, $key);
     }
 
     public function saveTitle($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gl" . $inputPlace] = $key;
+        $this->webFormsData->add("@gl" . $inputPlace, $key);
     }
 
     public function saveText($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gt" . $inputPlace] = $key;
+        $this->webFormsData->add("@gt" . $inputPlace, $key);
     }
 
     public function saveTextLength($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gg" . $inputPlace] = $key;
+        $this->webFormsData->add("@gg" . $inputPlace, $key);
     }
 
     public function saveAttribute($inputPlace, $attribute, $key = ".")
     {
-        $this->webFormsData["@ga" . $inputPlace] = $key . '|' . $attribute;
+        $this->webFormsData->add("@ga" . $inputPlace, $key . '|' . $attribute);
     }
 
     public function saveWidth($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gw" . $inputPlace] = $key;
+        $this->webFormsData->add("@gw" . $inputPlace, $key);
     }
 
     public function saveHeight($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gh" . $inputPlace] = $key;
+        $this->webFormsData->add("@gh" . $inputPlace, $key);
     }
 
     public function saveReadOnly($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gr" . $inputPlace] = $key;
+        $this->webFormsData->add("@gr" . $inputPlace, $key);
     }
 
     public function saveSelectedIndex($inputPlace, $key = ".")
     {
-        $this->webFormsData["@gx" . $inputPlace] = $key;
+        $this->webFormsData->add("@gx" . $inputPlace, $key);
     }
 
     public function saveTextAlign($inputPlace, $key = ".")
     {
-        $this->webFormsData["@ta" . $inputPlace] = $key;
+        $this->webFormsData->add("@ta" . $inputPlace, $key);
     }
 
     public function saveNodeLength($inputPlace, $key = ".")
     {
-        $this->webFormsData["@nl" . $inputPlace] = $key;
+        $this->webFormsData->add("@nl" . $inputPlace, $key);
     }
 
     public function saveVisible($inputPlace, $key = ".")
     {
-        $this->webFormsData["@vi" . $inputPlace] = $key;
+        $this->webFormsData->add("@vi" . $inputPlace, $key);
     }
 
     // Pre Runner
-    public function assignDelay($second, $index = -1)
+	public function assignDelay($second, $index = -1)
     {
-        $currentName = $this->webFormsData->getIterator()->key();
+        $currentName = $this->webFormsData->getNameByIndex($index);
 
-        if (empty($currentName))
+        if (empty($currentName)) {
             return;
+        }
 
-        $this->webFormsData->offsetSet(":" . $second . ")" . $currentName, $this->webFormsData->offsetGet($currentName));
-        $this->webFormsData->offsetUnset($currentName);
+        $this->webFormsData->changeNameByIndex($index, ":" . $second . ")" . $currentName);
     }
 
     public function assignDelayChange($second, $index = -1)
     {
-        $currentName = $this->webFormsData->getIterator()->key();
+        $currentName = $this->webFormsData->getNameByIndex($index);
 
-        if (empty($currentName))
+        if (empty($currentName)) {
             return;
+        }
 
-        $currentName = str_replace(":", "", $currentName);
-        $currentName = str_replace(")", "", $currentName);
-
-        $this->webFormsData->offsetSet(":" . $second . ")" . $currentName, $this->webFormsData->offsetGet($currentName));
-        $this->webFormsData->offsetUnset($currentName);
+        $currentName = $this->removeOuter($currentName, ":", ")");
+        $this->webFormsData->changeNameByIndex($index, ":" . $second . ")" . $currentName);
     }
 
     public function assignInterval($second, $index = -1)
     {
-        $currentName = $this->webFormsData->getIterator()->key();
+        $currentName = $this->webFormsData->getNameByIndex($index);
 
-        if (empty($currentName))
+        if (empty($currentName)) {
             return;
+        }
 
-        $this->webFormsData->offsetSet("(" . $second . ")" . $currentName, $this->webFormsData->offsetGet($currentName));
-        $this->webFormsData->offsetUnset($currentName);
+        $this->webFormsData->changeNameByIndex($index, "(" . $second . ")" . $currentName);
     }
 
     public function assignIntervalChange($second, $index = -1)
     {
-        $currentName = $this->webFormsData->getIterator()->key();
+        $currentName = $this->webFormsData->getNameByIndex($index);
 
-        if (empty($currentName))
+        if (empty($currentName)) {
             return;
+        }
 
-        $currentName = str_replace("(", "", $currentName);
-        $currentName = str_replace(")", "", $currentName);
-
-        $this->webFormsData->offsetSet("(" . $second . ")" . $currentName, $this->webFormsData->offsetGet($currentName));
-        $this->webFormsData->offsetUnset($currentName);
+        $currentName = $this->removeOuter($currentName, "(", ")");
+        $this->webFormsData->changeNameByIndex($index, "(" . $second . ")" . $currentName);
     }
 
     // Index
     public function startIndex($name = "")
     {
-        $this->webFormsData["#"] = $name;
+        $this->webFormsData->add("#", $name);
     }
 
     // Get
@@ -742,11 +738,14 @@ class WebForms
     {
         $returnValue = "";
 
-        foreach ($this->webFormsData as $name => $value) {
-            $returnValue .= PHP_EOL . $name;
+        $webFormsDataList = $this->webFormsData->getList();
 
-            if (!empty($value))
-                $returnValue .= "=" . $value;
+        foreach ($webFormsDataList as $nv) {
+            $returnValue .= PHP_EOL . $nv->name;
+
+            if (!empty($nv->value)) {
+                $returnValue .= "=" . $nv->value;
+            }
         }
 
         return $returnValue;
@@ -761,17 +760,19 @@ class WebForms
     {
         $returnValue = "";
 
-        $webFormsDataList = $this->webFormsData;
+        $webFormsDataList = $this->webFormsData->getList();
 
         $i = count($webFormsDataList);
-        foreach ($webFormsDataList as $name => $value) {
-            $returnValue .= $name;
+        foreach ($webFormsDataList as $nv) {
+            $returnValue .= $nv->name;
 
-            if (!empty($value))
-                $returnValue .= "=" . str_replace("\"", "$[dq];", $value);
+            if (!empty($nv->value)) {
+                $returnValue .= "=" . str_replace("\"", "$[dq];", $nv->value);
+            }
 
-            if ($i-- > 1)
+            if ($i-- > 1) {
                 $returnValue .= "$[sln];";
+            }
         }
 
         return $returnValue;
@@ -798,15 +799,15 @@ class WebForms
         return "<web-forms ac=\"" . $this->getFormsActionDataLineBreak() . "\"" . (!empty($id) ? " id=\"" . $id . "\" done=\"true\"" : "") . "></web-forms>";
     }
 
-    public function exportToArrayObject()
+    public function exportToNameValue()
     {
         return $this->webFormsData;
     }
 
     public function appendForm(WebForms $form)
     {
-        foreach ($form->exportToArrayObject() as $name => $value) {
-            $this->webFormsData[$name] = $value;
+        foreach ($form->exportToNameValue() as $name => $value) {
+            $this->webFormsData->addList($name, $value);
         }
     }
 
@@ -817,7 +818,7 @@ class WebForms
 
     public function clean()
     {
-        $this->webFormsData = new ArrayObject();
+        $this->webFormsData = new NameValueCollection();
     }
 }
 
@@ -1158,5 +1159,185 @@ class ExtensionWebFormsMethods
         $lengthToRemove = ($end - $start) + strlen($endString);
 
         return substr($text, 0, $start) . substr($text, $end + strlen($endString));
+    }
+}
+
+class NameValue
+{
+    public $name;
+    public $value;
+
+    public function __construct($name = "", $value = "")
+    {
+        $this->name = $name;
+        $this->value = $value;
+    }
+}
+
+class NameValueCollection
+{
+    private $nameValueList = [];
+
+    public function add($name, $value)
+    {
+        $this->nameValueList[] = new NameValue($name, $value);
+    }
+
+    public function set($name, $value)
+    {
+        if (!$this->exist($name)) {
+            $this->add($name, $value);
+        } else {
+            $this->changeValue($name, $value);
+        }
+    }
+
+    public function delete($name)
+    {
+        $this->nameValueList = array_filter($this->nameValueList, function ($nv) use ($name) {
+            return $nv->name !== $name;
+        });
+    }
+
+    public function deleteByIndex($index)
+    {
+        if ($index < 0) {
+            $index = count($this->nameValueList) + $index;
+        }
+
+        if (isset($this->nameValueList[$index])) {
+            array_splice($this->nameValueList, $index, 1);
+        }
+    }
+
+    public function setEmpty()
+    {
+        $this->nameValueList = [];
+    }
+
+    public function exist($name)
+    {
+        foreach ($this->nameValueList as $nv) {
+            if ($nv->name === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function changeValue($name, $value)
+    {
+        foreach ($this->nameValueList as $nv) {
+            if ($nv->name === $name) {
+                $nv->value = $value;
+                break;
+            }
+        }
+    }
+
+    public function changeName($name, $newName)
+    {
+        foreach ($this->nameValueList as $nv) {
+            if ($nv->name === $name) {
+                $nv->name = $newName;
+                break;
+            }
+        }
+    }
+
+    // Overload
+    public function changeValueByName($name, $newName, $value)
+    {
+        foreach ($this->nameValueList as $nv) {
+            if ($nv->name === $name) {
+                $nv->name = $newName;
+                $nv->value = $value;
+                break;
+            }
+        }
+    }
+
+    public function changeValueByIndex($index, $value)
+    {
+        if ($index < 0) {
+            $index = count($this->nameValueList) + $index;
+        }
+
+        if (isset($this->nameValueList[$index])) {
+            $this->nameValueList[$index]->value = $value;
+        }
+    }
+
+    public function changeNameByIndex($index, $name)
+    {
+        if ($index < 0) {
+            $index = count($this->nameValueList) + $index;
+        }
+
+        if (isset($this->nameValueList[$index])) {
+            $this->nameValueList[$index]->name = $name;
+        }
+    }
+
+    public function changeNameValueByIndex($index, $name, $value)
+    {
+        if ($index < 0) {
+            $index = count($this->nameValueList) + $index;
+        }
+
+        if (isset($this->nameValueList[$index])) {
+            $this->nameValueList[$index]->name = $name;
+            $this->nameValueList[$index]->value = $value;
+        }
+    }
+
+    public function addList($nameValueList)
+    {
+        foreach ($nameValueList as $nv) {
+            $this->nameValueList[] = $nv;
+        }
+    }
+
+    public function getValue($name)
+    {
+        foreach ($this->nameValueList as $nv) {
+            if ($nv->name === $name) {
+                return $nv->value;
+            }
+        }
+
+        return "";
+    }
+
+    public function getNameByIndex($index)
+    {
+        if ($index < 0) {
+            $index = count($this->nameValueList) + $index;
+        }
+
+        if (isset($this->nameValueList[$index])) {
+            return $this->nameValueList[$index]->name;
+        }
+
+        return "";
+    }
+
+    public function getValueByIndex($index)
+    {
+        if ($index < 0) {
+            $index = count($this->nameValueList) + $index;
+        }
+
+        if (isset($this->nameValueList[$index])) {
+            return $this->nameValueList[$index]->value;
+        }
+
+        return "";
+    }
+
+    public function getList()
+    {
+        return $this->nameValueList;
     }
 }
