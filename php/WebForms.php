@@ -1,5 +1,7 @@
 <?php
 
+// Compatible with WebFormsJS version 1.6
+
 class WebForms
 {
     private $webFormsData;
