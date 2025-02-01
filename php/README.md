@@ -46,7 +46,7 @@ if (!empty($_POST['btn_SetBodyValue']))
         <input name="btn_SetBodyValue" type="submit" value="Click to send data" />
 
     </form>
-<body>
+</body>
 </html>
 ```
 
