@@ -13,11 +13,11 @@ def index():
     if request.method == 'POST' and 'btn_SetBodyValue' in request.form:
         name = request.form['txt_Name']
         background_color = request.form['txt_BackgroundColor']
-        font_size = int(request.form['txt_FontSize'])
+        font_size = str(request.form['txt_FontSize'])
 
         form = WebForms()
 
-        form.set_font_size(InputPlace.tag('form'), font_size)
+        form.set_font_size(InputPlace.tag('form'), font_size + 'px')
         form.set_background_color(InputPlace.tag('form'), background_color)
         form.set_disabled(InputPlace.name('btn_SetBodyValue'), True)
 
@@ -31,7 +31,7 @@ def index():
     <html>
     <head>
       <title>Using WebForms Core</title>
-      <script type="text/javascript" src="/script/web-forms.js"></script>
+      <script type="text/javascript" src="https://elanat.net/script/web-forms.js"></script>
     </head>
     <body>
         <form method="post" action="/">
