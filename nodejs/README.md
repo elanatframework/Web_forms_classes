@@ -5,7 +5,7 @@ To use WebForms Core, first copy the WebForms class file in this directory to yo
 ```javascript
 const express = require('express');
 const bodyParser = require('body-parser');
-const WebForms = require('./WebForms');
+const { WebForms, InputPlace } = require('./WebForms');
 
 const app = express();
 const PORT = 3000;
@@ -22,7 +22,6 @@ app.get('/', (req, res) => {
         </head>
         <body>
             <form method="post" action="/" >
-
                 <label for="txt_Name">Your Name</label>
                 <input name="txt_Name" id="txt_Name" type="text" />
                 <br>
@@ -33,9 +32,8 @@ app.get('/', (req, res) => {
                 <input name="txt_BackgroundColor" id="txt_BackgroundColor" type="text" />
                 <br>
                 <input name="btn_SetBodyValue" type="submit" value="Click to send data" />
-
             </form>
-        <body>
+        </body>
         </html>
     `);
 });
