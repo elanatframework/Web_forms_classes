@@ -26,12 +26,14 @@ class WebForms {
         this.webFormsData.add(`ac${inputPlace}`, className);
     }
 
-    addStyle(inputPlace, style) {
-        this.webFormsData.add(`as${inputPlace}`, style);
-    }
-
-    addStyle(inputPlace, name, value) {
-        this.webFormsData.add(`as${inputPlace}`, `${name}:${value}`);
+    addStyle(inputPlace, styleOrName, value = null) {
+        if (value === null) {
+            // Handle the two argument case (inputPlace, style)
+            this.webFormsData.add(`as${inputPlace}`, styleOrName);
+        } else {
+            // Handle the three argument case (inputPlace, name, value)
+            this.webFormsData.add(`as${inputPlace}`, `${styleOrName}:${value}`);
+        }
     }
 
     addOptionTag(inputPlace, text, value, selected = false) {
@@ -76,59 +78,69 @@ class WebForms {
 
     // Set methods
     setId(inputPlace, id) {
-        this.webFormsData.set(`si${inputPlace}`, id);
+        this.webFormsData.add(`si${inputPlace}`, id);
     }
 
     setName(inputPlace, name) {
-        this.webFormsData.set(`sn${inputPlace}`, name);
+        this.webFormsData.add(`sn${inputPlace}`, name);
     }
 
     setValue(inputPlace, value) {
-        this.webFormsData.set(`sv${inputPlace}`, value);
+        this.webFormsData.add(`sv${inputPlace}`, value);
     }
 
     setClass(inputPlace, className) {
-        this.webFormsData.set(`sc${inputPlace}`, className);
+        this.webFormsData.add(`sc${inputPlace}`, className);
     }
 
-    setStyle(inputPlace, style) {
-        this.webFormsData.set(`ss${inputPlace}`, style);
-    }
-
-    setStyle(inputPlace, name, value) {
-        this.webFormsData.set(`ss${inputPlace}`, `${name}:${value}`);
+    setStyle(inputPlace, styleOrName, value = null) {
+        if (value === null) {
+            // Handle the two argument case (inputPlace, style)
+            this.webFormsData.add(`ss${inputPlace}`, styleOrName);
+        } else {
+            // Handle the three argument case (inputPlace, name, value)
+            this.webFormsData.add(`ss${inputPlace}`, `${styleOrName}:${value}`);
+        }
     }
 
     setOptionTag(inputPlace, text, value, selected = false) {
-        this.webFormsData.set(`so${inputPlace}`, `${value}|${text}${selected ? '|1' : ''}`);
+        this.webFormsData.add(`so${inputPlace}`, `${value}|${text}${selected ? '|1' : ''}`);
     }
 
     setChecked(inputPlace, checked = false) {
-        this.webFormsData.set(`sk${inputPlace}`, checked ? "1" : "0");
+        this.webFormsData.add(`sk${inputPlace}`, checked ? "1" : "0");
     }
 
     setCheckBoxTagToList(inputPlace, text, value, checked = false) {
-        this.webFormsData.set(`sk${inputPlace}`, `${value}|${text}${checked ? '|1' : ''}`);
+        this.webFormsData.add(`sk${inputPlace}`, `${value}|${text}${checked ? '|1' : ''}`);
     }
 
     setTitle(inputPlace, title) {
-        this.webFormsData.set(`sl${inputPlace}`, title);
+        this.webFormsData.add(`sl${inputPlace}`, title);
     }
 
     setText(inputPlace, text) {
-        this.webFormsData.set(`st${inputPlace}`, text.replace(/\n/g, "$[ln];"));
+        this.webFormsData.add(`st${inputPlace}`, text.replace(/\n/g, "$[ln];"));
     }
 
     setAttribute(inputPlace, attribute, value = "") {
-        this.webFormsData.set(`sa${inputPlace}`, `${attribute}${value ? `|${value}` : ''}`);
+        this.webFormsData.add(`sa${inputPlace}`, `${attribute}${value ? `|${value}` : ''}`);
     }
 
     setWidth(inputPlace, width) {
-        this.webFormsData.set(`sw${inputPlace}`, width);
+		if (typeof  width === 'string') {
+			this.webFormsData.add(`sw${inputPlace}`, width);
+		} else {
+			this.webFormsData.add(`sw${inputPlace}`, `${width}px`);
+		}
     }
-
+	
     setHeight(inputPlace, height) {
-        this.webFormsData.set(`sh${inputPlace}`, height);
+		if (typeof  height === 'string') {
+			this.webFormsData.add(`sh${inputPlace}`, height);
+		} else {
+			this.webFormsData.add(`sh${inputPlace}`, `${height}px`);
+		}
     }
 
     // Insert methods
@@ -148,12 +160,14 @@ class WebForms {
         this.webFormsData.add(`ic${inputPlace}`, className);
     }
 
-    insertStyle(inputPlace, style) {
-        this.webFormsData.add(`is${inputPlace}`, style);
-    }
-
-    insertStyle(inputPlace, name, value) {
-        this.webFormsData.add(`is${inputPlace}`, `${name}:${value}`);
+    insertStyle(inputPlace, styleOrName, value = null) {
+        if (value === null) {
+            // Handle the two argument case (inputPlace, style)
+            this.webFormsData.add(`is${inputPlace}`, styleOrName);
+        } else {
+            // Handle the three argument case (inputPlace, name, value)
+            this.webFormsData.add(`is${inputPlace}`, `${styleOrName}:${value}`);
+        }
     }
 
     insertOptionTag(inputPlace, text, value, selected = false) {
@@ -253,6 +267,14 @@ class WebForms {
     setFontSize(inputPlace, size) {
         this.webFormsData.add(`fs${inputPlace}`, `${size}px`);
     }
+	
+    setFontSize(inputPlace, size) {
+		if (typeof  size === 'string') {
+			this.webFormsData.add(`fs${inputPlace}`, size);
+		} else {
+			this.webFormsData.add(`fs${inputPlace}`, `${size}px`);
+		}
+    }
 
     setFontBold(inputPlace, bold) {
         this.webFormsData.add(`fb${inputPlace}`, bold ? "1" : "0");
@@ -334,13 +356,13 @@ class WebForms {
         this.webFormsData.add('cs', "1");
     }
 
-    setCache(second) {
-        this.webFormsData.add('cd', String(second));
-    }
-
-    setCache() {
-        this.webFormsData.add('cd', "*");
-    }
+	setCache(second = '*') {
+		if (second === '*') {
+			this.webFormsData.add('cd', "*");
+		} else {
+			this.webFormsData.add('cd', String(second));
+		}
+	}
 
     // Increase and Decrease methods
     increaseMinLength(inputPlace, value) {
@@ -420,7 +442,7 @@ class WebForms {
         this.webFormsData.add(`Eg${inputPlace}`, `${htmlEvent}|${path ? path : "#"}`);
     }
 
-    setGetEvent(inputPlace, htmlEvent, outputPlace, path = null) {
+    setGetEventInOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
         this.webFormsData.add(`Eg${inputPlace}`, `${htmlEvent}|${path ? path : "#"}|${outputPlace}`);
     }
 
@@ -428,7 +450,7 @@ class WebForms {
         this.webFormsData.add(`Eg${inputPlace}`, htmlEvent);
     }
 
-    setGetEventInForm(inputPlace, htmlEvent, outputPlace) {
+    setGetEventInFormInOutputPlace(inputPlace, htmlEvent, outputPlace) {
         this.webFormsData.add(`Eg${inputPlace}`, `${htmlEvent}|${outputPlace}`);
     }
 
@@ -436,7 +458,7 @@ class WebForms {
         this.webFormsData.add(`EG${inputPlace}`, `${htmlEventListener}|${path ? path : "#"}`);
     }
 
-    setGetEventListener(inputPlace, htmlEventListener, outputPlace, path = null) {
+    setGetEventListenerInOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
         this.webFormsData.add(`EG${inputPlace}`, `${htmlEventListener}|${path ? path : "#"}|${outputPlace}`);
     }
 
@@ -444,7 +466,7 @@ class WebForms {
         this.webFormsData.add(`EG${inputPlace}`, htmlEventListener);
     }
 
-    setGetEventInFormListener(inputPlace, htmlEventListener, outputPlace) {
+    setGetEventInFormListenerInOutputPlace(inputPlace, htmlEventListener, outputPlace) {
         this.webFormsData.add(`EG${inputPlace}`, `${htmlEventListener}|${outputPlace}`);
     }
 
@@ -689,12 +711,13 @@ class InputPlace {
 class OutputPlace extends InputPlace {}
 
 class Fetch {
-    static random(maxValue) {
-        return `@mr${maxValue}`;
-    }
-
+	
     static random(minValue, maxValue) {
-        return `@mr${maxValue},${minValue}`;
+        if (arguments.length === 1) {
+            return `@mr${minValue}`; // Is maxValue
+        } else if (arguments.length === 2) {
+            return `@mr${maxValue},${minValue}`;
+        }
     }
 
     static dateYear = "@dy";
@@ -709,40 +732,40 @@ class Fetch {
         return `@co${key}`;
     }
 
-    static session(key) {
-        return `@cs${key}`;
-    }
-
     static session(key, replaceValue) {
-        return `@cs${key},${replaceValue}`;
-    }
-
-    static sessionAndRemove(key) {
-        return `@cl${key}`;
+        if (arguments.length === 1) {
+            return `@cs${key}`;
+        } else if (arguments.length === 2) {
+            return `@cs${key},${replaceValue}`;
+        }
     }
 
     static sessionAndRemove(key, replaceValue) {
-        return `@cl${key},${replaceValue}`;
+        if (arguments.length === 1) {
+            return `@cl${key}`;
+        } else if (arguments.length === 2) {
+            return `@cl${key},${replaceValue}`;
+        }
     }
 
     static saved(key = ".") {
         return `@cl${key}`;
     }
 
-    static cache(key) {
-        return `@cd${key}`;
-    }
-
     static cache(key, replaceValue) {
-        return `@cd${key},${replaceValue}`;
-    }
-
-    static cacheAndRemove(key) {
-        return `@ct${key}`;
+        if (arguments.length === 1) {
+            return `@cd${key}`;
+        } else if (arguments.length === 2) {
+            return `@cd${key},${replaceValue}`;
+        }
     }
 
     static cacheAndRemove(key, replaceValue) {
-        return `@ct${key},${replaceValue}`;
+        if (arguments.length === 1) {
+            return `@ct${key}`;
+        } else if (arguments.length === 2) {
+            return `@ct${key},${replaceValue}`;
+        }
     }
 
     static script(scriptText) {
@@ -970,9 +993,11 @@ class NameValueCollection {
     }
 
     deleteByIndex(index) {
-        if (index >= 0 && index < this.data.length) {
+        if (index >= 0) {
             this.data.splice(index, 1);
-        }
+        } else {
+			this.data.splice(this.data.length + index);
+		}
     }
 
     getValue(name) {
@@ -981,16 +1006,20 @@ class NameValueCollection {
     }
 
     getValueByIndex(index) {
-        if (index >= 0 && index < this.data.length) {
+        if (index >= 0) {
             return this.data[index].value;
-        }
+        } else {
+			return this.data[this.data.length + index].value;
+		}
         return null;
     }
 
     getNameByIndex(index) {
-        if (index >= 0 && index < this.data.length) {
+        if (index >= 0) {
             return this.data[index].name;
-        }
+        } else {
+			return this.data[this.data.length + index].name;
+		}
         return null;
     }
 
@@ -999,22 +1028,30 @@ class NameValueCollection {
     }
 
     changeNameByIndex(index, newName) {
-        if (index >= 0 && index < this.data.length) {
+        if (index >= 0) {
             this.data[index].name = newName;
-        }
+        } else {
+			this.data[this.data.length + index].name = newName;
+		}
     }
 
     changeValueByIndex(index, newValue) {
-        if (index >= 0 && index < this.data.length) {
+        if (index >= 0) {
             this.data[index].value = newValue;
-        }
+        } else {
+			this.data[this.data.length + index].value = newValue;
+		}
     }
 
     changeNameValueByIndex(index, newName, newValue) {
-        if (index >= 0 && index < this.data.length) {
+        if (index >= 0) {
             this.data[index].name = newName;
             this.data[index].value = newValue;
-        }
+        } else {
+		  const adjustedIndex = this.data.length + index;
+		  this.data[adjustedIndex].name = newName;
+		  this.data[adjustedIndex].value = newValue;
+		}
     }
 
     empty() {
