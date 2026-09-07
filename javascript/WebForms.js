@@ -1,2435 +1,1485 @@
-// WebForms.js 2.0 - The Front-End Commander Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
-// Compatible with WebFormsJS version 2.0
+// WebForms.js 2.1 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
+// Compatible with WebFormsJS version 2.1
 
-class WebForms {
+export class WebForms {
+    static GS = "\x1D";
+    static US = "\x1F";
+
     constructor() {
-        this.webFormsData = [];
+        this._webFormsData = "";
     }
 
-    // Private helper methods
-    _addLine(name, value = null) {
-        if (value !== null) {
-            this.webFormsData.push(`${name}=${value}`);
-        } else {
-            this.webFormsData.push(name);
-        }
+    _add(name, value = null) {
+        if (this._webFormsData.length > 0) this._webFormsData += "\n";
+        this._webFormsData += name;
+        if (value !== null) this._webFormsData += "=" + value;
+    }
+
+    _addToUp(name, value = null) {
+        let line = name + (value !== null ? "=" + value : "");
+        if (this._webFormsData.length > 0) line += "\n";
+        this._webFormsData = line + this._webFormsData;
     }
 
     _getLineByIndex(index) {
-        if (this.webFormsData.length === 0 || index < -this.webFormsData.length || index >= this.webFormsData.length) {
-            return "";
-        }
-
-        if (index < 0) {
-            index = this.webFormsData.length + index;
-        }
-
-        return this.webFormsData[index];
+        if (this._webFormsData.length === 0) return "";
+        const lines = this._webFormsData.split("\n");
+        if (index < 0) index = lines.length + index;
+        if (index < 0 || index >= lines.length) return "";
+        return lines[index];
     }
 
     _updateLineByIndex(index, name, value = null) {
-        if (this.webFormsData.length === 0 || index < -this.webFormsData.length || index >= this.webFormsData.length) {
-            return;
-        }
-
-        if (index < 0) {
-            index = this.webFormsData.length + index;
-        }
-
-        if (value !== null) {
-            this.webFormsData[index] = `${name}=${value}`;
-        } else {
-            this.webFormsData[index] = name;
-        }
+        if (this._webFormsData.length === 0) return;
+        const lines = this._webFormsData.split("\n");
+        if (index < 0) index = lines.length + index;
+        if (index < 0 || index >= lines.length) return;
+        lines[index] = name + ((value !== null && value !== "") ? "=" + value : "");
+        this._webFormsData = lines.join("\n");
     }
 
     // For Extension
-    addLine(name, value) {
-        this._addLine(name, value);
-    }
+    addLine(name, value) { this._add(name, value); }
 
-    // Add methods
-    addId(inputPlace, id) {
-        this._addLine(`ai${inputPlace}`, id);
+    // Add
+    // Creates the Data if it does not exist; otherwise, Appends the New Value to the Existing Value.
+    addId(inputPlace, id) { this._add("ai" + inputPlace, id); }
+    addName(inputPlace, name) { this._add("an" + inputPlace, name); }
+    addValue(inputPlace, value) { this._add("av" + inputPlace, value); }
+    addClass(inputPlace, className) { this._add("ac" + inputPlace, className); }
+    
+    addStyle(inputPlace, arg1, arg2 = null) {
+        if (arguments.length === 3) this._add("as" + inputPlace, arg1 + ":" + arg2);
+        else this._add("as" + inputPlace, arg1);
     }
-
-    addName(inputPlace, name) {
-        this._addLine(`an${inputPlace}`, name);
+    
+    addOptionTag(inputPlace, text, value, selected = false) { this._add("ao" + inputPlace, value + WebForms.GS + text + (selected ? WebForms.GS + "1" : "")); }
+    addCheckBoxTag(inputPlace, text, value, checked = false) { this._add("ak" + inputPlace, value + WebForms.GS + text + (checked ? WebForms.GS + "1" : "")); }
+    addTitle(inputPlace, title) { this._add("al" + inputPlace, title); }
+    addLabel(inputPlace, label) { this._add("aA" + inputPlace, label); }
+    addText(inputPlace, text) { this._add("at" + inputPlace, text.replace(/\n/g, "$[ln];")); }
+    addTextToUp(inputPlace, text) { this._add("pt" + inputPlace, text.replace(/\n/g, "$[ln];")); }
+    
+    addAttribute(inputPlace, attribute, value = "", splitter = "") {
+        this._add("aa" + inputPlace, attribute + WebForms.GS + (splitter !== "" ? splitter : "") + ((value !== null && value !== "") ? WebForms.GS + value : ""));
     }
+    
+    addTag(inputPlace, tagName, id = "") { this._add("nt" + inputPlace, tagName + (id !== "" ? WebForms.GS + id : "")); }
+    addTagToUp(inputPlace, tagName, id = "") { this._add("ut" + inputPlace, tagName + (id !== "" ? WebForms.GS + id : "")); }
+    addTagBefore(inputPlace, tagName, id = "") { this._add("bt" + inputPlace, tagName + (id !== "" ? WebForms.GS + id : "")); }
+    addTagAfter(inputPlace, tagName, id = "") { this._add("ft" + inputPlace, tagName + (id !== "" ? WebForms.GS + id : "")); }
+    addHidden(inputPlace, name, value, id = "") { this._add("ah" + inputPlace, name + WebForms.GS + value + (id !== "" ? WebForms.GS + id : "")); }
 
-    addValue(inputPlace, value) {
-        this._addLine(`av${inputPlace}`, value);
+    // Set
+    // Creates the Data if it does not exist; otherwise, Replaces the Existing Value with the New Value.
+    setId(inputPlace, id) { this._add("si" + inputPlace, id); }
+    setName(inputPlace, name) { this._add("sn" + inputPlace, name); }
+    setValue(inputPlace, value) { this._add("sv" + inputPlace, value); }
+    setClass(inputPlace, className) { this._add("sc" + inputPlace, className); }
+    
+    setStyle(inputPlace, arg1, arg2 = null) {
+        if (arguments.length === 3) this._add("ss" + inputPlace, arg1 + ":" + arg2);
+        else this._add("ss" + inputPlace, arg1);
     }
-
-    addClass(inputPlace, className) {
-        this._addLine(`ac${inputPlace}`, className);
-    }
-
-    addStyle(inputPlace, styleOrName, value = null) {
-        if (value === null) {
-            this._addLine(`as${inputPlace}`, styleOrName);
-        } else {
-            this._addLine(`as${inputPlace}`, `${styleOrName}:${value}`);
-        }
-    }
-
-    addOptionTag(inputPlace, text, value, selected = false) {
-        this._addLine(`ao${inputPlace}`, `${value}|${text}${selected ? '|1' : ''}`);
-    }
-
-    addCheckBoxTag(inputPlace, text, value, checked = false) {
-        this._addLine(`ak${inputPlace}`, `${value}|${text}${checked ? '|1' : ''}`);
-    }
-
-    addTitle(inputPlace, title) {
-        this._addLine(`al${inputPlace}`, title);
-    }
-
-    addLabel(inputPlace, label) {
-        this._addLine(`aA${inputPlace}`, label);
-    }
-
-    addText(inputPlace, text) {
-        this._addLine(`at${inputPlace}`, text.replace(/\n/g, "$[ln];"));
-    }
-
-    addTextToUp(inputPlace, text) {
-        this._addLine(`pt${inputPlace}`, text.replace(/\n/g, "$[ln];"));
-    }
-
-    addAttribute(inputPlace, attribute, value = "", splitter = '\0') {
-        const splitterStr = splitter !== '\0' ? splitter : "";
-        const valueStr = value ? `|${value}` : "";
-        this._addLine(`aa${inputPlace}`, `${attribute}|${splitterStr}${valueStr}`);
-    }
-
-    addTag(inputPlace, tagName, id = "") {
-        this._addLine(`nt${inputPlace}`, tagName + (id ? `|${id}` : ''));
-    }
-
-    addTagToUp(inputPlace, tagName, id = "") {
-        this._addLine(`ut${inputPlace}`, tagName + (id ? `|${id}` : ''));
-    }
-
-    addTagBefore(inputPlace, tagName, id = "") {
-        this._addLine(`bt${inputPlace}`, tagName + (id ? `|${id}` : ''));
-    }
-
-    addTagAfter(inputPlace, tagName, id = "") {
-        this._addLine(`ft${inputPlace}`, tagName + (id ? `|${id}` : ''));
-    }
-
-    addHidden(inputPlace, value, id = "") {
-        this._addLine(`ah${inputPlace}`, value + (id ? `|${id}` : ''));
-    }
-
-    // Set methods
-    setId(inputPlace, id) {
-        this._addLine(`si${inputPlace}`, id);
-    }
-
-    setName(inputPlace, name) {
-        this._addLine(`sn${inputPlace}`, name);
-    }
-
-    setValue(inputPlace, value) {
-        this._addLine(`sv${inputPlace}`, value);
-    }
-
-    setClass(inputPlace, className) {
-        this._addLine(`sc${inputPlace}`, className);
-    }
-
-    setStyle(inputPlace, styleOrName, value = null) {
-        if (value === null) {
-            this._addLine(`ss${inputPlace}`, styleOrName);
-        } else {
-            this._addLine(`ss${inputPlace}`, `${styleOrName}:${value}`);
-        }
-    }
-
-    setOptionTag(inputPlace, text, value, selected = false) {
-        this._addLine(`so${inputPlace}`, `${value}|${text}${selected ? '|1' : ''}`);
-    }
-
-    setChecked(inputPlace, checked = false) {
-        this._addLine(`sk${inputPlace}`, checked ? "1" : "0");
-    }
-
-    setCheckBoxTag(inputPlace, text, value, checked = false) {
-        this._addLine(`sk${inputPlace}`, `${value}|${text}${checked ? '|1' : ''}`);
-    }
-
-    setTitle(inputPlace, title) {
-        this._addLine(`sl${inputPlace}`, title);
-    }
-
-    setLabel(inputPlace, label) {
-        this._addLine(`sA${inputPlace}`, label);
-    }
-
-    setText(inputPlace, text) {
-        this._addLine(`st${inputPlace}`, text.replace(/\n/g, "$[ln];"));
-    }
-
-    setAttribute(inputPlace, attribute, value = "") {
-        const valueStr = value ? `|${value}` : "";
-        this._addLine(`sa${inputPlace}`, `${attribute}${valueStr}`);
-    }
-
+    
+    setOptionTag(inputPlace, text, value, selected = false) { this._add("so" + inputPlace, value + WebForms.GS + text + (selected ? WebForms.GS + "1" : "")); }
+    setChecked(inputPlace, checked = false) { this._add("sk" + inputPlace, checked ? "1" : "0"); }
+    setCheckBoxTag(inputPlace, text, value, checked = false) { this._add("sk" + inputPlace, value + WebForms.GS + text + (checked ? WebForms.GS + "1" : "")); }
+    setTitle(inputPlace, title) { this._add("sl" + inputPlace, title); }
+    setLabel(inputPlace, label) { this._add("sA" + inputPlace, label); }
+    setText(inputPlace, text) { this._add("st" + inputPlace, text.replace(/\n/g, "$[ln];")); }
+    setAttribute(inputPlace, attribute, value = "") { this._add("sa" + inputPlace, attribute + WebForms.GS + ((value !== null && value !== "") ? WebForms.GS + value : "")); }
+    
     setWidth(inputPlace, width) {
-        if (typeof width === 'number') {
-            this._addLine(`sw${inputPlace}`, `${width}px`);
-        } else {
-            this._addLine(`sw${inputPlace}`, width);
-        }
+        this._add("sw" + inputPlace, typeof width === "number" ? width + "px" : width);
     }
-
+    
     setHeight(inputPlace, height) {
-        if (typeof height === 'number') {
-            this._addLine(`sh${inputPlace}`, `${height}px`);
-        } else {
-            this._addLine(`sh${inputPlace}`, height);
-        }
+        this._add("sh" + inputPlace, typeof height === "number" ? height + "px" : height);
     }
-
-    setBackgroundColor(inputPlace, color) {
-        this._addLine(`bc${inputPlace}`, color);
-    }
-
-    setTextColor(inputPlace, color) {
-        this._addLine(`tc${inputPlace}`, color);
-    }
-
-    setFontName(inputPlace, name) {
-        this._addLine(`fn${inputPlace}`, name);
-    }
-
+    
+    setBackgroundColor(inputPlace, color) { this._add("bc" + inputPlace, color); }
+    setTextColor(inputPlace, color) { this._add("tc" + inputPlace, color); }
+    setFontName(inputPlace, name) { this._add("fn" + inputPlace, name); }
+    
     setFontSize(inputPlace, size) {
-        if (typeof size === 'number') {
-            this._addLine(`fs${inputPlace}`, `${size}px`);
+        this._add("fs" + inputPlace, typeof size === "number" ? size + "px" : size);
+    }
+    
+    setFontBold(inputPlace, bold) { this._add("fb" + inputPlace, bold ? "1" : "0"); }
+    setVisible(inputPlace, visible) { this._add("vi" + inputPlace, visible ? "1" : "0"); }
+    setTextAlign(inputPlace, align) { this._add("ta" + inputPlace, align); }
+    setReadOnly(inputPlace, readOnly) { this._add("sr" + inputPlace, readOnly ? "1" : "0"); }
+    setDisabled(inputPlace, disabled) { this._add("sd" + inputPlace, disabled ? "1" : "0"); }
+    setFocus(inputPlace, focus) { this._add("sf" + inputPlace, focus ? "1" : "0"); }
+    setMinLength(inputPlace, length) { this._add("mn" + inputPlace, length); }
+    setMaxLength(inputPlace, length) { this._add("mx" + inputPlace, length); }   
+    setSelectedValue(inputPlace, value) { this._add("ts" + inputPlace, value); }
+    setSelectedIndex(inputPlace, index) { this._add("ti" + inputPlace, index); }
+    setCheckedValue(inputPlace, value, checked) { this._add("ks" + inputPlace, value + WebForms.GS + (checked ? "1" : "0")); }
+    setCheckedIndex(inputPlace, index, checked) { this._add("ki" + inputPlace, index + WebForms.GS + (checked ? "1" : "0")); }
+
+    // Insert
+    // Creates the Data only if it does not exist; otherwise, does nothing.
+    insertId(inputPlace, id) { this._add("ii" + inputPlace, id); }
+    insertName(inputPlace, name) { this._add("in" + inputPlace, name); }
+    insertValue(inputPlace, value) { this._add("iv" + inputPlace, value); }
+    insertClass(inputPlace, className) { this._add("ic" + inputPlace, className); }
+    
+    insertStyle(inputPlace, arg1, arg2 = null) {
+        if (arguments.length === 3) this._add("is" + inputPlace, arg1 + ":" + arg2);
+        else this._add("is" + inputPlace, arg1);
+    }
+    
+    insertOptionTag(inputPlace, text, value, selected = false) { this._add("io" + inputPlace, value + WebForms.GS + text + (selected ? WebForms.GS + "1" : "")); }
+    insertCheckBoxTag(inputPlace, text, value, checked = false) { this._add("ik" + inputPlace, value + WebForms.GS + text + (checked ? WebForms.GS + "1" : "")); }
+    insertTitle(inputPlace, title) { this._add("il" + inputPlace, title); }
+    insertLabel(inputPlace, label) { this._add("iA" + inputPlace, label); }
+    insertText(inputPlace, text) { this._add("it" + inputPlace, text.replace(/\n/g, "$[ln];")); }
+    
+    insertAttribute(inputPlace, attribute, value = "", splitter = "") {
+        this._add("ia" + inputPlace, attribute + WebForms.GS + (splitter !== "" ? splitter : "") + ((value !== null && value !== "") ? WebForms.GS + value : ""));
+    }
+
+    // Delete
+    deleteId(inputPlace) { this._add("di" + inputPlace); }
+    deleteName(inputPlace) { this._add("dn" + inputPlace); }
+    deleteValue(inputPlace) { this._add("dv" + inputPlace); }
+    deleteClass(inputPlace, className) { this._add("dc" + inputPlace, className); }
+    deleteStyle(inputPlace, styleName) { this._add("ds" + inputPlace, styleName); }
+    deleteOptionTag(inputPlace, value) { this._add("do" + inputPlace, value); }
+    deleteAllOptionTag(inputPlace) { this._add("do" + inputPlace, "*"); }
+    deleteCheckBoxTag(inputPlace, value) { this._add("dk" + inputPlace, value); }
+    deleteAllCheckBoxTag(inputPlace) { this._add("dk" + inputPlace, "*"); }
+    deleteTitle(inputPlace) { this._add("dl" + inputPlace); }
+    deleteLabel(inputPlace) { this._add("dA" + inputPlace); }
+    deleteText(inputPlace) { this._add("dt" + inputPlace); }
+    deleteAttribute(inputPlace, attribute) { this._add("da" + inputPlace, attribute); }
+    delete(inputPlace) { this._add("de" + inputPlace); }
+    deleteParent(inputPlace) { this._add("dp" + inputPlace); }
+
+    // Tag
+    swapTag(inputPlace, outputPlace) { this._add("sp" + inputPlace, outputPlace); }
+    setReflection(inputPlace, tag) { this._add("sR" + inputPlace, tag); }
+    setReflectionByOutputPlace(inputPlace, outputPlace) { this._add("iR" + inputPlace, outputPlace); }
+    setMorph(inputPlace, tag) { this._add("sM" + inputPlace, tag); }
+    setMorphByOutputPlace(inputPlace, outputPlace) { this._add("iM" + inputPlace, outputPlace); }
+
+    // Browser
+    changeUrl(url) { this._add("cu", url); }
+    setHeadTitle(title) { this._add("ht", title); }
+    clipboardWriteText(text) { this._add("nw", text); }
+    scrollTo(x, y) { this._add("ws", x + WebForms.GS + y); }
+    historyGo(steps) { this._add("wg", steps); }
+    reloadPage() { this._add("lr"); }
+    redirect(path) { this._add("lh", path); }
+
+    // Increase
+    increaseMinLength(inputPlace, value) { this._add("+n" + inputPlace, value); }
+    increaseMaxLength(inputPlace, value) { this._add("+x" + inputPlace, value); }
+    increaseFontSize(inputPlace, value) { this._add("+f" + inputPlace, value); }
+    increaseWidth(inputPlace, value) { this._add("+w" + inputPlace, value); }
+    increaseHeight(inputPlace, value) { this._add("+h" + inputPlace, value); }
+    increaseValue(inputPlace, value) { this._add("+v" + inputPlace, value); }
+
+    // Decrease
+    decreaseMinLength(inputPlace, value) { this._add("-n" + inputPlace, value); }
+    decreaseMaxLength(inputPlace, value) { this._add("-x" + inputPlace, value); }
+    decreaseFontSize(inputPlace, value) { this._add("-f" + inputPlace, value); }
+    decreaseWidth(inputPlace, value) { this._add("-w" + inputPlace, value); }
+    decreaseHeight(inputPlace, value) { this._add("-h" + inputPlace, value); }
+    decreaseValue(inputPlace, value) { this._add("-v" + inputPlace, value); }
+
+    // Event
+    // ConstructorName: mouseevent, keyboardevent, uievent, focusevent, inputevent, event
+    // All Method in "Event" Section Only Support Dynamic Args Once. To Support Invoking Dynamic Arguments on a Momentary Basis, Use "EventListener" Section Methods.
+    triggerEvent(inputPlace, htmlEventListener, constructorName = null) { this._add("TE" + inputPlace, htmlEventListener + (constructorName !== null ? WebForms.GS + constructorName : "")); }
+    
+    setPostEvent(inputPlace, htmlEvent, arg1 = null) {
+        if (arguments.length === 3) this._add("Ep" + inputPlace, htmlEvent + WebForms.GS + arg1);
+        else this._add("Ep" + inputPlace, htmlEvent);
+    }
+    setPostEventAddView(inputPlace, htmlEvent) { this._add("Ep" + inputPlace, htmlEvent + WebForms.GS + "+"); }
+    
+    setPostEventListener(inputPlace, htmlEventListener, arg1 = null) {
+        if (arguments.length === 3) this._add("EP" + inputPlace, htmlEventListener + WebForms.GS + arg1);
+        else this._add("EP" + inputPlace, htmlEventListener);
+    }
+    setPostEventListenerAddView(inputPlace, htmlEventListener) { this._add("EP" + inputPlace, htmlEventListener + WebForms.GS + "+"); }
+    
+    setGetEvent(inputPlace, htmlEvent, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("Eg" + inputPlace, htmlEvent + WebForms.GS + path);
         } else {
-            this._addLine(`fs${inputPlace}`, size);
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("Eg" + inputPlace, htmlEvent + WebForms.GS + path + WebForms.GS + arg1);
         }
     }
-
-    setFontBold(inputPlace, bold) {
-        this._addLine(`fb${inputPlace}`, bold ? "1" : "0");
-    }
-
-    setVisible(inputPlace, visible) {
-        this._addLine(`vi${inputPlace}`, visible ? "1" : "0");
-    }
-
-    setTextAlign(inputPlace, align) {
-        this._addLine(`ta${inputPlace}`, align);
-    }
-
-    setReadOnly(inputPlace, readOnly) {
-        this._addLine(`sr${inputPlace}`, readOnly ? "1" : "0");
-    }
-
-    setDisabled(inputPlace, disabled) {
-        this._addLine(`sd${inputPlace}`, disabled ? "1" : "0");
-    }
-
-    setFocus(inputPlace, focus) {
-        this._addLine(`sf${inputPlace}`, focus ? "1" : "0");
-    }
-
-    setMinLength(inputPlace, length) {
-        this._addLine(`mn${inputPlace}`, String(length));
-    }
-
-    setMaxLength(inputPlace, length) {
-        this._addLine(`mx${inputPlace}`, String(length));
-    }
-
-    setSelectedValue(inputPlace, value) {
-        this._addLine(`ts${inputPlace}`, value);
-    }
-
-    setSelectedIndex(inputPlace, index) {
-        this._addLine(`ti${inputPlace}`, String(index));
-    }
-
-    setCheckedValue(inputPlace, value, selected) {
-        this._addLine(`ks${inputPlace}`, `${value}|${selected ? "1" : "0"}`);
-    }
-
-    setCheckedIndex(inputPlace, index, selected) {
-        this._addLine(`ki${inputPlace}`, `${index}|${selected ? "1" : "0"}`);
-    }
-
-    // Insert methods
-    insertId(inputPlace, id) {
-        this._addLine(`ii${inputPlace}`, id);
-    }
-
-    insertName(inputPlace, name) {
-        this._addLine(`in${inputPlace}`, name);
-    }
-
-    insertValue(inputPlace, value) {
-        this._addLine(`iv${inputPlace}`, value);
-    }
-
-    insertClass(inputPlace, className) {
-        this._addLine(`ic${inputPlace}`, className);
-    }
-
-    insertStyle(inputPlace, styleOrName, value = null) {
-        if (value === null) {
-            this._addLine(`is${inputPlace}`, styleOrName);
+    
+    setGetEventListener(inputPlace, htmlEventListener, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("EG" + inputPlace, htmlEventListener + WebForms.GS + path);
         } else {
-            this._addLine(`is${inputPlace}`, `${styleOrName}:${value}`);
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("EG" + inputPlace, htmlEventListener + WebForms.GS + path + WebForms.GS + arg1);
         }
     }
-
-    insertOptionTag(inputPlace, text, value, selected = false) {
-        this._addLine(`io${inputPlace}`, `${value}|${text}${selected ? '|1' : ''}`);
-    }
-
-    insertCheckBoxTag(inputPlace, text, value, checked = false) {
-        this._addLine(`ik${inputPlace}`, `${value}|${text}${checked ? '|1' : ''}`);
-    }
-
-    insertTitle(inputPlace, title) {
-        this._addLine(`il${inputPlace}`, title);
-    }
-
-    insertLabel(inputPlace, label) {
-        this._addLine(`iA${inputPlace}`, label);
-    }
-
-    insertText(inputPlace, text) {
-        this._addLine(`it${inputPlace}`, text.replace(/\n/g, "$[ln];"));
-    }
-
-    insertAttribute(inputPlace, attribute, value = "", splitter = '\0') {
-        const splitterStr = splitter !== '\0' ? splitter : "";
-        const valueStr = value ? `|${value}` : "";
-        this._addLine(`ia${inputPlace}`, `${attribute}|${splitterStr}${valueStr}`);
-    }
-
-    // Delete methods
-    deleteId(inputPlace) {
-        this._addLine(`di${inputPlace}`);
-    }
-
-    deleteName(inputPlace) {
-        this._addLine(`dn${inputPlace}`);
-    }
-
-    deleteValue(inputPlace) {
-        this._addLine(`dv${inputPlace}`);
-    }
-
-    deleteClass(inputPlace, className) {
-        this._addLine(`dc${inputPlace}`, className);
-    }
-
-    deleteStyle(inputPlace, styleName) {
-        this._addLine(`ds${inputPlace}`, styleName);
-    }
-
-    deleteOptionTag(inputPlace, value) {
-        this._addLine(`do${inputPlace}`, value);
-    }
-
-    deleteAllOptionTag(inputPlace) {
-        this._addLine(`do${inputPlace}`, "*");
-    }
-
-    deleteCheckBoxTag(inputPlace, value) {
-        this._addLine(`dk${inputPlace}`, value);
-    }
-
-    deleteAllCheckBoxTag(inputPlace) {
-        this._addLine(`dk${inputPlace}`, "*");
-    }
-
-    deleteTitle(inputPlace) {
-        this._addLine(`dl${inputPlace}`);
-    }
-
-    deleteLabel(inputPlace) {
-        this._addLine(`dA${inputPlace}`);
-    }
-
-    deleteText(inputPlace) {
-        this._addLine(`dt${inputPlace}`);
-    }
-
-    deleteAttribute(inputPlace, attribute) {
-        this._addLine(`da${inputPlace}`, attribute);
-    }
-
-    delete(inputPlace) {
-        this._addLine(`de${inputPlace}`);
-    }
-
-    deleteParent(inputPlace) {
-        this._addLine(`dp${inputPlace}`);
-    }
-
-    // Tag methods
-    swapTag(inputPlace, outputPlace) {
-        this._addLine(`sp${inputPlace}`, outputPlace);
-    }
-
-    setReflection(inputPlace, tag) {
-        this._addLine(`sR${inputPlace}`, tag);
-    }
-
-    setReflectionByOutputPlace(inputPlace, outputPlace) {
-        this._addLine(`iR${inputPlace}`, outputPlace);
-    }
-
-    // Browser methods
-    changeUrl(url) {
-        this._addLine(`cu`, url);
-    }
-
-    setHeadTitle(title) {
-        this._addLine(`ht`, title);
-    }
-
-    clipboardWriteText(text) {
-        this._addLine(`nw`, text);
-    }
-
-    scrollTo(x, y) {
-        this._addLine(`ws`, `${x}|${y}`);
-    }
-
-    historyGo(steps) {
-        this._addLine(`wg`, String(steps));
-    }
-
-    reloadPage() {
-        this._addLine(`lr`);
-    }
-
-    redirect(path) {
-        this._addLine(`lh`, path);
-    }
-
-    // Increase methods
-    increaseMinLength(inputPlace, value) {
-        this._addLine(`+n${inputPlace}`, String(value));
-    }
-
-    increaseMaxLength(inputPlace, value) {
-        this._addLine(`+x${inputPlace}`, String(value));
-    }
-
-    increaseFontSize(inputPlace, value) {
-        this._addLine(`+f${inputPlace}`, String(value));
-    }
-
-    increaseWidth(inputPlace, value) {
-        this._addLine(`+w${inputPlace}`, String(value));
-    }
-
-    increaseHeight(inputPlace, value) {
-        this._addLine(`+h${inputPlace}`, String(value));
-    }
-
-    increaseValue(inputPlace, value) {
-        this._addLine(`+v${inputPlace}`, String(value));
-    }
-
-    // Decrease methods
-    decreaseMinLength(inputPlace, value) {
-        this._addLine(`-n${inputPlace}`, String(value));
-    }
-
-    decreaseMaxLength(inputPlace, value) {
-        this._addLine(`-x${inputPlace}`, String(value));
-    }
-
-    decreaseFontSize(inputPlace, value) {
-        this._addLine(`-f${inputPlace}`, String(value));
-    }
-
-    decreaseWidth(inputPlace, value) {
-        this._addLine(`-w${inputPlace}`, String(value));
-    }
-
-    decreaseHeight(inputPlace, value) {
-        this._addLine(`-h${inputPlace}`, String(value));
-    }
-
-    decreaseValue(inputPlace, value) {
-        this._addLine(`-v${inputPlace}`, String(value));
-    }
-
-    // Event methods
-    triggerEvent(inputPlace, htmlEventListener, constructorName = null) {
-        this._addLine(`TE${inputPlace}`, htmlEventListener + (constructorName ? `|${constructorName}` : ""));
-    }
-
-    setPostEvent(inputPlace, htmlEvent) {
-        this._addLine(`Ep${inputPlace}`, htmlEvent);
-    }
-
-    setPostEventView(inputPlace, htmlEvent) {
-        this._addLine(`Ep${inputPlace}`, `${htmlEvent}|+`);
-    }
-
-    setPostEventTo(inputPlace, htmlEvent, outputPlace) {
-        this._addLine(`Ep${inputPlace}`, `${htmlEvent}|${outputPlace}`);
-    }
-
-    setPostEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`EP${inputPlace}`, htmlEventListener);
-    }
-
-    setPostEventListenerView(inputPlace, htmlEventListener) {
-        this._addLine(`EP${inputPlace}`, `${htmlEventListener}|+`);
-    }
-
-    setPostEventListenerTo(inputPlace, htmlEventListener, outputPlace) {
-        this._addLine(`EP${inputPlace}`, `${htmlEventListener}|${outputPlace}`);
-    }
-
-    setGetEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`Eg${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setGetEventWithOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
-        this._addLine(`Eg${inputPlace}`, `${htmlEvent}|${path || "#"}|${outputPlace}`);
-    }
-
-    setGetEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`EG${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setGetEventListenerWithOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
-        this._addLine(`EG${inputPlace}`, `${htmlEventListener}|${path || "#"}|${outputPlace}`);
-    }
-
-    setPatchEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`Ea${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setPatchEventWithOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
-        this._addLine(`Ea${inputPlace}`, `${htmlEvent}|${path || "#"}|${outputPlace}`);
-    }
-
-    setPatchEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`EA${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setPatchEventListenerWithOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
-        this._addLine(`EA${inputPlace}`, `${htmlEventListener}|${path || "#"}|${outputPlace}`);
-    }
-
-    setDeleteEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`El${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setDeleteEventWithOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
-        this._addLine(`El${inputPlace}`, `${htmlEvent}|${path || "#"}|${outputPlace}`);
-    }
-
-    setDeleteEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`EL${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setDeleteEventListenerWithOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
-        this._addLine(`EL${inputPlace}`, `${htmlEventListener}|${path || "#"}|${outputPlace}`);
-    }
-
-    setOptionsEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`Eo${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setOptionsEventWithOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
-        this._addLine(`Eo${inputPlace}`, `${htmlEvent}|${path || "#"}|${outputPlace}`);
-    }
-
-    setOptionsEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`EO${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setOptionsEventListenerWithOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
-        this._addLine(`EO${inputPlace}`, `${htmlEventListener}|${path || "#"}|${outputPlace}`);
-    }
-
-    setTraceEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`Er${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setTraceEventWithOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
-        this._addLine(`Er${inputPlace}`, `${htmlEvent}|${path || "#"}|${outputPlace}`);
-    }
-
-    setTraceEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`ER${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setTraceEventListenerWithOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
-        this._addLine(`ER${inputPlace}`, `${htmlEventListener}|${path || "#"}|${outputPlace}`);
-    }
-
-    setConnectEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`Ec${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setConnectEventWithOutputPlace(inputPlace, htmlEvent, outputPlace, path = null) {
-        this._addLine(`Ec${inputPlace}`, `${htmlEvent}|${path || "#"}|${outputPlace}`);
-    }
-
-    setConnectEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`EC${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setConnectEventListenerWithOutputPlace(inputPlace, htmlEventListener, outputPlace, path = null) {
-        this._addLine(`EC${inputPlace}`, `${htmlEventListener}|${path || "#"}|${outputPlace}`);
-    }
-
-    setHeadEvent(inputPlace, htmlEvent, path = null) {
-        this._addLine(`Eh${inputPlace}`, `${htmlEvent}|${path || "#"}`);
-    }
-
-    setHeadEventListener(inputPlace, htmlEventListener, path = null) {
-        this._addLine(`EH${inputPlace}`, `${htmlEventListener}|${path || "#"}`);
-    }
-
-    setTagEvent(inputPlace, htmlEvent, outputPlace) {
-        this._addLine(`Et${inputPlace}`, `${htmlEvent}|${outputPlace}`);
-    }
-
-    setTagEventListener(inputPlace, htmlEventListener, outputPlace) {
-        this._addLine(`ET${inputPlace}`, `${htmlEventListener}|${outputPlace}`);
-    }
-
-    setCommentEvent(inputPlace, htmlEvent, index = null, outputPlace = null) {
-        this._addLine(`Eb${inputPlace}`, `${htmlEvent}|${index || ""}|${outputPlace || ""}`);
-    }
-
-    setCommentEventListener(inputPlace, htmlEventListener, index = null, outputPlace = null) {
-        this._addLine(`EB${inputPlace}`, `${htmlEventListener}|${index || ""}|${outputPlace || ""}`);
-    }
-
-    setWasmEvent(inputPlace, htmlEvent, wasmLanguage, wasmUrl, methodName, args = null, outputPlace = null) {
-        const argsJoin = args && args.length > 0 ? args.join(",") : "";
-        this._addLine(`Ey${inputPlace}`, `${htmlEvent}|${wasmLanguage}|${wasmUrl}|${methodName}|${argsJoin}|${outputPlace || ""}`);
-    }
-
-    setWasmEventListener(inputPlace, htmlEventListener, wasmLanguage, wasmUrl, methodName, args = null, outputPlace = null) {
-        const argsJoin = args && args.length > 0 ? args.join(",") : "";
-        this._addLine(`EY${inputPlace}`, `${htmlEventListener}|${wasmLanguage}|${wasmUrl}|${methodName}|${argsJoin}|${outputPlace || ""}`);
-    }
-
-    setWebSocketEvent(inputPlace, htmlEvent, path) {
-        this._addLine(`Ew${inputPlace}`, `${htmlEvent}|${path}`);
-    }
-
-    setWebSocketEventListener(inputPlace, htmlEventListener, path) {
-        this._addLine(`EW${inputPlace}`, `${htmlEventListener}|${path}`);
-    }
-
-    setSSEEvent(inputPlace, htmlEvent, path, shouldReconnect = true, reconnectTryTimeout = 3000) {
-        this._addLine(`Ee${inputPlace}`, `${htmlEvent}|${path}|${shouldReconnect ? "1" : "0"}|${reconnectTryTimeout}`);
-    }
-
-    setSSEEventWithOutputPlace(inputPlace, htmlEvent, path, outputPlace, shouldReconnect = true, reconnectTryTimeout = 3000) {
-        this._addLine(`Ee${inputPlace}`, `${htmlEvent}|${path}|${shouldReconnect ? "1" : "0"}|${reconnectTryTimeout}|${outputPlace}`);
-    }
-
-    setSSEEventListener(inputPlace, htmlEventListener, path, shouldReconnect = true, reconnectTryTimeout = 3000) {
-        this._addLine(`EE${inputPlace}`, `${htmlEventListener}|${path}|${shouldReconnect ? "1" : "0"}|${reconnectTryTimeout}`);
-    }
-
-    setSSEEventListenerWithOutputPlace(inputPlace, htmlEventListener, path, outputPlace, shouldReconnect = true, reconnectTryTimeout = 3000) {
-        this._addLine(`EE${inputPlace}`, `${htmlEventListener}|${path}|${shouldReconnect ? "1" : "0"}|${reconnectTryTimeout}|${outputPlace}`);
-    }
-
-    setFrontEvent(inputPlace, htmlEvent, modulePath, args = null, outputPlace = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`Ej${inputPlace}`, `${htmlEvent}|${modulePath}|${outputPlace || ""}${argsJoin}`);
-    }
-
-    setFrontEventListener(inputPlace, htmlEventListener, modulePath, args = null, outputPlace = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`EJ${inputPlace}`, `${htmlEventListener}|${modulePath}|${outputPlace || ""}${argsJoin}`);
-    }
-
+    
+    setPutEvent(inputPlace, htmlEvent, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("Et" + inputPlace, htmlEvent + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("Et" + inputPlace, htmlEvent + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setPutEventListener(inputPlace, htmlEventListener, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("ET" + inputPlace, htmlEventListener + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("ET" + inputPlace, htmlEventListener + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setPatchEvent(inputPlace, htmlEvent, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("Ea" + inputPlace, htmlEvent + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("Ea" + inputPlace, htmlEvent + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setPatchEventListener(inputPlace, htmlEventListener, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("EA" + inputPlace, htmlEventListener + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("EA" + inputPlace, htmlEventListener + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setDeleteEvent(inputPlace, htmlEvent, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("El" + inputPlace, htmlEvent + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("El" + inputPlace, htmlEvent + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setDeleteEventListener(inputPlace, htmlEventListener, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("EL" + inputPlace, htmlEventListener + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("EL" + inputPlace, htmlEventListener + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setOptionsEvent(inputPlace, htmlEvent, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("Eo" + inputPlace, htmlEvent + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("Eo" + inputPlace, htmlEvent + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setOptionsEventListener(inputPlace, htmlEventListener, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            const path = arg1 !== null ? arg1 : "#";
+            this._add("EO" + inputPlace, htmlEventListener + WebForms.GS + path);
+        } else {
+            const path = arg2 !== null ? arg2 : "#";
+            this._add("EO" + inputPlace, htmlEventListener + WebForms.GS + path + WebForms.GS + arg1);
+        }
+    }
+    
+    setHeadEvent(inputPlace, htmlEvent, path = null) { this._add("Eh" + inputPlace, htmlEvent + WebForms.GS + (path !== null ? path : "#")); }
+    setHeadEventListener(inputPlace, htmlEventListener, path = null) { this._add("EH" + inputPlace, htmlEventListener + WebForms.GS + (path !== null ? path : "#")); }
+    
+    // IsMultiPart: If this value is true, the data will be sent based on the Form and with the "content" key.
     setSendEvent(inputPlace, htmlEvent, data, path = null, method = "POST", isMultiPart = false, contentType = "text/plain", outputPlace = null) {
-        const safeData = data.replace(/\n/g, "$[ln];").replace(/"/g, "$[dq];").replace(/'/g, "$[sq];");
-        this._addLine(`En${inputPlace}`, `${htmlEvent}|${safeData}|${path || "#"}|${method}|${isMultiPart ? "1" : "0"}|${contentType}|${outputPlace || ""}`);
+        this._add("En" + inputPlace, htmlEvent + WebForms.GS + data.replace(/\n/g, "$[ln];").replace(/"/g, "$[dq];").replace(/'/g, "$[sq];") + WebForms.GS + (path !== null ? path : "#") + WebForms.GS + method + WebForms.GS + (isMultiPart ? "1" : "0") + WebForms.GS + contentType + WebForms.GS + outputPlace);
     }
-
+    
     setSendEventListener(inputPlace, htmlEventListener, data, path = null, method = "POST", isMultiPart = false, contentType = "text/plain", outputPlace = null) {
-        const safeData = data.replace(/\n/g, "$[ln];");
-        this._addLine(`EN${inputPlace}`, `${htmlEventListener}|${safeData}|${path || "#"}|${method}|${isMultiPart ? "1" : "0"}|${contentType}|${outputPlace || ""}`);
+        this._add("EN" + inputPlace, htmlEventListener + WebForms.GS + data.replace(/\n/g, "$[ln];") + WebForms.GS + (path !== null ? path : "#") + WebForms.GS + method + WebForms.GS + (isMultiPart ? "1" : "0") + WebForms.GS + contentType + WebForms.GS + outputPlace);
     }
-
-    setMasterPagesEvent(inputPlace, htmlEvent, outputPlace = null) {
-        this._addLine(`Eu${inputPlace}`, `${htmlEvent}|${outputPlace || ""}`);
+    
+    setCommentEvent(inputPlace, htmlEvent, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            this._add("Eb" + inputPlace, htmlEvent + WebForms.GS + arg1 + WebForms.GS + "");
+        } else {
+            this._add("Eb" + inputPlace, htmlEvent + WebForms.GS + arg1 + WebForms.GS + arg2);
+        }
     }
-
-    setMasterPagesEventListener(inputPlace, htmlEventListener, outputPlace = null) {
-        this._addLine(`EU${inputPlace}`, `${htmlEventListener}|${outputPlace || ""}`);
+    
+    setCommentEventListener(inputPlace, htmlEventListener, arg1 = null, arg2 = null) {
+        if (arguments.length === 3) {
+            this._add("EB" + inputPlace, htmlEventListener + WebForms.GS + arg1 + WebForms.GS + "");
+        } else {
+            this._add("EB" + inputPlace, htmlEventListener + WebForms.GS + arg1 + WebForms.GS + arg2);
+        }
     }
-
-    setPreventDefaultEvent(inputPlace, htmlEvent) {
-        this._addLine(`Ed${inputPlace}`, htmlEvent);
+    
+    setWasmEvent(inputPlace, htmlEvent, wasmLanguage, wasmUrl, methodName, args = null, outputPlace = null) {
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = "[" + args.map(String).join(WebForms.US);
+        this._add("Ey" + inputPlace, htmlEvent + WebForms.GS + wasmLanguage + WebForms.GS + wasmUrl + WebForms.GS + methodName + WebForms.GS + argsJoin + WebForms.GS + outputPlace);
     }
-
-    setPreventDefaultEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`ED${inputPlace}`, htmlEventListener);
+    
+    setWasmEventListener(inputPlace, htmlEventListener, wasmLanguage, wasmUrl, methodName, args = null, outputPlace = null) {
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = "[" + args.map(String).join(WebForms.US);
+        this._add("EY" + inputPlace, htmlEventListener + WebForms.GS + wasmLanguage + WebForms.GS + wasmUrl + WebForms.GS + methodName + WebForms.GS + argsJoin + WebForms.GS + outputPlace);
     }
-
-    setStopPropagationEvent(inputPlace, htmlEvent) {
-        this._addLine(`Es${inputPlace}`, htmlEvent);
+    
+    setWebSocketEvent(inputPlace, htmlEvent, path) { this._add("Ew" + inputPlace, htmlEvent + WebForms.GS + path); }
+    setWebSocketEventListener(inputPlace, htmlEventListener, path) { this._add("EW" + inputPlace, htmlEventListener + WebForms.GS + path); }
+    
+    setSSEEvent(inputPlace, htmlEvent, path, arg1 = true, arg2 = 3000, arg3 = null) {
+        let outputPlace = null, shouldReconnect = true, reconnectTryTimeout = 3000;
+        if (arguments.length === 6) { outputPlace = arg1; shouldReconnect = arg2; reconnectTryTimeout = arg3; }
+        else { shouldReconnect = arg1; reconnectTryTimeout = arg2; }
+        let val = htmlEvent + WebForms.GS + path + WebForms.GS + (shouldReconnect ? "1" : "0") + WebForms.GS + reconnectTryTimeout;
+        if (outputPlace !== null) val += WebForms.GS + outputPlace;
+        this._add("Ee" + inputPlace, val);
     }
-
-    setStopPropagationEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`ES${inputPlace}`, htmlEventListener);
+    
+    setSSEEventListener(inputPlace, htmlEventListener, path, arg1 = true, arg2 = 3000, arg3 = null) {
+        let outputPlace = null, shouldReconnect = true, reconnectTryTimeout = 3000;
+        if (arguments.length === 6) { outputPlace = arg1; shouldReconnect = arg2; reconnectTryTimeout = arg3; }
+        else { shouldReconnect = arg1; reconnectTryTimeout = arg2; }
+        let val = htmlEventListener + WebForms.GS + path + WebForms.GS + (shouldReconnect ? "1" : "0") + WebForms.GS + reconnectTryTimeout;
+        if (outputPlace !== null) val += WebForms.GS + outputPlace;
+        this._add("EE" + inputPlace, val);
     }
-
+    
+    setFrontEvent(inputPlace, htmlEvent, modulePath, args = null, outputPlace = null) {
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("Ej" + inputPlace, htmlEvent + WebForms.GS + modulePath + WebForms.GS + outputPlace + argsJoin);
+    }
+    
+    setFrontEventListener(inputPlace, htmlEventListener, modulePath, args = null, outputPlace = null) {
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("EJ" + inputPlace, htmlEventListener + WebForms.GS + modulePath + WebForms.GS + outputPlace + argsJoin);
+    }
+    
+    setMasterPagesEvent(inputPlace, htmlEvent, outputPlace = null) { this._add("Eu" + inputPlace, htmlEvent + WebForms.GS + outputPlace); }
+    setMasterPagesEventListener(inputPlace, htmlEventListener, outputPlace = null) { this._add("EU" + inputPlace, htmlEventListener + WebForms.GS + outputPlace); }
+    setPreventDefaultEvent(inputPlace, htmlEvent) { this._add("Ed" + inputPlace, htmlEvent); }
+    setPreventDefaultEventListener(inputPlace, htmlEventListener) { this._add("ED" + inputPlace, htmlEventListener); }
+    setStopPropagationEvent(inputPlace, htmlEvent) { this._add("Es" + inputPlace, htmlEvent); }
+    setStopPropagationEventListener(inputPlace, htmlEventListener) { this._add("ES" + inputPlace, htmlEventListener); }
+    
     setMethodEvent(inputPlace, htmlEvent, methodName, args = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`Em${inputPlace}`, `${htmlEvent}|${methodName}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("Em" + inputPlace, htmlEvent + WebForms.GS + methodName + argsJoin);
     }
-
+    
     setMethodEventListener(inputPlace, htmlEventListener, methodName, args = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`EM${inputPlace}`, `${htmlEventListener}|${methodName}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("EM" + inputPlace, htmlEventListener + WebForms.GS + methodName + argsJoin);
     }
-
+    
     setModuleMethodEvent(inputPlace, htmlEvent, methodName, args = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`Ex${inputPlace}`, `${htmlEvent}|${methodName}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("Ex" + inputPlace, htmlEvent + WebForms.GS + methodName + argsJoin);
     }
-
+    
     setModuleMethodEventListener(inputPlace, htmlEventListener, methodName, args = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`EX${inputPlace}`, `${htmlEventListener}|${methodName}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("EX" + inputPlace, htmlEventListener + WebForms.GS + methodName + argsJoin);
     }
-
+    
     assignConfirmEvent(inputPlace, htmlEvent, text = "Are you sure you want to proceed?", type = "none", title = "Confirm", okText = "OK", cancelText = "Cancel") {
-        const textStr = text === "Are you sure you want to proceed?" ? "" : text;
-        const typeStr = type === "none" ? "" : type;
-        const titleStr = title === "Confirm" ? "" : title;
-        const okTextStr = okText === "OK" ? "" : okText;
-        const cancelTextStr = cancelText === "Cancel" ? "" : cancelText;
-        this._addLine(`Ef${inputPlace}`, `${htmlEvent}|${textStr}|${typeStr}|${titleStr}|${okTextStr}|${cancelTextStr}`);
+        this._add("Ef" + inputPlace, htmlEvent + WebForms.GS + (text === "Are you sure you want to proceed?" ? "" : text) + WebForms.GS + (type === "none" ? "" : type) + WebForms.GS + (title === "Confirm" ? "" : title) + WebForms.GS + (okText === "OK" ? "" : okText) + WebForms.GS + (cancelText === "Cancel" ? "" : cancelText));
     }
+    
+    removePostEvent(inputPlace, htmlEvent) { this._add("Rp" + inputPlace, htmlEvent); }
+    removePostEventListener(inputPlace, htmlEventListener) { this._add("RP" + inputPlace, htmlEventListener); }
+    removeGetEvent(inputPlace, htmlEvent) { this._add("Rg" + inputPlace, htmlEvent); }
+    removeGetEventListener(inputPlace, htmlEventListener) { this._add("RG" + inputPlace, htmlEventListener); }
+    removePutEvent(inputPlace, htmlEvent) { this._add("Rt" + inputPlace, htmlEvent); }
+    removePutEventListener(inputPlace, htmlEventListener) { this._add("RT" + inputPlace, htmlEventListener); }
+    removePatchEvent(inputPlace, htmlEvent) { this._add("Ra" + inputPlace, htmlEvent); }
+    removePatchEventListener(inputPlace, htmlEventListener) { this._add("RA" + inputPlace, htmlEventListener); }
+    removeDeleteEvent(inputPlace, htmlEvent) { this._add("Rl" + inputPlace, htmlEvent); }
+    removeDeleteEventListener(inputPlace, htmlEventListener) { this._add("RL" + inputPlace, htmlEventListener); }
+    removeOptionsEvent(inputPlace, htmlEvent) { this._add("Ro" + inputPlace, htmlEvent); }
+    removeOptionsEventListener(inputPlace, htmlEventListener) { this._add("RO" + inputPlace, htmlEventListener); }
+    removeHeadEvent(inputPlace, htmlEvent) { this._add("Rh" + inputPlace, htmlEvent); }
+    removeHeadEventListener(inputPlace, htmlEventListener) { this._add("RH" + inputPlace, htmlEventListener); }
+    removeSendEvent(inputPlace, htmlEvent) { this._add("Rn" + inputPlace, htmlEvent); }
+    removeSendEventListener(inputPlace, htmlEventListener) { this._add("RN" + inputPlace, htmlEventListener); }
+    removeCommentEvent(inputPlace, htmlEvent) { this._add("Rb" + inputPlace, htmlEvent); }
+    removeCommentEventListener(inputPlace, htmlEventListener) { this._add("RB" + inputPlace, htmlEventListener); }
+    removeWasmEvent(inputPlace, htmlEvent) { this._add("Ry" + inputPlace, htmlEvent); }
+    removeWasmEventListener(inputPlace, htmlEventListener) { this._add("RY" + inputPlace, htmlEventListener); }
+    removeWebSocketEvent(inputPlace, htmlEvent) { this._add("Rw" + inputPlace, htmlEvent); }
+    removeWebSocketEventListener(inputPlace, htmlEventListener) { this._add("RW" + inputPlace, htmlEventListener); }
+    removeSSEEvent(inputPlace, htmlEvent) { this._add("Re" + inputPlace, htmlEvent); }
+    removeSSEEventListener(inputPlace, htmlEventListener) { this._add("RE" + inputPlace, htmlEventListener); }
+    removeFrontEvent(inputPlace, htmlEvent) { this._add("Rj" + inputPlace, htmlEvent); }
+    removeFrontEventListener(inputPlace, htmlEventListener) { this._add("RJ" + inputPlace, htmlEventListener); }
+    removePreventDefaultEvent(inputPlace, htmlEvent) { this._add("Rd" + inputPlace, htmlEvent); }
+    removePreventDefaultEventListener(inputPlace, htmlEventListener) { this._add("RD" + inputPlace, htmlEventListener); }
+    removeMasterPagesEvent(inputPlace, htmlEvent) { this._add("Ru" + inputPlace, htmlEvent); }
+    removeMasterPagesEventListener(inputPlace, htmlEventListener) { this._add("RU" + inputPlace, htmlEventListener); }
+    removeStopPropagationEvent(inputPlace, htmlEvent) { this._add("Rs" + inputPlace, htmlEvent); }
+    removeStopPropagationEventListener(inputPlace, htmlEventListener) { this._add("RS" + inputPlace, htmlEventListener); }
+    removeMethodEvent(inputPlace, htmlEvent, methodName) { this._add("Rm" + inputPlace, htmlEvent + WebForms.GS + methodName); }
+    removeMethodEventListener(inputPlace, htmlEventListener, methodName) { this._add("RM" + inputPlace, htmlEventListener + WebForms.GS + methodName); }
+    removeModuleMethodEvent(inputPlace, htmlEvent, methodName) { this._add("Rx" + inputPlace, htmlEvent + WebForms.GS + methodName); }
+    removeModuleMethodEventListener(inputPlace, htmlEventListener, methodName) { this._add("RX" + inputPlace, htmlEventListener + WebForms.GS + methodName); }
+    removeConfirmEvent(inputPlace, htmlEvent) { this._add("Rf" + inputPlace, htmlEvent); }
 
-    // Remove event methods (simplified for brevity)
-    removePostEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rp${inputPlace}`, htmlEvent);
+    // Custom Event
+    // This Method Is Compatible With EventListener And May Not Be Compatible With Events Written As Attributes In Some Browsers.
+    // Watch: attribute, style, text, children, value
+    // Compare: greater, less, equal, notequal, includes, startswith, endswith, matches, changed, inrange, lengthgreater, lengthless, lengthequal
+    // Range: Only Use For Compare With inrange Value. Split By Comma ","
+    // Key: Only Use For Watch With attribute And style Value
+    createCustomDOMEvent(inputPlace, eventName, watch, key, compare, value, range, arg1 = false, arg2 = "0") {
+        let immediate = false, delay = "0";
+        if (arguments.length === 9) { immediate = arg1; delay = arg2; }
+        else { immediate = arg1; delay = arg2; }
+        this._add("eC" + inputPlace, eventName + WebForms.GS + watch + WebForms.GS + key + WebForms.GS + compare + WebForms.GS + value + WebForms.GS + range + WebForms.GS + (immediate ? "1" : "0") + WebForms.GS + delay);
     }
+    
+    enableScrollBottomEvent(enable = true) { this._add("eb", enable ? "1" : "0"); }
+    enableReachedElementEvent(inputPlace, once, enable = true) { this._add("er" + inputPlace, (once ? "1" : "0") + WebForms.GS + (enable ? "1" : "0")); }
 
-    removePostEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RP${inputPlace}`, htmlEventListener);
+    // Module
+    loadModule(modulePath, methods = null) {
+        if (methods === null) methods = [];
+        this._add("Ml", modulePath + (methods.length > 0 ? WebForms.GS + "[" + methods.join(WebForms.US) : ""));
     }
+    unloadModule(modulePath) { this._add("Mu", modulePath); }
+    deleteModuleMethod(methodName) { this._add("Md", methodName); }
 
-    removeGetEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rg${inputPlace}`, htmlEvent);
+    // Unit Testing
+    // InputPlace Is Actual, Expected Is Tag/OutputPlace
+    assertEqual(inputPlace, tag) { this._add("At" + inputPlace, tag.replace(/\n/g, "$[ln];")); }
+    assertEqualByOutputPlace(inputPlace, outputPlace) { this._add("Ao" + inputPlace, outputPlace); }
+
+    // Debug
+    createDebugger(pause = false) { this._add("Dc", pause ? "1" : "0"); }
+
+    // Service Worker
+    // To Use Service Worker, You Need To Add The Elanat Dedicated Module (service-worker.js) On The Client Side
+    serviceWorkerRegister(path = null, scopePath = null) { this._add("wR", (path !== null ? path : "") + WebForms.GS + (scopePath !== null ? scopePath : "")); }
+    serviceWorkerPreCacheStatic(pathList) { this._add("wp", pathList.join(WebForms.GS)); }
+    
+    serviceWorkerDynamicCache(path, arg1 = "") {
+        let seconds = "";
+        if (typeof arg1 === "number") seconds = arg1 > 0 ? arg1 : "";
+        else seconds = arg1;
+        this._add("wc", path + (seconds !== "" ? WebForms.GS + seconds : ""));
     }
-
-    removeGetEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RG${inputPlace}`, htmlEventListener);
-    }
-
-    removePatchEvent(inputPlace, htmlEvent) {
-        this._addLine(`Ra${inputPlace}`, htmlEvent);
-    }
-
-    removePatchEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RA${inputPlace}`, htmlEventListener);
-    }
-
-    removeDeleteEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rl${inputPlace}`, htmlEvent);
-    }
-
-    removeDeleteEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RL${inputPlace}`, htmlEventListener);
-    }
-
-    removeHeadEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rh${inputPlace}`, htmlEvent);
-    }
-
-    removeHeadEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RH${inputPlace}`, htmlEventListener);
-    }
-
-    removeOptionsEvent(inputPlace, htmlEvent) {
-        this._addLine(`Ro${inputPlace}`, htmlEvent);
-    }
-
-    removeOptionsEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RO${inputPlace}`, htmlEventListener);
-    }
-
-    removeTraceEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rr${inputPlace}`, htmlEvent);
-    }
-
-    removeTraceEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RR${inputPlace}`, htmlEventListener);
-    }
-
-    removeConnectEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rc${inputPlace}`, htmlEvent);
-    }
-
-    removeConnectEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RC${inputPlace}`, htmlEventListener);
-    }
-
-    removeTagEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rt${inputPlace}`, htmlEvent);
-    }
-
-    removeTagEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RT${inputPlace}`, htmlEventListener);
-    }
-
-    removeCommentEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rb${inputPlace}`, htmlEvent);
-    }
-
-    removeCommentEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RB${inputPlace}`, htmlEventListener);
-    }
-
-    removeWasmEvent(inputPlace, htmlEvent) {
-        this._addLine(`Ry${inputPlace}`, htmlEvent);
-    }
-
-    removeWasmEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RY${inputPlace}`, htmlEventListener);
-    }
-
-    removeWebSocketEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rw${inputPlace}`, htmlEvent);
-    }
-
-    removeWebSocketEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RW${inputPlace}`, htmlEventListener);
-    }
-
-    removeSSEEvent(inputPlace, htmlEvent) {
-        this._addLine(`Re${inputPlace}`, htmlEvent);
-    }
-
-    removeSSEEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RE${inputPlace}`, htmlEventListener);
-    }
-
-    removeFrontEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rj${inputPlace}`, htmlEvent);
-    }
-
-    removeFrontEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RJ${inputPlace}`, htmlEventListener);
-    }
-
-    removeSendEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rn${inputPlace}`, htmlEvent);
-    }
-
-    removeSendEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RN${inputPlace}`, htmlEventListener);
-    }
-
-    removePreventDefaultEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rd${inputPlace}`, htmlEvent);
-    }
-
-    removePreventDefaultEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RD${inputPlace}`, htmlEventListener);
-    }
-
-    removeMasterPagesEvent(inputPlace, htmlEvent) {
-        this._addLine(`Ru${inputPlace}`, htmlEvent);
-    }
-
-    removeMasterPagesEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RU${inputPlace}`, htmlEventListener);
-    }
-
-    removeStopPropagationEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rs${inputPlace}`, htmlEvent);
-    }
-
-    removeStopPropagationEventListener(inputPlace, htmlEventListener) {
-        this._addLine(`RS${inputPlace}`, htmlEventListener);
-    }
-
-    removeMethodEvent(inputPlace, htmlEvent, methodName) {
-        this._addLine(`Rm${inputPlace}`, `${htmlEvent}|${methodName}`);
-    }
-
-    removeMethodEventListener(inputPlace, htmlEventListener, methodName) {
-        this._addLine(`RM${inputPlace}`, `${htmlEventListener}|${methodName}`);
-    }
-
-    removeModuleMethodEvent(inputPlace, htmlEvent, methodName) {
-        this._addLine(`Rx${inputPlace}`, `${htmlEvent}|${methodName}`);
-    }
-
-    removeModuleMethodEventListener(inputPlace, htmlEventListener, methodName) {
-        this._addLine(`RX${inputPlace}`, `${htmlEventListener}|${methodName}`);
-    }
-
-    removeConfirmEvent(inputPlace, htmlEvent) {
-        this._addLine(`Rf${inputPlace}`, htmlEvent);
-    }
-
-    // Custom Event methods
-    createCustomDOMEvent(inputPlace, eventName, watch, key, compare, value, range, immediate = false, delay = 0) {
-        this._addLine(`eC${inputPlace}`, `${eventName}|${watch}|${key}|${compare}|${value}|${range}|${immediate ? "1" : "0"}|${delay}`);
-    }
-
-    enableScrollBottomEvent(enable = true) {
-        this._addLine(`eb`, enable ? "1" : "0");
-    }
-
-    enableReachedElementEvent(inputPlace, once, enable = true) {
-        this._addLine(`er${inputPlace}`, `${once ? "1" : "0"}|${enable ? "1" : "0"}`);
-    }
-
-    // Module methods
-    loadModule(modulePath, methods) {
-        this._addLine(`Ml`, modulePath + (methods && methods.length > 0 ? `|${methods.join("|")}` : ""));
-    }
-
-    unloadModule(modulePath) {
-        this._addLine(`Mu`, modulePath);
-    }
-
-    deleteModuleMethod(methodName) {
-        this._addLine(`Md`, methodName);
-    }
-
-    // Unit Testing methods
-    assertEqual(inputPlace, tag) {
-        this._addLine(`At${inputPlace}`, tag.replace(/\n/g, "$[ln];"));
-    }
-
-    assertEqualByOutputPlace(inputPlace, outputPlace) {
-        this._addLine(`Ao${inputPlace}`, outputPlace);
-    }
-
-    // Service Worker methods
-    serviceWorkerRegister(path = null, scopePath = null) {
-        this._addLine(`wR`, `${path || ""}|${scopePath || ""}`);
-    }
-
-    serviceWorkerPreCacheStatic(pathList) {
-        this._addLine(`wp`, pathList.join("|"));
-    }
-
-    serviceWorkerDynamicCache(path, seconds = 0) {
-        this._addLine(`wc`, path + (seconds > 0 ? `|${seconds}` : ""));
-    }
-
+    
     serviceWorkerDeleteDynamicCache(path = null) {
-        if (path) {
-            this._addLine(`wd`, path);
-        } else {
-            this._addLine(`wd`);
-        }
+        if (path !== null) this._add("wd", path);
+        else this._add("wd");
     }
-
-    serviceWorkerDynamicCacheTTLUpdate(path, seconds = 0) {
-        this._addLine(`wt`, path + (seconds > 0 ? `|${seconds}` : ""));
+    
+    serviceWorkerDynamicCacheTTLUpdate(path, arg1 = "") {
+        let seconds = "";
+        if (typeof arg1 === "number") seconds = arg1 > 0 ? arg1 : "";
+        else seconds = arg1;
+        this._add("wt", path + (seconds !== "" ? WebForms.GS + seconds : ""));
     }
-
-    serviceWorkerRouteSet(path, type, cacheDynamic = false) {
-        this._addLine(`wr`, `${path}|${type}${cacheDynamic ? "|1" : ""}`);
-    }
-
-    serviceWorkerRouteAlias(path, to) {
-        this._addLine(`wa`, `${path}|${to}`);
-    }
-
+    
+    // Path: Support Wildcard Automatically And Also Support Regex If Use "re:" Before Pattern
+    // Type: Type Is Cache Strategy. cachefirst, networkfirst, cacheonly, networkonly, stalerevalidate (Fast From Cache, Updates Simultaneously From The Network)
+    // CacheDynamic: If True, Any Successful Network Response For That Route Will Be Stored In The Dynamic Cache
+    serviceWorkerRouteSet(path, type, cacheDynamic = false) { this._add("wr", path + WebForms.GS + type + (cacheDynamic ? WebForms.GS + "1" : "")); }
+    serviceWorkerRouteAlias(path, to) { this._add("wa", path + WebForms.GS + to); }
+    
     serviceWorkerDeleteRouteAlias(path = null) {
-        this._addLine(`wC`, path || "");
+        if (path !== null) this._add("wC", path);
+        else this._add("wC");
     }
-
+    
+    // Delete All Route And Alias
     serviceWorkerDeleteRoute(path = null) {
-        if (path) {
-            this._addLine(`wD`, path);
-        } else {
-            this._addLine(`wD`);
-        }
+        if (path !== null) this._add("wD", path);
+        else this._add("wD");
     }
 
-    // SSE methods
+    // SSE
     disconnectSSE(path = null) {
-        if (path) {
-            this._addLine(`Ds`, path);
-        } else {
-            this._addLine(`Ds`);
-        }
+        if (path !== null) this._add("Ds", path);
+        else this._add("Ds");
     }
+    disconnectAllSSE() { this._add("Ds"); }
 
-    // State methods
-    addState(path = null, title = null) {
-        this._addLine(`AS`, `${path || ""}|${title || ""}`);
-    }
-
+    // State
+    addState(path = null, title = null) { this._add("AS", (path !== null ? path : "") + WebForms.GS + (title !== null ? title : "")); }
+    saveState(path = null, title = null) { this._add("As", (path !== null ? path : "") + WebForms.GS + (title !== null ? title : "")); }
+    loadState(path) { this._add("ls", path); }
+    
     deleteState(path = null) {
-        if (path) {
-            this._addLine(`DS`, path);
-        } else {
-            this._addLine(`DS`, "*");
-        }
+        if (path !== null) this._add("DS", path);
+        else this._add("DS", "*");
     }
+    deleteAllState() { this._add("DS", "*"); }
 
-    // Cookie methods
+    // Cookie
     setCookie(key, value, seconds, path = null) {
-        this._addLine(`sC`, `${key}|${value}|${seconds}${path ? `|${path}` : ""}`);
+        this._add("sC", key + WebForms.GS + value + WebForms.GS + seconds + (path !== null ? WebForms.GS + path : ""));
     }
 
-    // Save/Session Cache methods
-    saveId(inputPlace, key = ".") {
-        this._addLine(`@gi${inputPlace}`, key);
-    }
+    // Save (Session Cache)
+    saveId(inputPlace, key = ".") { this._add("@gi" + inputPlace, key); }
+    saveName(inputPlace, key = ".") { this._add("@gn" + inputPlace, key); }
+    saveValue(inputPlace, key = ".") { this._add("@gv" + inputPlace, key); }
+    saveValueLength(inputPlace, key = ".") { this._add("@ge" + inputPlace, key); }
+    saveClass(inputPlace, key = ".") { this._add("@gc" + inputPlace, key); }
+    saveStyle(inputPlace, key = ".") { this._add("@gs" + inputPlace, key); }
+    saveTitle(inputPlace, key = ".") { this._add("@gl" + inputPlace, key); }
+    saveLabel(inputPlace, key = ".") { this._add("@gA" + inputPlace, key); }
+    saveText(inputPlace, key = ".") { this._add("@gt" + inputPlace, key); }
+    saveOuterText(inputPlace, key = ".") { this._add("@go" + inputPlace, key); }
+    saveTextLength(inputPlace, key = ".") { this._add("@gg" + inputPlace, key); }
+    saveAttribute(inputPlace, attribute, key = ".") { this._add("@ga" + inputPlace, key + WebForms.GS + attribute); }
+    saveWidth(inputPlace, key = ".") { this._add("@gw" + inputPlace, key); }
+    saveHeight(inputPlace, key = ".") { this._add("@gh" + inputPlace, key); }
+    saveReadOnly(inputPlace, key = ".") { this._add("@gr" + inputPlace, key); }
+    saveSelectedIndex(inputPlace, key = ".") { this._add("@gx" + inputPlace, key); }
+    saveTextAlign(inputPlace, key = ".") { this._add("@gT" + inputPlace, key); }
+    saveNodeLength(inputPlace, key = ".") { this._add("@gL" + inputPlace, key); }
+    saveVisible(inputPlace, key = ".") { this._add("@gV" + inputPlace, key); }
+    saveUrl(url, fetchScript = false, key = ".") { this._add("@gu", key + WebForms.GS + url + (fetchScript ? WebForms.GS + "1" : "")); }
+    saveIndex(inputPlace, key = ".") { this._add("@gI" + inputPlace, key); }
+    removeSave(cacheKey) { this._add("rs", cacheKey); }
+    removeAllSave() { this._add("rs", "*"); }
+    
+    // Calling the SetSave Method Causes Action Control Requests Triggered by Events Using the GET, POST, PUT, PATCH, DELETE, and OPTIONS Methods, as well as Requests Triggered by the Send Event, to be Temporarily Saved on the Active Page, so the Request will not be Sent to the Server Again.
+    setSave() { this._add("cs", "*"); }
+    addSaveValue(cacheKey, value) { this._add("SA", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];")); }
+    insertSaveValue(cacheKey, value) { this._add("SI", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];")); }
+    appendSaveValue(cacheKey, value) { this._add("SP", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];")); }
+    replaceSaveValue(cacheKey, searchValue, value) { this._add("SR", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];") + WebForms.GS + searchValue.replace(/\n/g, "$[ln];")); }
 
-    saveName(inputPlace, key = ".") {
-        this._addLine(`@gn${inputPlace}`, key);
+    // Cache
+    cacheId(inputPlace, key = ".") { this._add("@ci" + inputPlace, key); }
+    cacheName(inputPlace, key = ".") { this._add("@cn" + inputPlace, key); }
+    cacheValue(inputPlace, key = ".") { this._add("@cv" + inputPlace, key); }
+    cacheValueLength(inputPlace, key = ".") { this._add("@ce" + inputPlace, key); }
+    cacheClass(inputPlace, key = ".") { this._add("@cc" + inputPlace, key); }
+    cacheStyle(inputPlace, key = ".") { this._add("@cs" + inputPlace, key); }
+    cacheTitle(inputPlace, key = ".") { this._add("@cl" + inputPlace, key); }
+    cacheLabel(inputPlace, key = ".") { this._add("@cA" + inputPlace, key); }
+    cacheText(inputPlace, key = ".") { this._add("@ct" + inputPlace, key); }
+    cacheOuterText(inputPlace, key = ".") { this._add("@co" + inputPlace, key); }
+    cacheTextLength(inputPlace, key = ".") { this._add("@cg" + inputPlace, key); }
+    cacheAttribute(inputPlace, attribute, key = ".") { this._add("@ca" + inputPlace, key + WebForms.GS + attribute); }
+    cacheWidth(inputPlace, key = ".") { this._add("@cw" + inputPlace, key); }
+    cacheHeight(inputPlace, key = ".") { this._add("@ch" + inputPlace, key); }
+    cacheReadOnly(inputPlace, key = ".") { this._add("@cr" + inputPlace, key); }
+    cacheSelectedIndex(inputPlace, key = ".") { this._add("@cx" + inputPlace, key); }
+    cacheTextAlign(inputPlace, key = ".") { this._add("@cT" + inputPlace, key); }
+    cacheNodeLength(inputPlace, key = ".") { this._add("@cL" + inputPlace, key); }
+    cacheVisible(inputPlace, key = ".") { this._add("@cV" + inputPlace, key); }
+    cacheUrl(url, fetchScript = false, key = ".") { this._add("@cu", key + WebForms.GS + url + (fetchScript ? WebForms.GS + "1" : "")); }
+    cacheIndex(inputPlace, key = ".") { this._add("@cI" + inputPlace, key); }
+    removeCache(cacheKey) { this._add("rd", cacheKey); }
+    removeAllCache() { this._add("rd", "*"); }
+    
+    // Calling the SetCache Method Causes Action Control Requests Triggered by events using the GET, POST, PUT, PATCH, DELETE, and OPTIONS Methods, as well as Requests Triggered by the Send event, to be Cached, so the Request will not be Sent to the Server Again.
+    setCache(arg1 = null) {
+        if (arg1 === null) this._add("cd", "*");
+        else this._add("cd", arg1);
     }
+    addCacheValue(cacheKey, value) { this._add("CA", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];")); }
+    insertCacheValue(cacheKey, value) { this._add("CI", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];")); }
+    appendCacheValue(cacheKey, value) { this._add("CP", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];")); }
+    replaceCacheValue(cacheKey, searchValue, value) { this._add("CR", cacheKey + WebForms.GS + value.replace(/\n/g, "$[ln];") + WebForms.GS + searchValue.replace(/\n/g, "$[ln];")); }
 
-    saveValue(inputPlace, key = ".") {
-        this._addLine(`@gv${inputPlace}`, key);
-    }
-
-    saveValueLength(inputPlace, key = ".") {
-        this._addLine(`@ge${inputPlace}`, key);
-    }
-
-    saveClass(inputPlace, key = ".") {
-        this._addLine(`@gc${inputPlace}`, key);
-    }
-
-    saveStyle(inputPlace, key = ".") {
-        this._addLine(`@gs${inputPlace}`, key);
-    }
-
-    saveTitle(inputPlace, key = ".") {
-        this._addLine(`@gl${inputPlace}`, key);
-    }
-
-    saveLabel(inputPlace, key = ".") {
-        this._addLine(`@gA${inputPlace}`, key);
-    }
-
-    saveText(inputPlace, key = ".") {
-        this._addLine(`@gt${inputPlace}`, key);
-    }
-
-    saveOuterText(inputPlace, key = ".") {
-        this._addLine(`@go${inputPlace}`, key);
-    }
-
-    saveTextLength(inputPlace, key = ".") {
-        this._addLine(`@gg${inputPlace}`, key);
-    }
-
-    saveAttribute(inputPlace, attribute, key = ".") {
-        this._addLine(`@ga${inputPlace}`, `${key}|${attribute}`);
-    }
-
-    saveWidth(inputPlace, key = ".") {
-        this._addLine(`@gw${inputPlace}`, key);
-    }
-
-    saveHeight(inputPlace, key = ".") {
-        this._addLine(`@gh${inputPlace}`, key);
-    }
-
-    saveReadOnly(inputPlace, key = ".") {
-        this._addLine(`@gr${inputPlace}`, key);
-    }
-
-    saveSelectedIndex(inputPlace, key = ".") {
-        this._addLine(`@gx${inputPlace}`, key);
-    }
-
-    saveTextAlign(inputPlace, key = ".") {
-        this._addLine(`@gT${inputPlace}`, key);
-    }
-
-    saveNodeLength(inputPlace, key = ".") {
-        this._addLine(`@gL${inputPlace}`, key);
-    }
-
-    saveVisible(inputPlace, key = ".") {
-        this._addLine(`@gV${inputPlace}`, key);
-    }
-
-    saveUrl(url, fetchScript = false, key = ".") {
-        this._addLine(`@gu`, `${key}|${url}${fetchScript ? "|1" : ""}`);
-    }
-
-    saveIndex(inputPlace, key = ".") {
-        this._addLine(`@gI${inputPlace}`, key);
-    }
-
-    removeSessionCache(cacheKey) {
-        if (cacheKey) {
-            this._addLine(`rs`, cacheKey);
-        } else {
-            this._addLine(`rs`, "*");
-        }
-    }
-
-    setSessionCache() {
-        this._addLine(`cs`, "*");
-    }
-
-    addSessionCacheValue(cacheKey, value) {
-        this._addLine(`SA`, `${cacheKey}|${value.replace(/\n/g, "$[ln];")}`);
-    }
-
-    insertSessionCacheValue(cacheKey, value) {
-        this._addLine(`SI`, `${cacheKey}|${value.replace(/\n/g, "$[ln];")}`);
-    }
-
-    // Cache methods
-    cacheId(inputPlace, key = ".") {
-        this._addLine(`@ci${inputPlace}`, key);
-    }
-
-    cacheName(inputPlace, key = ".") {
-        this._addLine(`@cn${inputPlace}`, key);
-    }
-
-    cacheValue(inputPlace, key = ".") {
-        this._addLine(`@cv${inputPlace}`, key);
-    }
-
-    cacheValueLength(inputPlace, key = ".") {
-        this._addLine(`@ce${inputPlace}`, key);
-    }
-
-    cacheClass(inputPlace, key = ".") {
-        this._addLine(`@cc${inputPlace}`, key);
-    }
-
-    cacheStyle(inputPlace, key = ".") {
-        this._addLine(`@cs${inputPlace}`, key);
-    }
-
-    cacheTitle(inputPlace, key = ".") {
-        this._addLine(`@cl${inputPlace}`, key);
-    }
-
-    cacheLabel(inputPlace, key = ".") {
-        this._addLine(`@cA${inputPlace}`, key);
-    }
-
-    cacheText(inputPlace, key = ".") {
-        this._addLine(`@ct${inputPlace}`, key);
-    }
-
-    cacheOuterText(inputPlace, key = ".") {
-        this._addLine(`@co${inputPlace}`, key);
-    }
-
-    cacheTextLength(inputPlace, key = ".") {
-        this._addLine(`@cg${inputPlace}`, key);
-    }
-
-    cacheAttribute(inputPlace, attribute, key = ".") {
-        this._addLine(`@ca${inputPlace}`, `${key}|${attribute}`);
-    }
-
-    cacheWidth(inputPlace, key = ".") {
-        this._addLine(`@cw${inputPlace}`, key);
-    }
-
-    cacheHeight(inputPlace, key = ".") {
-        this._addLine(`@ch${inputPlace}`, key);
-    }
-
-    cacheReadOnly(inputPlace, key = ".") {
-        this._addLine(`@cr${inputPlace}`, key);
-    }
-
-    cacheSelectedIndex(inputPlace, key = ".") {
-        this._addLine(`@cx${inputPlace}`, key);
-    }
-
-    cacheTextAlign(inputPlace, key = ".") {
-        this._addLine(`@cT${inputPlace}`, key);
-    }
-
-    cacheNodeLength(inputPlace, key = ".") {
-        this._addLine(`@cL${inputPlace}`, key);
-    }
-
-    cacheVisible(inputPlace, key = ".") {
-        this._addLine(`@cV${inputPlace}`, key);
-    }
-
-    cacheUrl(url, fetchScript = false, key = ".") {
-        this._addLine(`@cu`, `${key}|${url}${fetchScript ? "|1" : ""}`);
-    }
-
-    cacheIndex(inputPlace, key = ".") {
-        this._addLine(`@cI${inputPlace}`, key);
-    }
-
-    removeCache(cacheKey) {
-        if (cacheKey) {
-            this._addLine(`rd`, cacheKey);
-        } else {
-            this._addLine(`rd`, "*");
-        }
-    }
-
-    setCache(second = '*') {
-        if (second === '*') {
-            this._addLine(`cd`, "*");
-        } else {
-            this._addLine(`cd`, String(second));
-        }
-    }
-
-    addCacheValue(cacheKey, value) {
-        this._addLine(`CA`, `${cacheKey}|${value.replace(/\n/g, "$[ln];")}`);
-    }
-
-    insertCacheValue(cacheKey, value) {
-        this._addLine(`CI`, `${cacheKey}|${value.replace(/\n/g, "$[ln];")}`);
-    }
-
-    // Call methods
-    loadUrl(inputPlace, url) {
-        this._addLine(`lu${inputPlace}`, url);
-    }
-
-    runActionControls(actionControls, index = null, withoutWebFormsSection = false, useCurrentEvent = true) {
-        const indexStr = index !== null ? index : "";
-        this._addLine(`lA`, `${useCurrentEvent ? "1" : "0"}|${withoutWebFormsSection ? "1" : "0"}|${indexStr}|${actionControls}`);
-    }
-
-    callScript(scriptText) {
-        this._addLine(`_`, scriptText.replace(/\n/g, "$[ln];"));
-    }
-
+    // Call
+    loadUrl(inputPlace, url) { this._add("lu" + inputPlace, url); }
+    runActionControls(actionControls, withoutWebFormsSection = true, index = null, useCurrentEvent = true) { this._add("lA", (useCurrentEvent ? "1" : "0") + WebForms.GS + (withoutWebFormsSection ? "1" : "0") + WebForms.GS + index + WebForms.GS + actionControls); }
+    callScript(scriptText) { this._add("_", scriptText.replace(/\n/g, "$[ln];")); }
+    
     callMethod(methodName, args = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`lm`, `${methodName}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("lm", methodName + argsJoin);
     }
-
+    
     callModuleMethod(methodName, args = null) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`lM`, `${methodName}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("lM", methodName + argsJoin);
     }
-
-    callPostBack(formInputPlace, outputPlace = null) {
-        this._addLine(`Lp`, `1|${formInputPlace}${outputPlace ? `|${outputPlace}` : ""}`);
+    
+    callPostBack(formInputPlace, outputPlace = null) { this._add("Lp", "1" + WebForms.GS + formInputPlace + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
+    
+    callCommentBack(arg1 = null, arg2 = null, arg3 = true) {
+        let index = null, inputPlace = null, useCurrentEvent = true;
+        if (arguments.length === 1) { index = arg1; }
+        else if (arguments.length === 2) { index = arg1; inputPlace = arg2; }
+        else { index = arg1; inputPlace = arg2; useCurrentEvent = arg3; }
+        this._add("LC", (useCurrentEvent ? "1" : "0") + WebForms.GS + (index !== null ? index : "") + WebForms.GS + inputPlace);
     }
-
-    callTagBack(outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Lt`, `${useCurrentEvent ? "1" : "0"}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callCommentBack(index = null, outputPlace = null, useCurrentEvent = true) {
-        const indexStr = index !== null ? index : "";
-        this._addLine(`LC`, `${useCurrentEvent ? "1" : "0"}|${indexStr}|${outputPlace || ""}`);
-    }
-
+    
     callWasmBack(wasmLanguage, wasmUrl, methodName, args = null, outputPlace = null, useCurrentEvent = true) {
-        const argsJoin = args && args.length > 0 ? args.join(",") : "";
-        this._addLine(`Ly`, `${useCurrentEvent ? "1" : "0"}|${wasmLanguage}|${wasmUrl}|${methodName}|${argsJoin}|${outputPlace || ""}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = "[" + args.map(String).join(WebForms.US);
+        this._add("Ly", (useCurrentEvent ? "1" : "0") + WebForms.GS + wasmLanguage + WebForms.GS + wasmUrl + WebForms.GS + methodName + WebForms.GS + argsJoin + WebForms.GS + outputPlace);
     }
-
-    callWebSocketBack(path, useCurrentEvent = true) {
-        this._addLine(`Lw`, `${useCurrentEvent ? "1" : "0"}|${path}`);
+    
+    callWebSocketBack(path, useCurrentEvent = true) { this._add("Lw", (useCurrentEvent ? "1" : "0") + WebForms.GS + path); }
+    
+    callSSEBack(path, arg1 = null, arg2 = true, arg3 = true, arg4 = "3000") {
+        let outputPlace = null, useCurrentEvent = true, shouldReconnect = true, reconnectTryTimeout = "3000";
+        if (arguments.length === 5) { outputPlace = arg1; useCurrentEvent = arg2; shouldReconnect = arg3; reconnectTryTimeout = arg4; }
+        else { useCurrentEvent = arg1; shouldReconnect = arg2; reconnectTryTimeout = arg3; }
+        let val = (useCurrentEvent ? "1" : "0") + WebForms.GS + path + WebForms.GS + (shouldReconnect ? "1" : "0") + WebForms.GS + reconnectTryTimeout;
+        if (outputPlace !== null) val += WebForms.GS + outputPlace;
+        this._add("Ls", val);
     }
-
-    callSSEBack(path, outputPlace = null, useCurrentEvent = true, shouldReconnect = true, reconnectTryTimeout = 3000) {
-        this._addLine(`Ls`, `${useCurrentEvent ? "1" : "0"}|${path}|${shouldReconnect ? "1" : "0"}|${reconnectTryTimeout}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
+    
     callFront(modulePath, args = null, outputPlace = null, useCurrentEvent = true) {
-        const argsJoin = args && args.length > 0 ? `|${args.join("|")}` : "";
-        this._addLine(`Lj`, `${useCurrentEvent ? "1" : "0"}|${modulePath}|${outputPlace || ""}${argsJoin}`);
+        let argsJoin = "";
+        if (args !== null && args.length > 0) argsJoin = WebForms.GS + "[" + args.map(String).join(WebForms.US);
+        this._add("Lj", (useCurrentEvent ? "1" : "0") + WebForms.GS + modulePath + WebForms.GS + outputPlace + argsJoin);
     }
+    
+    callGetBack(path, outputPlace = null, useCurrentEvent = true) { this._add("Lg", (useCurrentEvent ? "1" : "0") + WebForms.GS + path + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
+    callPutBack(path, outputPlace = null, useCurrentEvent = true) { this._add("Lt", (useCurrentEvent ? "1" : "0") + WebForms.GS + path + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
+    callPatchBack(path, outputPlace = null, useCurrentEvent = true) { this._add("LP", (useCurrentEvent ? "1" : "0") + WebForms.GS + path + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
+    callDeleteBack(path, outputPlace = null, useCurrentEvent = true) { this._add("Ld", (useCurrentEvent ? "1" : "0") + WebForms.GS + path + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
+    callHeadBack(path, useCurrentEvent = true) { this._add("Lh", (useCurrentEvent ? "1" : "0") + WebForms.GS + path); }
+    callOptionsBack(path, outputPlace = null, useCurrentEvent = true) { this._add("Lo", (useCurrentEvent ? "1" : "0") + WebForms.GS + path + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
+    callSendBack(path, method, isMultiPart, contentType, data, outputPlace = null, useCurrentEvent = true) { this._add("LS", (useCurrentEvent ? "1" : "0") + WebForms.GS + path + WebForms.GS + method + WebForms.GS + (isMultiPart ? "1" : "0") + WebForms.GS + contentType + WebForms.GS + data.replace(/\n/g, "$[ln];") + (outputPlace !== null ? WebForms.GS + outputPlace : "")); }
 
-    callGetBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Lg`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
+    // Update
+    increase(inputPlace, value) { this._add("gt" + inputPlace, "i" + WebForms.GS + value); }
+    decrease(inputPlace, value) { this._add("gt" + inputPlace, "i" + WebForms.GS + (value * -1)); }
+    
+    // If You Don't Use Deep Mode, any Tags Inside the Current Tag Will Simply Be Treated as Strings. Deep Mode Does not Remove Inner Elements.
+    replace(inputPlace, value, newValue, alsoStartTag = false, deep = true) { this._add("gt" + inputPlace, "r" + WebForms.GS + value + WebForms.GS + newValue + WebForms.GS + (alsoStartTag ? "1" : "0") + WebForms.GS + (deep ? "1" : "0")); }
+    
+    // HTML Converts Attribute Names to Lowercase, so they Need to Be Written in Lowercase.
+    replaceStartTag(inputPlace, value, newValue) { this._add("gt" + inputPlace, "s" + WebForms.GS + value + WebForms.GS + newValue); }
 
-    callPutBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Lu`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callPatchBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`LP`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callDeleteBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Ld`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callHeadBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Lh`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callOptionsBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Lo`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callTraceBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`LT`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callConnectBack(path, outputPlace = null, useCurrentEvent = true) {
-        this._addLine(`Lc`, `${useCurrentEvent ? "1" : "0"}|${path}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    callSendBack(path, method, isMultiPart, contentType, data, outputPlace = null, useCurrentEvent = true) {
-        const safeData = data.replace(/\n/g, "$[ln];").replace(/\|/g, "$[vb];");
-        this._addLine(`LS`, `${useCurrentEvent ? "1" : "0"}|${path}|${method}|${isMultiPart ? "1" : "0"}|${contentType}|${safeData}${outputPlace ? `|${outputPlace}` : ""}`);
-    }
-
-    // Update methods
-    increase(inputPlace, value) {
-        this._addLine(`gt${inputPlace}`, `i|${value}`);
-    }
-
-    decrease(inputPlace, value) {
-        this._addLine(`gt${inputPlace}`, `i|${value * -1}`);
-    }
-
-    replace(inputPlace, value, newValue, alsoStartTag = false, deep = false) {
-        let safeValue = value;
-        let safeNewValue = newValue;
-
-        if (safeValue && safeValue[0] === '@') {
-            safeValue = safeValue.substring(1);
-            safeValue = `$[at];${safeValue}`;
-        }
-
-        if (safeNewValue && safeNewValue[0] === '@') {
-            safeNewValue = safeNewValue.substring(1);
-            safeNewValue = `$[at];${safeNewValue}`;
-        }
-
-        this._addLine(`gt${inputPlace}`, `r|${safeValue}|${safeNewValue}|${alsoStartTag ? "1" : "0"}|${deep ? "1" : "0"}`);
-    }
-
-    replaceStartTag(inputPlace, value, newValue) {
-        let safeValue = value;
-        let safeNewValue = newValue;
-
-        if (safeValue && safeValue[0] === '@') {
-            safeValue = safeValue.substring(1);
-            safeValue = `$[at];${safeValue}`;
-        }
-
-        if (safeNewValue && safeNewValue[0] === '@') {
-            safeNewValue = safeNewValue.substring(1);
-            safeNewValue = `$[at];${safeNewValue}`;
-        }
-
-        this._addLine(`gt${inputPlace}`, `s|${safeValue}|${safeNewValue}`);
-    }
-
-    // Pre Runner methods
-    assignDelay(milliSecond, index = -1) {
+    // Pre Runner
+    assignDelay(miliSecond, index = -1) {
         const currentLine = this._getLineByIndex(index);
-        if (!currentLine) return;
-
-        const parts = currentLine.split('=', 2);
-        const newName = `:${milliSecond})${parts[0]}`;
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
+        const newName = ":" + miliSecond + ")" + parts[0];
         const newValue = parts.length > 1 ? parts[1] : "";
-
         this._updateLineByIndex(index, newName, newValue);
     }
-
-    assignDelayChange(milliSecond, index = -1) {
+    
+    assignDelayChange(miliSecond, index = -1) {
         const currentLine = this._getLineByIndex(index);
-        if (!currentLine) return;
-
-        const parts = currentLine.split('=', 2);
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
         let currentName = parts[0];
-
         if (currentName.startsWith(":") && currentName.includes(")")) {
-            const closingBracket = currentName.indexOf(')');
+            const closingBracket = currentName.indexOf(")");
             currentName = currentName.substring(closingBracket + 1);
         }
-
-        const newName = `:${milliSecond})${currentName}`;
+        const newName = ":" + miliSecond + ")" + currentName;
         const newValue = parts.length > 1 ? parts[1] : "";
-
         this._updateLineByIndex(index, newName, newValue);
     }
-
-    assignInterval(milliSecond, id = null, index = -1) {
+    
+    assignInterval(miliSecond, id = null, index = -1) {
         const currentLine = this._getLineByIndex(index);
-        if (!currentLine) return;
-
-        const parts = currentLine.split('=', 2);
-        const newName = `(${milliSecond}${id ? `|${id}` : ""})${parts[0]}`;
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
+        const newName = "(" + miliSecond + (id !== null ? "|" + id : "") + ")" + parts[0];
         const newValue = parts.length > 1 ? parts[1] : "";
-
         this._updateLineByIndex(index, newName, newValue);
     }
-
-    assignIntervalChange(milliSecond, id = null, index = -1) {
+    
+    assignIntervalChange(miliSecond, id = null, index = -1) {
         const currentLine = this._getLineByIndex(index);
-        if (!currentLine) return;
-
-        const parts = currentLine.split('=', 2);
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
         let currentName = parts[0];
-
         if (currentName.startsWith("(") && currentName.includes(")")) {
-            const closingBracket = currentName.indexOf(')');
+            const closingBracket = currentName.indexOf(")");
             currentName = currentName.substring(closingBracket + 1);
         }
-
-        const newName = `(${milliSecond}${id ? `|${id}` : ""})${currentName}`;
+        const newName = "(" + miliSecond + (id !== null ? "|" + id : "") + ")" + currentName;
         const newValue = parts.length > 1 ? parts[1] : "";
-
         this._updateLineByIndex(index, newName, newValue);
     }
-
-    deleteInterval(id) {
-        this._addLine(`Di`, id);
-    }
-
+    
+    deleteInterval(id) { this._add("Di", id); }
+    
     assignRepeat(count, index = -1) {
         const currentLine = this._getLineByIndex(index);
-        if (!currentLine) return;
-
-        const parts = currentLine.split('=', 2);
-        const newName = `,${count})${parts[0]}`;
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
+        const newName = "," + count + ")" + parts[0];
         const newValue = parts.length > 1 ? parts[1] : "";
-
         this._updateLineByIndex(index, newName, newValue);
     }
-
+    
     assignRepeatChange(count, index = -1) {
         const currentLine = this._getLineByIndex(index);
-        if (!currentLine) return;
-
-        const parts = currentLine.split('=', 2);
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
         let currentName = parts[0];
-
         if (currentName.startsWith(",") && currentName.includes(")")) {
-            const closingBracket = currentName.indexOf(')');
+            const closingBracket = currentName.indexOf(")");
             currentName = currentName.substring(closingBracket + 1);
         }
-
-        const newName = `,${count})${currentName}`;
+        const newName = "," + count + ")" + currentName;
         const newValue = parts.length > 1 ? parts[1] : "";
-
         this._updateLineByIndex(index, newName, newValue);
     }
 
-    // Index methods
-    startIndex(name = "") {
-        this._addLine(`#`, name);
-    }
+    // Index
+    startIndex(name = null) { this._add("#", name !== null ? name : ""); }
+    
+    // This Index Is Automatically Run After Changing The Browser History (Back And Forward Buttons)
+    startState() { this.startIndex("$"); }
+    
+    goTo(line, repeat = 1) { this._add("&", line + WebForms.GS + repeat); }
+    goToIndex(index, repeat = 1) { this._add("&", "#" + index + WebForms.GS + repeat); }
 
-    goTo(line, repeat = 1) {
-        if (typeof line === 'number') {
-            this._addLine(`&`, `${line}|${repeat}`);
+    // Start
+    startTransientDOM(inputPlace) { this._add("td", inputPlace); }
+    endTransientDOM() { this._add("td", ";"); }
+
+    // Message
+    // Type: warning, problem, help, success, none
+    alert(text, type = "none", title = "Alert", okText = "OK") { this._add("Al", text + WebForms.GS + (type === "none" ? "" : type) + WebForms.GS + (title === "Alert" ? "" : title) + WebForms.GS + (okText === "OK" ? "" : okText)); }
+    
+    message(text, arg1 = "none", arg2 = "0") {
+        if (typeof arg1 === "number") {
+            this._add("me", text + WebForms.GS + "" + WebForms.GS + arg1);
+        } else if (arguments.length === 3) {
+            this._add("me", text + WebForms.GS + arg1 + WebForms.GS + arg2);
         } else {
-            this._addLine(`&`, `#${line}|${repeat}`);
+            this._add("me", text + WebForms.GS + (arg1 === "none" ? "" : arg1) + WebForms.GS + "");
         }
     }
+    
+    // Type: log, info, warn, error, debug, trace, group, groupend, table
+    consoleMessage(text, type = "log") { this._add("mc", text.replace(/\n/g, "$[ln];") + (type === "log" ? "" : WebForms.GS + type)); }
+    consoleMessageAssert(text, condition) { this._add("ma", text.replace(/\n/g, "$[ln];") + WebForms.GS + condition); }
 
-    // Start methods
-    startTransientDOM(inputPlace) {
-        this._addLine(`td`, inputPlace);
-    }
+    // Enable
+    //Calling The EnableWebSocket Or EnableWebSocketOnce Or AddWebSocket Methods Will Cause Any Subsequent Requests (Under WebForms Core Technology) To Operate Under The WebSocket Protocol.
+    enableWebSocket(enable = true) { this._add("ew", enable ? "1" : "0"); }
+    enableWebSocketOnce() { this._add("ew", "$"); }
+    addWebSocket(path) { this._add("aw" + path); }
+    
+    // Disconnected WebSocket
+    deleteWebSocket(path) { this._add("dw" + path); }
 
-    endTransientDOM() {
-        this._addLine(`td`, ";");
-    }
+    // Use
+    // InputPlace Using Only For form Element
+    useWebSocket(inputPlace) { this._add("uw" + inputPlace); }
+    useOnlyChangeUpdate(inputPlace) { this._add("uo" + inputPlace); }
 
-    // Message methods
-    alert(text, type = "none", title = "Alert", okText = "OK") {
-        const typeStr = type === "none" ? "" : type;
-        const titleStr = title === "Alert" ? "" : title;
-        const okTextStr = okText === "OK" ? "" : okText;
-        this._addLine(`Al`, `${text}|${typeStr}|${titleStr}|${okTextStr}`);
-    }
-
-    message(text, type = "none", duration = 0) {
-        const typeStr = type === "none" ? "" : type;
-        const durationStr = duration === 0 ? "" : String(duration);
-        this._addLine(`me`, `${text}|${typeStr}|${durationStr}`);
-    }
-
-    consoleMessage(text, type = "log") {
-        const typeStr = type === "log" ? "" : type;
-        this._addLine(`mc`, `${text.replace(/\n/g, "$[ln];")}${typeStr ? `|${typeStr}` : ""}`);
-    }
-
-    consoleMessageAssert(text, condition) {
-        this._addLine(`ma`, `${text.replace(/\n/g, "$[ln];")}|${condition}`);
-    }
-
-    // Enable methods
-    enableWebSocket(enable = true) {
-        this._addLine(`ew`, enable ? "1" : "0");
-    }
-
-    enableWebSocketOnce() {
-        this._addLine(`ew`, "$");
-    }
-
-    addWebSocket(path) {
-        this._addLine(`aw${path}`);
-    }
-
-    // Use methods
-    useWebSocket(inputPlace) {
-        this._addLine(`uw${inputPlace}`);
-    }
-
-    useOnlyChangeUpdate(inputPlace) {
-        this._addLine(`uo${inputPlace}`);
-    }
-
-    // Condition methods
+    // Condition And Loop
+    // Condition And Loop Supports Brackets and Then
+    // Type: warning, problem, help, success, none
+    // Interval: Value 0 is Await (if is not True, all Next Action Controls Waiting for it), Value -1 is Sync Check Once (is Support Bracket or Next Action Control), Value > 0 is Async and is Wait Based on Time Repetition Until it Becomes True (Is Support Bracket or Next Action Control, but is not Support Else).
+    // Nested Conditions and Nested Loops are Possible.
+    _condPrefix(interval) { return (interval >= 0 ? "{(" + interval + ")" : "{"); }
+    
     confirmIsTrueAccept(text = "Are you sure you want to proceed?", type = "none", title = "Confirm", okText = "OK", cancelText = "Cancel", interval = 100) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        const textStr = text === "Are you sure you want to proceed?" ? "" : text;
-        const typeStr = type === "none" ? "" : type;
-        const titleStr = title === "Confirm" ? "" : title;
-        const okTextStr = okText === "OK" ? "" : okText;
-        const cancelTextStr = cancelText === "Cancel" ? "" : cancelText;
-        this._addLine(`${prefix}ct`, `${textStr}|${typeStr}|${titleStr}|${okTextStr}|${cancelTextStr}`);
+        this._add(this._condPrefix(interval) + "ct", (text === "Are you sure you want to proceed?" ? "" : text) + WebForms.GS + (type === "none" ? "" : type) + WebForms.GS + (title === "Confirm" ? "" : title) + WebForms.GS + (okText === "OK" ? "" : okText) + WebForms.GS + (cancelText === "Cancel" ? "" : cancelText));
+        return this;
     }
-
+    
     confirmIsFalseAccept(text = "Are you sure you want to proceed?", type = "none", title = "Confirm", okText = "OK", cancelText = "Cancel", interval = 100) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        const textStr = text === "Are you sure you want to proceed?" ? "" : text;
-        const typeStr = type === "none" ? "" : type;
-        const titleStr = title === "Confirm" ? "" : title;
-        const okTextStr = okText === "OK" ? "" : okText;
-        const cancelTextStr = cancelText === "Cancel" ? "" : cancelText;
-        this._addLine(`${prefix}cf`, `${textStr}|${typeStr}|${titleStr}|${okTextStr}|${cancelTextStr}`);
+        this._add(this._condPrefix(interval) + "cf", (text === "Are you sure you want to proceed?" ? "" : text) + WebForms.GS + (type === "none" ? "" : type) + WebForms.GS + (title === "Confirm" ? "" : title) + WebForms.GS + (okText === "OK" ? "" : okText) + WebForms.GS + (cancelText === "Cancel" ? "" : cancelText));
+        return this;
     }
-
-    isGreaterThan(firstValue, secondValue, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}gt`, `${firstValue}|${secondValue}`);
-    }
-
-    isLessThan(firstValue, secondValue, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}lt`, `${firstValue}|${secondValue}`);
-    }
-
-    isEqualTo(firstValue, secondValue, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}et`, `${firstValue}|${secondValue}`);
-    }
-
-    isNotEqualTo(firstValue, secondValue, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}Nt`, `${firstValue}|${secondValue}`);
-    }
-
-    exist(value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}ex`, value);
-    }
-
-    notExist(value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}nx`, value);
-    }
-
-    isTrue(value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}tr`, value);
-    }
-
-    isFalse(value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}fa`, value);
-    }
-
-    isMatchMedia(value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}mm`, value);
-    }
-
-    isNotMatchMedia(value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}nm`, value);
-    }
-
-    include(text, value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}In`, `${value}|${text}`);
-    }
-
-    notInclude(text, value, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}Nn`, `${value}|${text}`);
-    }
-
-    elementExists(inputPlace, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}eE`, inputPlace);
-    }
-
-    elementNotExists(inputPlace, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}nE`, inputPlace);
-    }
-
-    isRegexMatch(value, pattern, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}re`, `${value}|${pattern}`);
-    }
-
-    isRegexNotMatch(value, pattern, interval = -1) {
-        const prefix = interval >= 0 ? `{(${interval})` : "{";
-        this._addLine(`${prefix}rn`, `${value}|${pattern}`);
-    }
-
-    break() {
-        this._addLine(`;`);
-    }
-
-    startBracket() {
-        this._addLine(`{`);
-    }
-
-    endBracket() {
-        this._addLine(`}`);
-    }
-
-    // Async methods
-    async() {
-        this._addLine(`{(a)`);
-    }
-
-    delay(milliSecond) {
-        this._addLine(`De`, String(milliSecond));
-    }
-
-    // Format Storage methods
-    createFormatStorage(key, data) {
-        this._addLine(`.C`, `${key}|${data}`);
-    }
-
-    deleteFormatStorage(key) {
-        this._addLine(`.D`, key);
-    }
-
-    addJSON(key, path, value) {
-        this._addLine(`.a`, `${key}|j|${value}|${path}`);
-    }
-
-    addXML(key, path, name, value = null) {
-        let safeName = name;
-        if (safeName && safeName[0] === '@') {
-            safeName = safeName.substring(1);
-            safeName = `$[at];${safeName}`;
+    
+    isGreaterThan(firstValue, secondValue, interval = -1) { this._add(this._condPrefix(interval) + "gt", firstValue + WebForms.GS + secondValue); return this; }
+    isLessThan(firstValue, secondValue, interval = -1) { this._add(this._condPrefix(interval) + "lt", firstValue + WebForms.GS + secondValue); return this; }
+    isEqualTo(firstValue, secondValue, interval = -1) { this._add(this._condPrefix(interval) + "et", firstValue + WebForms.GS + secondValue); return this; }
+    isNotEqualTo(firstValue, secondValue, interval = -1) { this._add(this._condPrefix(interval) + "Nt", firstValue + WebForms.GS + secondValue); return this; }
+    exist(value, interval = -1) { this._add(this._condPrefix(interval) + "ex", value); return this; }
+    notExist(value, interval = -1) { this._add(this._condPrefix(interval) + "nx", value); return this; }
+    isTrue(value, interval = -1) { this._add(this._condPrefix(interval) + "tr", value); return this; }
+    isFalse(value, interval = -1) { this._add(this._condPrefix(interval) + "fa", value); return this; }
+    isMatchMedia(value, interval = -1) { this._add(this._condPrefix(interval) + "mm", value); return this; }
+    isNotMatchMedia(value, interval = -1) { this._add(this._condPrefix(interval) + "nm", value); return this; }
+    include(text, value, interval = -1) { this._add(this._condPrefix(interval) + "In", value + WebForms.GS + text); return this; }
+    notInclude(text, value, interval = -1) { this._add(this._condPrefix(interval) + "Nn", value + WebForms.GS + text); return this; }
+    elementExists(inputPlace, interval = -1) { this._add(this._condPrefix(interval) + "eE", inputPlace); return this; }
+    elementNotExists(inputPlace, interval = -1) { this._add(this._condPrefix(interval) + "nE", inputPlace); return this; }
+    isRegexMatch(value, pattern, interval = -1) { this._add(this._condPrefix(interval) + "re", value + WebForms.GS + pattern); return this; }
+    isRegexNotMatch(value, pattern, interval = -1) { this._add(this._condPrefix(interval) + "rn", value + WebForms.GS + pattern); return this; }
+    
+    // In: Everything Becomes A JSON List.
+    // Key: Creates A Temporary Data In The Browser IndexedDB.
+    // Key + "i" Creates A Temporary Data To Maintain The Loop Counter In The Browser IndexedDB.
+    forEach(path, inVal, key = ".") { this._add("{fe", path + WebForms.GS + inVal + WebForms.GS + key); return this; }
+    
+    break() { this._add(";"); }
+    else() { this._add("}e"); return this; }
+    startBracket() { this._add("{"); }
+    endBracket() { this._add("}"); }
+    
+    // Used Then In Condition And Loop Methods
+    then(newForm) {
+        if (newForm === null) return this;
+        const data = newForm.getWebFormsData();
+        if (data !== "") {
+            if (data.includes("\n")) {
+                newForm._addToUp("{");
+                newForm._add("}");
+            }
         }
-        safeName = safeName.replace(/@/g, "$[at];");
-        this._addLine(`.a`, `${key}|x|${safeName}|${value || ""}|${path}`);
+        this.appendForm(newForm);
+        return this;
+    }
+    
+    thenClosure(configure) {
+        const newForm = new WebForms();
+        configure(newForm);
+        const data = newForm.getWebFormsData();
+        if (data !== "") {
+            if (data.includes("\n")) {
+                newForm._addToUp("{");
+                newForm._add("}");
+            }
+        }
+        this.appendForm(newForm);
+        return this;
+    }
+    
+    repeat(newForm, repeat) {
+        if (newForm === null) return this;
+        const bodyData = newForm.getWebFormsData();
+        if (bodyData === "") return this;
+        const startLine = bodyData.split("\n").length * -1;
+        this.appendForm(newForm);
+        this.goTo(startLine, repeat - 1);
+        return this;
+    }
+    
+    repeatWithIndex(newForm, repeat, index) {
+        if (newForm === null) return this;
+        this.goToIndex(index);
+        this.startIndex(index);
+        const bodyData = newForm.getWebFormsData();
+        if (bodyData === "") return this;
+        this.appendForm(newForm);
+        if (index === "") {
+            let indexNumber = -1;
+            for (const x of this.getWebFormsData().split("\n")) {
+                if (x.startsWith("#")) indexNumber++;
+            }
+            this.goTo(indexNumber, repeat - 1);
+        } else {
+            this.goToIndex(index, repeat - 1);
+        }
+        return this;
+    }
+    
+    repeatClosure(configure, repeat) {
+        const newForm = new WebForms();
+        configure(newForm);
+        return this.repeat(newForm, repeat);
+    }
+    
+    repeatClosureWithIndex(configure, repeat, index) {
+        const newForm = new WebForms();
+        configure(newForm);
+        return this.repeatWithIndex(newForm, repeat, index);
     }
 
-    addINI(key, path, value, isINILike = false) {
-        this._addLine(`.a`, `${key}|i|${isINILike ? "1" : "0"}|${value}|${path}`);
+    // Async
+    // It Supports Brackets and Then
+    async() { this._add("{(a)"); return this; }
+    delay(miliSecond) { this._add("De", miliSecond); }
+
+    // Option
+    changeOption(name, value) { this._add("co", name + WebForms.GS + value); }
+    resetOption(name = null) {
+        if (name !== null) this._add("ro", name);
+        else this._add("ro");
     }
 
-    addTextLine(key, line, text) {
-        this._addLine(`.a`, `${key}|t|${text}|${line}`);
+    // Format Storage
+    createFormatStorage(key, data) { this._add(".C", key + WebForms.GS + data); }
+    deleteFormatStorage(key) { this._add(".D", key); }
+    addJSON(key, path, value) { this._add(".a", key + WebForms.GS + "j" + WebForms.GS + value + WebForms.GS + path); }
+    
+    // Name: For Support Attribute, Set Double At Sign (@@) Before Name.
+    addXML(key, path, name, value = null) { this._add(".a", key + WebForms.GS + "x" + WebForms.GS + name + WebForms.GS + (value !== null ? value : "") + WebForms.GS + path); }
+    
+    addINI(key, path, value, isINILike = false) { this._add(".a", key + WebForms.GS + "i" + WebForms.GS + (isINILike ? "1" : "0") + WebForms.GS + value + WebForms.GS + path); }
+    addTextLine(key, line, text) { this._add(".a", key + WebForms.GS + "t" + WebForms.GS + text + WebForms.GS + line); }
+    addVariable(key, value) { this._add(".a", key + WebForms.GS + "v" + WebForms.GS + value); }
+    updateJSON(key, path, value) { this._add(".u", key + WebForms.GS + "j" + WebForms.GS + value + WebForms.GS + path); }
+    updateXML(key, path, value) { this._add(".u", key + WebForms.GS + "x" + WebForms.GS + value + WebForms.GS + path); }
+    updateINI(key, path, value, isINILike = false) { this._add(".u", key + WebForms.GS + "i" + WebForms.GS + (isINILike ? "1" : "0") + WebForms.GS + value + WebForms.GS + path); }
+    updateTexLine(key, line, text) { this._add(".u", key + WebForms.GS + "t" + WebForms.GS + text + WebForms.GS + line); }
+    updateVariable(key, value) { this._add(".u", key + WebForms.GS + "v" + WebForms.GS + value); }
+    increaseVariable(key, value) { this._add(".i", key + WebForms.GS + "v" + WebForms.GS + value); }
+    decreaseVariable(key, value) { this.increaseVariable(key, value * -1); }
+    deleteJSON(key, path) { this._add(".d", key + WebForms.GS + "j" + WebForms.GS + path); }
+    deleteXML(key, path) { this._add(".d", key + WebForms.GS + "x" + WebForms.GS + path); }
+    deleteINI(key, path, isINILike = false) { this._add(".d", key + WebForms.GS + "i" + WebForms.GS + (isINILike ? "1" : "0") + WebForms.GS + path); }
+    deleteTextLine(key, line) { this._add(".d", key + WebForms.GS + "t" + WebForms.GS + line); }
+    deleteVariable(key) { this._add(".d", key + WebForms.GS + "v"); }
+
+    // Template Engine
+    // Pattern Example: {{value}}, ((value)), *value*, $value;
+    bindJSONToTemplate(inputPlace, jsonText, path, pattern, alsoStartTag = true) { this._add("Tj" + inputPlace, jsonText + WebForms.GS + path + WebForms.GS + pattern + WebForms.GS + (alsoStartTag ? "1" : "0")); }
+    
+    // Because XML Elements Are Lowercased, Placeholders Must Use Lowercase Names.
+    bindXMLToTemplate(inputPlace, xmlText, path, pattern, alsoStartTag = true) { this._add("Tx" + inputPlace, xmlText + WebForms.GS + path + WebForms.GS + pattern + WebForms.GS + (alsoStartTag ? "1" : "0")); }
+    
+    bindINIToTemplate(inputPlace, iniText, path, pattern, alsoStartTag = true) { this._add("Ti" + inputPlace, iniText + WebForms.GS + path + WebForms.GS + pattern + WebForms.GS + (alsoStartTag ? "1" : "0")); }
+
+    // Inject
+    // Need Add @: to First of String
+    inject(value) { return "$[" + value + "];"; }
+
+    // Action Control
+    replaceActionControl(searchValue, value, addingToUp = false) {
+        if (addingToUp) this._addToUp("rE", searchValue + WebForms.GS + value);
+        else this._add("rE", searchValue + WebForms.GS + value);
+    }
+    
+    assignReplace(searchValue, value, index = -1) {
+        const currentLine = this._getLineByIndex(index);
+        if (currentLine === "") return;
+        const parts = currentLine.split("=", 2);
+        const newName = ";" + searchValue + WebForms.GS + value + WebForms.GS + parts[0];
+        const newValue = parts.length > 1 ? parts[1] : "";
+        this._updateLineByIndex(index, newName, newValue);
     }
 
-    addVariable(key, value) {
-        this._addLine(`.a`, `${key}|v|${value}`);
-    }
-
-    updateJSON(key, path, value) {
-        this._addLine(`.u`, `${key}|j|${value}|${path}`);
-    }
-
-    updateXML(key, path, value) {
-        this._addLine(`.u`, `${key}|x|${value}|${path}`);
-    }
-
-    updateINI(key, path, value, isINILike = false) {
-        this._addLine(`.u`, `${key}|i|${isINILike ? "1" : "0"}|${value}|${path}`);
-    }
-
-    updateTextLine(key, line, text) {
-        this._addLine(`.u`, `${key}|t|${text}|${line}`);
-    }
-
-    updateVariable(key, value) {
-        this._addLine(`.u`, `${key}|v|${value}`);
-    }
-
-    increaseVariable(key, value) {
-        this._addLine(`.i`, `${key}|v|${value}`);
-    }
-
-    decreaseVariable(key, value) {
-        this.increaseVariable(key, value * -1);
-    }
-
-    deleteJSON(key, path) {
-        this._addLine(`.d`, `${key}|j|${path}`);
-    }
-
-    deleteXML(key, path) {
-        this._addLine(`.d`, `${key}|x|${path}`);
-    }
-
-    deleteINI(key, path, isINILike = false) {
-        this._addLine(`.d`, `${key}|i|${isINILike}|${path}`);
-    }
-
-    deleteTextLine(key, line) {
-        this._addLine(`.d`, `${key}|t|${line}`);
-    }
-
-    deleteVariable(key) {
-        this._addLine(`.d`, `${key}|v`);
-    }
-
-    // Inject method
-    inject(value) {
-        return `$[${value}];`;
-    }
-
-    // Hash And Checksum methods
-    setHash() {
-        this._addLine(`SH`);
-    }
-
-    setChecksum() {
-        this._addLine(`CS`);
-    }
-
+    // Hash And Checksum
+    setHash() { this._add("SH"); }
+    setChecksum() { this._add("CS"); }
+    
     checksumCalculation(text) {
         let sum = 0;
         const mod = 65536;
         const shift = 5;
-
         for (let i = 0; i < text.length; i++) {
-            sum = ((sum << shift) | (sum >> (16 - shift))) ^ text.charCodeAt(i);
+            const c = text.charCodeAt(i);
+            sum = ((sum << shift) | (sum >>> (16 - shift))) ^ c;
             sum %= mod;
         }
-
-        return sum.toString();
+        return String(sum);
     }
+    
+    getChecksum() { return this.checksumCalculation(this.getWebFormsData()); }
 
-    getChecksum() {
-        return this.checksumCalculation(this.getWebFormsData());
-    }
-
-    // Get methods
+    // Get
     getFormsActionData() {
-        return this.webFormsData.join('\n');
+        if (this._webFormsData.length === 0) return "";
+        return this._webFormsData;
     }
-
-    response() {
-        return `[web-forms]\n${this.getFormsActionData()}`;
-    }
-
+    
+    response() { return "[web-forms]\n" + this.getFormsActionData(); }
+    
     getFormsActionDataLineBreak() {
-        const data = this.getFormsActionData();
-        const processedData = data.replace(/"/g, "$[dq];");
-        return processedData.replace(/\n/g, "$[sln];");
+        if (this._webFormsData.length === 0) return "";
+        return this._webFormsData.replace(/"/g, "$[dq];").replace(/\n/g, "$[sln];");
     }
 
-    // Export methods
-    exportToWebFormsTag(src = null) {
-        return `<web-forms ac="${this.getFormsActionDataLineBreak()}"${src ? ` src="${src}"` : ''}></web-forms>`;
-    }
-
-    exportToLineBreak(src = null) {
-        return `[web-forms]$[sln];${this.getFormsActionDataLineBreak()}`;
-    }
-
-    exportToWebFormsTagWithDimensions(width, height, src = null) {
-        return `<web-forms ac="${this.getFormsActionDataLineBreak()}" width="${width}" height="${height}"${src ? ` src="${src}"` : ''}></web-forms>`;
-    }
-
-    doneToWebFormsTag(id = null) {
-        return `<web-forms ac="${this.getFormsActionDataLineBreak()}"${id ? ` id="${id}" done="true"` : ''}></web-forms>`;
-    }
-
+    // Export
     exportToHtmlComment(addLine = false) {
-        return `${addLine ? '\n' : ''}<!--${this.response()}-->`;
+        let response = this.response().replace(/--/g, "$[dd];");
+        if (response.endsWith("-")) {
+            response = response.substring(0, response.length - 1) + "$[da];";
+        }
+        return (addLine ? "\n" : "") + "<!--" + response + "-->";
     }
-
-    getWebFormsData() {
-        return this.webFormsData.join('\n');
-    }
-
+    
+    // Using it for SSE Response
+    exportToLineBreak(src = null) { return "[web-forms]$[sln];" + this.getFormsActionDataLineBreak(); }
+    
+    getWebFormsData() { return this._webFormsData; }
+    
     appendForm(form) {
-        if (!form) return;
-
+        if (form === null) return;
         const otherData = form.getWebFormsData();
-        if (otherData) {
-            if (this.webFormsData.length > 0) {
-                this.webFormsData.push(...otherData.split('\n'));
-            } else {
-                this.webFormsData = otherData.split('\n');
-            }
+        if (otherData !== "") {
+            if (this._webFormsData.length > 0) this._webFormsData += "\n";
+            this._webFormsData += otherData;
         }
     }
-
-    setHeaders(context) {
-        context.setHeader("Content-Type", "text/plain");
-    }
-
-    clean() {
-        this.webFormsData = [];
-    }
+    
+    clean() { this._webFormsData = ""; }
 }
 
-// Security class
-class Security {
+export class Security {
     safeValue(value) {
-        if (!value || value.length < 1) {
-            return value;
-        }
-
-        let result = value;
-        if (result[0] === '@') {
-            result = result.substring(1);
-            result = `$[at];${result}`;
-        }
-
-        result = result.replace(/\n/g, "$[ln];");
-        result = result.replace(/\|/g, "$[vb];");
-        result = result.replace(/,@/g, "$[co];@");
-
-        return result;
+        if (value.length < 1) return value;
+        if (value[0] === "@") value = "@" + value;
+        return value.replace(/\n/g, "$[ln];").replace(/,@/g, "$[co];@").replace(/\x1C/g, "").replace(/\x1D/g, "").replace(/\x1E/g, "").replace(/\x1F/g, "");
     }
 }
 
-// InputPlace class
-class InputPlace {
-    static get Window() { return "`"; }
-    static get Root() { return "~"; }
-    static get Current() { return "$"; }
-    static get Target() { return "!"; }
-    static get Upper() { return "-"; }
-    static get Head() { return "^"; }
-    static get ScreenOrientation() { return "%"; }
+// WebForms Place Criteria (WPC) DSL
+export class InputPlace {
+    static DOCUMENT = ",";
+    static WINDOW = "`";
+    // When Calling TransientDOM, Using Root will Result in the Selection of the Transient Tag.
+    static ROOT = "~";
+    static HTML = ".";
+    static HEAD = "^";
+    static SCREEN_ORIENTATION = "%";
+    static ALL = "*";
+    static PARENT = "/";
+    static CURRENT = "$";
+    static TARGET = "!";
+    static UPPER = "-";
 
-    static id(id) {
-        return id;
+    static id(id) { return id; }
+    
+    static name(name, index = null) { return "(" + name + ")" + (index !== null ? index : ""); }
+    static allNames(name) { return "(" + name + ")*"; }
+    
+    static tag(tag, index = null) { return "<" + tag + ">" + (index !== null ? index : ""); }
+    static allTags(tag) { return "<" + tag + ">*"; }
+    
+    static child(index = null) { return "<>" + (index !== null ? index : ""); }
+    static allChild() { return "<>*"; }
+    
+    static class(className, index = null) { return "{" + className + "}" + (index !== null ? index : ""); }
+    static allClasses(className) { return "{" + className + "}*"; }
+    
+    static attribute(name, arg1 = null, arg2 = null, arg3 = "") {
+        if (arguments.length === 1) return '"' + name + '"';
+        if (typeof arg1 === "number") return '"' + name + '"' + arg1;
+        const op = arg3 !== "" ? arg3 : "";
+        if (typeof arg2 === "number") return '"' + name + op + "'" + arg1 + '"' + arg2;
+        return '"' + name + op + "'" + arg1 + '"';
     }
-
-    static name(name) {
-        return `(${name})`;
+    
+    static allAttributes(name, value = null, operator = "") {
+        if (value === null) return '"' + name + '"*';
+        const op = operator !== "" ? operator : "";
+        return '"' + name + op + "'" + value + '"*';
     }
-
-    static nameWithIndex(name, index) {
-        return `(${name})${index}`;
-    }
-
-    static allNames(name) {
-        return `(${name})*`;
-    }
-
-    static tag(tag) {
-        return `<${tag}>`;
-    }
-
-    static tagWithIndex(tag, index) {
-        return `<${tag}>${index}`;
-    }
-
-    static allTags(tag) {
-        return `<${tag}>*`;
-    }
-
-    static cssClass(className) {
-        return `{${className}}`;
-    }
-
-    static cssClassWithIndex(className, index) {
-        return `{${className}}${index}`;
-    }
-
-    static allCssClasses(className) {
-        return `{${className}}*`;
-    }
-
-    static query(query) {
-        return `*${query.replace(/=/g, "$[eq];")}`;
-    }
-
-    static queryAll(query) {
-        return `[${query.replace(/=/g, "$[eq];")}`;
-    }
+    
+    static query(query) { return "*" + query.replace(/=/g, "$[eq];").replace(/\|/g, "$[vb];").replace(/\?/g, "$[qu];"); }
+    static queryAll(query) { return "[" + query.replace(/=/g, "$[eq];").replace(/\|/g, "$[vb];").replace(/\?/g, "$[qu];"); }
 }
 
-// OutputPlace class (extends InputPlace)
-class OutputPlace extends InputPlace {}
+export class OutputPlace extends InputPlace {}
 
-// Fetch class
-class Fetch {
+// Do not Add any Data Before or After it
+export class Fetch {
+    static RS = "\x1E";
+    static US = "\x1F";
+
     // Method
     static random(maxValue, minValue = null) {
-        if (minValue !== null) {
-            return `@mr${maxValue},${minValue}`;
-        } else {
-            return `@mr${maxValue}`;
-        }
+        return "@mr" + maxValue + (minValue !== null ? Fetch.RS + minValue : "");
     }
-
-    static spaceToChar(text, character = "-") {
-        return `@sc${character},${text}`;
-    }
-
-    static encodeURI(text) {
-        return `@ue${text}`;
-    }
-
-    static decodeURI(text) {
-        return `@ud${text}`;
-    }
+    
+    static spaceToChar(text, character = "-") { return "@sc" + character + Fetch.RS + text; }
+    static encodeURI(text) { return "@ue" + text; }
+    static decodeURI(text) { return "@ud" + text; }
 
     static method(methodName, args = null) {
-        let returnValue = `@cm${methodName}`;
-        if (args && args.length > 0) {
-            returnValue += `,${args.join(",")}`;
-        }
-        return returnValue;
+        return "@cm" + methodName + (args !== null && args.length > 0 ? Fetch.RS + args.map(String).join(Fetch.US) : "");
     }
 
     static moduleMethod(methodName, args = null) {
-        let returnValue = `@cM${methodName}`;
-        if (args && args.length > 0) {
-            returnValue += `,${args.join(",")}`;
-        }
-        return returnValue;
+        return "@cM" + methodName + (args !== null && args.length > 0 ? Fetch.RS + args.map(String).join(Fetch.US) : "");
     }
 
+    // MethodName: The Method Name May Need to Include the Class Name, Separated by a Period. Example: MyClassName.MyMethodName
     static wasmMethod(wasmLanguage, wasmUrl, methodName, args = null, key = ".") {
-        let returnValue = `@wA${wasmLanguage},${wasmUrl},${methodName}`;
-        if (args && args.length > 0) {
-            returnValue += `,${args.join(",")}`;
-        }
-        return returnValue;
+        return "@wA" + wasmLanguage + Fetch.RS + wasmUrl + Fetch.RS + methodName + (args !== null && args.length > 0 ? Fetch.RS + args.map(String).join(Fetch.US) : "");
     }
 
-    static script(scriptText) {
-        return `@_${scriptText.replace(/\n/g, "$[ln];")}`;
-    }
-
-    static loadUrl(url, fetchScript = false) {
-        return `@lu${url}${fetchScript ? ",1" : ""}`;
-    }
-
-    static loadHtml(url, fetchInputPlace = null, fetchScript = false) {
-        return `@lh${url},${fetchScript ? "1" : "0"}${fetchInputPlace ? `,${fetchInputPlace}` : ""}`;
-    }
-
-    static loadLine(url, line) {
-        return `@ll${url},${line}`;
-    }
-
-    static loadINI(url, name, isINILike = false) {
-        return `@li${url},${name}${isINILike ? ",1" : ""}`;
-    }
-
-    static loadJSON(url, name) {
-        return `@lj${url},${name}`;
-    }
-
-    static loadXML(url, name) {
-        return `@lx${url},${name}`;
-    }
-
-    static hasMethod(methodName) {
-        return `@hm${methodName}`;
-    }
-
-    static hasModuleMethod(methodName) {
-        return `@hM${methodName}`;
-    }
-
-    static getModifierState(modifier) {
-        return `@ms${modifier}`;
-    }
+    static script(scriptText) { return "@_" + scriptText.replace(/\n/g, "$[ln];"); }
+    static loadUrl(url, fetchScript = false) { return "@lu" + url + (fetchScript ? Fetch.RS + "1" : ""); }
+    static loadHtml(url, fetchInputPlace = "", fetchScript = false) { return "@lh" + url + Fetch.RS + (fetchScript ? "1" : "0") + (fetchInputPlace !== "" ? Fetch.RS + fetchInputPlace : ""); }
+    static loadLine(url, line) { return "@ll" + url + Fetch.RS + line; }
+    static loadINI(url, name, isINILike = false) { return "@li" + url + Fetch.RS + name + (isINILike ? Fetch.RS + "1" : ""); }
+    
+    // Name: Name Or Nested Paths. Is Supprt Index (Student[8].Name). Nested Paths Index Starts At 0
+    static loadJSON(url, name) { return "@lj" + url + Fetch.RS + name; }
+    
+    // Name: Name Or XPath; XPath Index Starts At 1
+    static loadXML(url, name) { return "@lx" + url + Fetch.RS + name; }
+    
+    // MethodName: It's Check Function Or Variable
+    static hasMethod(methodName) { return "@hm" + methodName; }
+    static hasModuleMethod(methodName) { return "@hM" + methodName; }
+    
+    // This Method Return True Or False If Key Pressed
+    // Modifier: Alt, AltGraph, Control, Meta, Shift, CapsLock, NumLock, ScrollLock
+    static getModifierState(modifier) { return "@ms" + modifier; }
 
     // Math
     static math(methodName, args = null) {
-        let returnValue = `@M#${methodName}`;
-        if (args && args.length > 0) {
-            returnValue += `,${args.join(",")}`;
-        }
-        return returnValue;
+        return "@M#" + methodName + (args !== null && args.length > 0 ? Fetch.RS + args.map(String).join(Fetch.US) : "");
     }
 
     // Data
-    static get DateYear() { return "@dy"; }
-    static get DateMonth() { return "@dm"; }
-    static get DateDay() { return "@dd"; }
-    static get DateHours() { return "@dh"; }
-    static get DateMinutes() { return "@di"; }
-    static get DateSeconds() { return "@ds"; }
-    static get DateMilliseconds() { return "@dl"; }
+    static DATE_YEAR = "@dy";
+    // Month In JavaScript Is Start From Index 0, Month In WebForms Core Is Start From Index 1 
+    static DATE_MONTH = "@dm";
+    static DATE_DAY = "@dd";
+    static DATE_DATE = "@dD";
+    static DATE_HOURS = "@dh";
+    static DATE_MINUTES = "@di";
+    static DATE_SECONDS = "@ds";
+    static DATE_MILLISECONDS = "@dl";
 
     // String
-    static get Space() { return "@sp"; }
-    static get AtSign() { return "@sa"; }
+    static SPACE = "@sp";
+    static AT_SIGN = "@sa";
 
     // Tag
-    static getId(inputPlace) {
-        return `@$i${inputPlace}`;
-    }
-
-    static getName(inputPlace) {
-        return `@$n${inputPlace}`;
-    }
-
-    static getValue(inputPlace) {
-        return `@$v${inputPlace}`;
-    }
-
-    static getValueLength(inputPlace) {
-        return `@$e${inputPlace}`;
-    }
-
-    static getClass(inputPlace) {
-        return `@$c${inputPlace}`;
-    }
-
-    static getStyle(inputPlace) {
-        return `@$s${inputPlace}`;
-    }
-
-    static getTitle(inputPlace) {
-        return `@$l${inputPlace}`;
-    }
-
-    static getLabel(inputPlace) {
-        return `@$A${inputPlace}`;
-    }
-
-    static getText(inputPlace) {
-        return `@$t${inputPlace}`;
-    }
-
-    static getOuterText(inputPlace) {
-        return `@$o${inputPlace}`;
-    }
-
-    static getTextLength(inputPlace) {
-        return `@$g${inputPlace}`;
-    }
-
-    static getAttribute(inputPlace, attribute) {
-        return `@$a${inputPlace},${attribute}`;
-    }
-
-    static getWidth(inputPlace) {
-        return `@$w${inputPlace}`;
-    }
-
-    static getHeight(inputPlace) {
-        return `@$h${inputPlace}`;
-    }
-
-    static getIsReadOnly(inputPlace) {
-        return `@$r${inputPlace}`;
-    }
-
-    static getSelectedIndex(inputPlace) {
-        return `@$x${inputPlace}`;
-    }
-
-    static getIndex(inputPlace) {
-        return `@$I${inputPlace}`;
-    }
-
-    static getTextAlign(inputPlace) {
-        return `@$T${inputPlace}`;
-    }
-
-    static getNodeLength(inputPlace) {
-        return `@$L${inputPlace}`;
-    }
-
-    static getIsVisible(inputPlace) {
-        return `@$V${inputPlace}`;
-    }
+    static getId(inputPlace) { return "@$i" + inputPlace; }
+    static getName(inputPlace) { return "@$n" + inputPlace; }
+    static getValue(inputPlace) { return "@$v" + inputPlace; }
+    static getValueLength(inputPlace) { return "@$e" + inputPlace; }
+    static getClass(inputPlace) { return "@$c" + inputPlace; }
+    static getStyle(inputPlace) { return "@$s" + inputPlace; }
+    static getTitle(inputPlace) { return "@$l" + inputPlace; }
+    static getLabel(inputPlace) { return "@$A" + inputPlace; }
+    static getText(inputPlace) { return "@$t" + inputPlace; }
+    static getOuterText(inputPlace) { return "@$o" + inputPlace; }
+    static getTextLength(inputPlace) { return "@$g" + inputPlace; }
+    static getAttribute(inputPlace, attribute) { return "@$a" + inputPlace + Fetch.RS + attribute; }
+    static getWidth(inputPlace) { return "@$w" + inputPlace; }
+    static getHeight(inputPlace) { return "@$h" + inputPlace; }
+    static getIsReadOnly(inputPlace) { return "@$r" + inputPlace; }
+    static getSelectedIndex(inputPlace) { return "@$x" + inputPlace; }
+    static getIndex(inputPlace) { return "@$I" + inputPlace; }
+    static getTextAlign(inputPlace) { return "@$T" + inputPlace; }
+    static getNodeLength(inputPlace) { return "@$L" + inputPlace; }
+    static getIsVisible(inputPlace) { return "@$V" + inputPlace; }
 
     // Save
-    static hasHash(hash) {
-        return `@HH${hash}`;
-    }
-
-    static cookie(key) {
-        return `@co${key}`;
-    }
-
-    static session(key, replaceValue = null) {
-        if (replaceValue !== null) {
-            return `@cs${key},${replaceValue}`;
-        } else {
-            return `@cs${key}`;
-        }
-    }
-
-    static sessionAndRemove(key, replaceValue = null) {
-        if (replaceValue !== null) {
-            return `@cl${key},${replaceValue}`;
-        } else {
-            return `@cl${key}`;
-        }
-    }
-
-    static saved(key = ".") {
-        return Fetch.session(key);
-    }
-
-    static cache(key = ".", replaceValue = null) {
-        if (replaceValue !== null) {
-            return `@cd${key},${replaceValue}`;
-        } else {
-            return `@cd${key}`;
-        }
-    }
-
-    static cacheAndRemove(key, replaceValue = null) {
-        if (replaceValue !== null) {
-            return `@ct${key},${replaceValue}`;
-        } else {
-            return `@ct${key}`;
-        }
-    }
-
-    static savedLine(key = ".", line = 0) {
-        return `@lL${key}[${line}`;
-    }
-
-    static savedLineConsume(key = ".") {
-        return `@lL${key}`;
-    }
-
-    static savedINI(key, iniKey) {
-        return `@lI${key}[${iniKey}`;
-    }
-
-    static cacheLine(key = ".", line = 0) {
-        return `@dL${key}[${line}`;
-    }
-
-    static cacheLineConsume(key = ".") {
-        return `@dL${key}`;
-    }
-
-    static cacheINI(key, iniKey) {
-        return `@dI${key}[${iniKey}`;
-    }
+    static hasHash(hash) { return "@HH" + hash; }
+    static cookie(key) { return "@co" + key; }
+    static save(key = ".", replaceValue = null) { return "@cs" + key + (replaceValue !== null ? Fetch.RS + replaceValue : ""); }
+    static saveThenRemove(key) { return "@cl" + key; }
+    static saveLength(key = ".") { return "@cg" + key; }
+    static cache(key = ".", replaceValue = null) { return "@cd" + key + (replaceValue !== null ? Fetch.RS + replaceValue : ""); }
+    static cacheThenRemove(key) { return "@ct" + key; }
+    static cacheLength(key = ".") { return "@cG" + key; }
+    static saveLine(key = ".", line = 0) { return "@lL" + key + "[" + line; }
+    static saveLineConsume(key = ".") { return "@lL" + key; }
+    
+    // INIKey: Only Direct Key is Supported
+    static saveINI(key, iniKey) { return "@lI" + key + "[" + iniKey; }
+    static cacheLine(key = ".", line = 0) { return "@dL" + key + "[" + line; }
+    static cacheLineConsume(key = ".") { return "@dL" + key; }
+    
+    // INIKey: Only Direct Key is Supported
+    static cacheINI(key, iniKey) { return "@dI" + key + "[" + iniKey; }
 
     // Format Storage
-    static formatStore(key) {
-        return `@fr${key}`;
-    }
+    static formatStore(key) { return "@fr" + key; }
+    static formatStoreByXMLQuery(key, xpath) { return "@fx" + key + Fetch.RS + xpath; }
+    static formatStoreByJSONQuery(key, query) { return "@fj" + key + Fetch.RS + query; }
+    static formatStoreByINI(key, name) { return "@fi" + key + Fetch.RS + name; }
+    static formatStoreByText(key, line) { return "@ft" + key + Fetch.RS + line; }
+    static formatStoreByVariable(key) { return "@fv" + key; }
 
-    static formatStoreByXMLQuery(key, xpath) {
-        return `@fx${key},${xpath}`;
-    }
+    // State
+    static hasState(path) { return "@hs" + path; }
 
-    static formatStoreByJSONQuery(key, query) {
-        return `@fj${key},${query}`;
-    }
+    // SSE
+    static sseIsConnected(path) { return "@Sc" + path; }
 
-    static formatStoreByINI(key, name) {
-        return `@fi${key},${name}`;
-    }
-
-    static formatStoreByText(key, line) {
-        return `@ft${key},${line}`;
-    }
-
-    static formatStoreByVariable(key) {
-        return `@fv${key}`;
-    }
+    // WebSockets
+    static webSocketsIsConnected(path = "") { return "@Wc" + path; }
 
     // Document
-    static get TabIsActive() { return "@da"; }
+    static TAB_IS_ACTIVE = "@da";
 
     // Window
-    static get Href() { return "@wf"; }
-    static get PathName() { return "@wP"; }
-    static get Query() { return "@wq"; }
-    static get Hash() { return "@wh"; }
-    static get Host() { return "@wH"; }
-    static get HostName() { return "@wn"; }
-    static get Port() { return "@wT"; }
-    static get Origin() { return "@wo"; }
-    static get GetSelection() { return "@ws"; }
-    static get ScrollX() { return "@wx"; }
-    static get ScrollY() { return "@wy"; }
+    static HREF = "@wf";
+    static PATH_NAME = "@wP";
+    static query(name = "*") { return "@wq" + name; }
+    static HASH = "@wh";
+    static HOST = "@wH";
+    static HOST_NAME = "@wn";
+    static PORT = "@wT";
+    static ORIGIN = "@wo";
+    static GET_SELECTION = "@ws";
+    static SCROLL_X = "@wx";
+    static SCROLL_Y = "@wy";
+    static segment(index) { return "@wS" + index; }
+    
+    // It Only Works when the String Starts with the Tilde Character (~). The Path is Also Separated by the Slash Character (/). #~/Segment1/Segment2/Segment3
+    static hashSegment(index) { return "@wt" + index; }
 
     // Navigator
-    static get ClipboardText() { return "@nC"; }
-    static get GeoLatitude() { return "@nW"; }
-    static get GeoLongitude() { return "@nO"; }
-    static get Language() { return "@nL"; }
-    static get IsOnLine() { return "@no"; }
-    static get UserAgent() { return "@na"; }
+    static CLIPBOARD_TEXT = "@nC";
+    static GEO_LATITUDE = "@nW";
+    static GEO_LONGITUDE = "@nO";
+    static LANGUAGE = "@nL";
+    static IS_ON_LINE = "@no";
+    static USER_AGENT = "@na";
 
     // Screen
-    static get ScreenWidth() { return "@sw"; }
-    static get ScreenHeight() { return "@sh"; }
-    static get ScreenOrientationType() { return "@so"; }
-    static get ScreenOrientationAngle() { return "@sr"; }
+    static SCREEN_WIDTH = "@sw";
+    static SCREEN_HEIGHT = "@sh";
+    static SCREEN_ORIENTATION_TYPE = "@so";
+    static SCREEN_ORIENTATION_ANGLE = "@sr";
 
     // Performance
-    static get TimeOrigin() { return "@pt"; }
-    static get PerformanceNow() { return "@pn"; }
+    static TIME_ORIGIN = "@pt";
+    static PERFORMANCE_NOW = "@pn";
 
     // Event
-    static get Event() { return "@EV"; }
-    static get EventSerialize() { return "@Es"; }
-    static get EventKey() { return "@ek"; }
-    static get EventWhich() { return "@ew"; }
-    static get EventClientX() { return "@ex"; }
-    static get EventClientY() { return "@ey"; }
-    static get EventPageX() { return "@eX"; }
-    static get EventPageY() { return "@eY"; }
-    static get EventOffsetX() { return "@Ex"; }
-    static get EventOffsetY() { return "@Ey"; }
-    static get EventDeltaY() { return "@ed"; }
+    static EVENT = "@EV";
+    static EVENT_SERIALIZE = "@Es";
+    static EVENT_KEY = "@ek";
+    static EVENT_WHICH = "@ew";
+    static EVENT_CLIENT_X = "@ex";
+    static EVENT_CLIENT_Y = "@ey";
+    static EVENT_PAGE_X = "@eX";
+    static EVENT_PAGE_Y = "@eY";
+    static EVENT_OFFSET_X = "@Ex";
+    static EVENT_OFFSET_Y = "@Ey";
+    static EVENT_DELTA_Y = "@ed";
 }
 
-// WasmLanguage class
-class WasmLanguage {
-    static get C() { return "c"; }
-    static get CPP() { return "c"; }
-    static get Rust() { return "rust"; }
-    static get CSharp() { return "csharp"; }
-    static get GO() { return "go"; }
-    static get JAVA() { return "java"; }
-    static get AssemblyScript() { return "as"; }
+export class WasmLanguage {
+    // The Suffix "Mediator" Means You Must Call the JavaScript Interface. In Other Cases, the WASM File Should Be Called Directly.
+    static C = "c";
+    static CPP = "c";
+    static Rust = "rust";
+    static CSharp = "csharp";
+    // .NET WebCIL Container. The "dotnet.js" File Should Be Invoked.
+    static CSharpMediator = "csharp-m";
+    static GO = "go";
+    static JAVA = "java";
+    static AssemblyScript = "as";
 }
 
-// HtmlEvent class
-class HtmlEvent {
-    static get OnAbort() { return "onabort"; }
-    static get OnAfterPrint() { return "onafterprint"; }
-    static get OnBeforePrint() { return "onbeforeprint"; }
-    static get OnBeforeUnload() { return "onbeforeunload"; }
-    static get OnBlur() { return "onblur"; }
-    static get OnCanPlay() { return "oncanplay"; }
-    static get OnCanPlayThrough() { return "oncanplaythrough"; }
-    static get OnChange() { return "onchange"; }
-    static get OnClick() { return "onclick"; }
-    static get OnCopy() { return "oncopy"; }
-    static get OnCut() { return "oncut"; }
-    static get OnDoubleClick() { return "ondblclick"; }
-    static get OnDrag() { return "ondrag"; }
-    static get OnDragEnd() { return "ondragend"; }
-    static get OnDragEnter() { return "ondragenter"; }
-    static get OnDragLeave() { return "ondragleave"; }
-    static get OnDragOver() { return "ondragover"; }
-    static get OnDragStart() { return "ondragstart"; }
-    static get OnDrop() { return "ondrop"; }
-    static get OnDurationChange() { return "ondurationchange"; }
-    static get OnEnded() { return "onended"; }
-    static get OnError() { return "onerror"; }
-    static get OnFocus() { return "onfocus"; }
-    static get OnFocusin() { return "onfocusin"; }
-    static get OnFocusOut() { return "onfocusout"; }
-    static get OnHashChange() { return "onhashchange"; }
-    static get OnInput() { return "oninput"; }
-    static get OnInvalid() { return "oninvalid"; }
-    static get OnKeyDown() { return "onkeydown"; }
-    static get OnKeyPress() { return "onkeypress"; }
-    static get OnKeyUp() { return "onkeyup"; }
-    static get OnLoad() { return "onload"; }
-    static get OnLoadedData() { return "onloadeddata"; }
-    static get OnLoadedMetaData() { return "onloadedmetadata"; }
-    static get OnLoadStart() { return "onloadstart"; }
-    static get OnMouseDown() { return "onmousedown"; }
-    static get OnMouseEnter() { return "onmouseenter"; }
-    static get OnMouseLeave() { return "onmouseleave"; }
-    static get OnMouseMove() { return "onmousemove"; }
-    static get OnMouseOver() { return "onmouseover"; }
-    static get OnMouseOut() { return "onmouseout"; }
-    static get OnMouseUp() { return "onmouseup"; }
-    static get OnOffline() { return "onoffline"; }
-    static get OnOnline() { return "ononline"; }
-    static get OnPageHide() { return "onpagehide"; }
-    static get OnPageShow() { return "onpageshow"; }
-    static get OnPaste() { return "onpaste"; }
-    static get OnPause() { return "onpause"; }
-    static get OnPlay() { return "onplay"; }
-    static get OnPlaying() { return "onplaying"; }
-    static get OnProgress() { return "onprogress"; }
-    static get OnRateChange() { return "onratechange"; }
-    static get OnResize() { return "onresize"; }
-    static get OnReset() { return "onreset"; }
-    static get OnScroll() { return "onscroll"; }
-    static get OnSearch() { return "onsearch"; }
-    static get OnSeeked() { return "onseeked"; }
-    static get OnSeeking() { return "onseeking"; }
-    static get OnSelect() { return "onselect"; }
-    static get OnStalled() { return "onstalled"; }
-    static get OnSubmit() { return "onsubmit"; }
-    static get OnSuspend() { return "onsuspend"; }
-    static get OnTimeUpdate() { return "ontimeupdate"; }
-    static get OnToggle() { return "ontoggle"; }
-    static get OnTouchCancel() { return "ontouchcancel"; }
-    static get OnTouchend() { return "ontouchend"; }
-    static get OnTouchMove() { return "ontouchmove"; }
-    static get OnTouchStart() { return "ontouchstart"; }
-    static get OnUnload() { return "onunload"; }
-    static get OnVolumeChange() { return "onvolumechange"; }
-    static get OnWaiting() { return "onwaiting"; }
-    static get OnWheel() { return "onwheel"; }
+export class HtmlEvent {
+    static OnAbort = "onabort";
+    static OnAfterPrint = "onafterprint";
+    static OnBeforePrint = "onbeforeprint";
+    static OnBeforeUnload = "onbeforeunload";
+    static OnBlur = "onblur";
+    static OnCanPlay = "oncanplay";
+    static OnCanPlayThrough = "oncanplaythrough";
+    static OnChange = "onchange";
+    static OnClick = "onclick";
+    static OnCopy = "oncopy";
+    static OnCut = "oncut";
+    static OnDoubleClick = "ondblclick";
+    static OnDrag = "ondrag";
+    static OnDragEnd = "ondragend";
+    static OnDragEnter = "ondragenter";
+    static OnDragLeave = "ondragleave";
+    static OnDragOver = "ondragover";
+    static OnDragStart = "ondragstart";
+    static OnDrop = "ondrop";
+    static OnDurationChange = "ondurationchange";
+    static OnEnded = "onended";
+    static OnError = "onerror";
+    static OnFocus = "onfocus";
+    static OnFocusin = "onfocusin";
+    static OnFocusOut = "onfocusout";
+    static OnHashChange = "onhashchange";
+    static OnInput = "oninput";
+    static OnInvalid = "oninvalid";
+    static OnKeyDown = "onkeydown";
+    static OnKeyPress = "onkeypress";
+    static OnKeyUp = "onkeyup";
+    static OnLoad = "onload";
+    static OnLoadedData = "onloadeddata";
+    static OnLoadedMetaData = "onloadedmetadata";
+    static OnLoadStart = "onloadstart";
+    static OnMouseDown = "onmousedown";
+    static OnMouseEnter = "onmouseenter";
+    static OnMouseLeave = "onmouseleave";
+    static OnMouseMove = "onmousemove";
+    static OnMouseOver = "onmouseover";
+    static OnMouseOut = "onmouseout";
+    static OnMouseUp = "onmouseup";
+    static OnOffline = "onoffline";
+    static OnOnline = "ononline";
+    static OnPageHide = "onpagehide";
+    static OnPageShow = "onpageshow";
+    static OnPaste = "onpaste";
+    static OnPause = "onpause";
+    static OnPlay = "onplay";
+    static OnPlaying = "onplaying";
+    static OnProgress = "onprogress";
+    static OnRateChange = "onratechange";
+    static OnResize = "onresize";
+    static OnReset = "onreset";
+    static OnScroll = "onscroll";
+    static OnSearch = "onsearch";
+    static OnSeeked = "onseeked";
+    static OnSeeking = "onseeking";
+    static OnSelect = "onselect";
+    static OnStalled = "onstalled";
+    static OnSubmit = "onsubmit";
+    static OnSuspend = "onsuspend";
+    static OnTimeUpdate = "ontimeupdate";
+    static OnToggle = "ontoggle";
+    static OnTouchCancel = "ontouchcancel";
+    static OnTouchend = "ontouchend";
+    static OnTouchMove = "ontouchmove";
+    static OnTouchStart = "ontouchstart";
+    static OnUnload = "onunload";
+    static OnVolumeChange = "onvolumechange";
+    static OnWaiting = "onwaiting";
+    static OnWheel = "onwheel";
 }
 
-// HtmlEventListener class
-class HtmlEventListener {
-    static get Abort() { return "abort"; }
-    static get AfterPrint() { return "afterprint"; }
-    static get BeforePrint() { return "beforeprint"; }
-    static get BeforeUnload() { return "beforeunload"; }
-    static get Blur() { return "blur"; }
-    static get CanPlay() { return "canplay"; }
-    static get CanPlayThrough() { return "canplaythrough"; }
-    static get Change() { return "change"; }
-    static get Click() { return "click"; }
-    static get Copy() { return "copy"; }
-    static get Cut() { return "cut"; }
-    static get DoubleClick() { return "dblclick"; }
-    static get Drag() { return "drag"; }
-    static get DragEnd() { return "dragend"; }
-    static get DragEnter() { return "dragenter"; }
-    static get DragLeave() { return "dragleave"; }
-    static get DragOver() { return "dragover"; }
-    static get DragStart() { return "dragstart"; }
-    static get Drop() { return "drop"; }
-    static get DurationChange() { return "durationchange"; }
-    static get Ended() { return "ended"; }
-    static get Error() { return "error"; }
-    static get Focus() { return "focus"; }
-    static get Focusin() { return "focusin"; }
-    static get FocusOut() { return "focusout"; }
-    static get HashChange() { return "hashchange"; }
-    static get Input() { return "input"; }
-    static get Invalid() { return "invalid"; }
-    static get KeyDown() { return "keydown"; }
-    static get KeyPress() { return "keypress"; }
-    static get KeyUp() { return "keyup"; }
-    static get Load() { return "load"; }
-    static get LoadedData() { return "loadeddata"; }
-    static get LoadedMetaData() { return "loadedmetadata"; }
-    static get LoadStart() { return "loadstart"; }
-    static get MouseDown() { return "mousedown"; }
-    static get MouseEnter() { return "mouseenter"; }
-    static get MouseLeave() { return "mouseleave"; }
-    static get MouseMove() { return "mousemove"; }
-    static get MouseOver() { return "mouseover"; }
-    static get MouseOut() { return "mouseout"; }
-    static get MouseUp() { return "mouseup"; }
-    static get Offline() { return "offline"; }
-    static get Online() { return "online"; }
-    static get PageHide() { return "pagehide"; }
-    static get PageShow() { return "pageshow"; }
-    static get Paste() { return "paste"; }
-    static get Pause() { return "pause"; }
-    static get Play() { return "play"; }
-    static get Playing() { return "playing"; }
-    static get Progress() { return "progress"; }
-    static get RateChange() { return "ratechange"; }
-    static get Resize() { return "resize"; }
-    static get Reset() { return "reset"; }
-    static get Scroll() { return "scroll"; }
-    static get Search() { return "search"; }
-    static get Seeked() { return "seeked"; }
-    static get Seeking() { return "seeking"; }
-    static get Select() { return "select"; }
-    static get Stalled() { return "stalled"; }
-    static get Submit() { return "submit"; }
-    static get Suspend() { return "suspend"; }
-    static get TimeUpdate() { return "timeupdate"; }
-    static get Toggle() { return "toggle"; }
-    static get TouchCancel() { return "touchcancel"; }
-    static get Touchend() { return "touchend"; }
-    static get TouchMove() { return "touchmove"; }
-    static get TouchStart() { return "touchstart"; }
-    static get Unload() { return "unload"; }
-    static get VolumeChange() { return "volumechange"; }
-    static get Waiting() { return "waiting"; }
-    static get Wheel() { return "wheel"; }
+export class HtmlEventListener {
+    static Abort = "abort";
+    static AfterPrint = "afterprint";
+    static BeforePrint = "beforeprint";
+    static BeforeUnload = "beforeunload";
+    static Blur = "blur";
+    static CanPlay = "canplay";
+    static CanPlayThrough = "canplaythrough";
+    static Change = "change";
+    static Click = "click";
+    static Copy = "copy";
+    static Cut = "cut";
+    static DoubleClick = "dblclick";
+    static Drag = "drag";
+    static DragEnd = "dragend";
+    static DragEnter = "dragenter";
+    static DragLeave = "dragleave";
+    static DragOver = "dragover";
+    static DragStart = "dragstart";
+    static Drop = "drop";
+    static DurationChange = "durationchange";
+    static Ended = "ended";
+    static Error = "error";
+    static Focus = "focus";
+    static Focusin = "focusin";
+    static FocusOut = "focusout";
+    static HashChange = "hashchange";
+    static Input = "input";
+    static Invalid = "invalid";
+    static KeyDown = "keydown";
+    static KeyPress = "keypress";
+    static KeyUp = "keyup";
+    static Load = "load";
+    static LoadedData = "loadeddata";
+    static LoadedMetaData = "loadedmetadata";
+    static LoadStart = "loadstart";
+    static MouseDown = "mousedown";
+    static MouseEnter = "mouseenter";
+    static MouseLeave = "mouseleave";
+    static MouseMove = "mousemove";
+    static MouseOver = "mouseover";
+    static MouseOut = "mouseout";
+    static MouseUp = "mouseup";
+    static Offline = "offline";
+    static Online = "online";
+    static PageHide = "pagehide";
+    static PageShow = "pageshow";
+    static Paste = "paste";
+    static Pause = "pause";
+    static Play = "play";
+    static Playing = "playing";
+    static Progress = "progress";
+    static RateChange = "ratechange";
+    static Resize = "resize";
+    static Reset = "reset";
+    static Scroll = "scroll";
+    static Search = "search";
+    static Seeked = "seeked";
+    static Seeking = "seeking";
+    static Select = "select";
+    static Stalled = "stalled";
+    static Submit = "submit";
+    static Suspend = "suspend";
+    static TimeUpdate = "timeupdate";
+    static Toggle = "toggle";
+    static TouchCancel = "touchcancel";
+    static Touchend = "touchend";
+    static TouchMove = "touchmove";
+    static TouchStart = "touchstart";
+    static Unload = "unload";
+    static VolumeChange = "volumechange";
+    static Waiting = "waiting";
+    static Wheel = "wheel";
 
-    static get AnimationEnd() { return "animationend"; }
-    static get AnimationIteration() { return "animationiteration"; }
-    static get AnimationStart() { return "animationstart"; }
-    static get ContextMenu() { return "contextmenu"; }
-    static get FullScreenChange() { return "fullscreenchange"; }
-    static get FullScreenError() { return "fullscreenerror"; }
-    static get PopState() { return "popstate"; }
-    static get TransitionEnd() { return "transitionend"; }
-    static get Storage() { return "storage"; }
+    static AnimationEnd = "animationend";
+    static AnimationIteration = "animationiteration";
+    static AnimationStart = "animationstart";
+    static ContextMenu = "contextmenu";
+    static FullScreenChange = "fullscreenchange";
+    static FullScreenError = "fullscreenerror";
+    static PopState = "popstate";
+    static TransitionEnd = "transitionend";
+    static Storage = "storage";
 
     // Custom
-    static get ScrollBottom() { return "scrollbottom"; }
-    static get ElementReached() { return "elementreached"; }
+    static ScrollBottom = "scrollbottom"; // Need Call EnableScrollBottomEvent Method Before
+    static ElementReached = "elementreached"; // Need Call EnableReachedElementEvent Method Before
 }
 
-// ExtensionWebFormsMethods class
-class ExtensionWebFormsMethods {
-    static appendPlace(text, value) {
-        if (!text || text.length < 1) {
-            return value;
-        }
-        return `${text}|${value}`;
+export class ExtensionWebFormsMethods {
+    static child(text, value) {
+        if (text.length < 1) return value;
+        return text + "|" + value;
     }
 
-    static appendParent(text) {
-        return `/${text}`;
+    static parent(text) {
+        if (text.length < 1) return text;
+        if (text.endsWith("|/") || text.endsWith("//")) return text + "/";
+        return text + "|/";
     }
 
-    static exportActionControlsToWebFormsTag(actionControls, addLine = false) {
-        return `${addLine ? '\n' : ''}<web-forms ac="${actionControls}"></web-forms>`;
+    static criteria(text, value) {
+        if (text.length < 1) return value;
+        return text + "?" + value.replace(/\|/g, "$[vb];").replace(/\?/g, "$[qu];");
     }
 
-    static exportActionControlsToHtmlComment(actionControls, addLine = false) {
-        return `${addLine ? '\n' : ''}<!--[web-forms]\n${actionControls}-->`;
+    static appendFetchReplace(text, searchValue, value) {
+        const fs = "\x1C";
+        return "@;" + searchValue + fs + value + fs + (text.length > 0 ? text.substring(1) : "");
     }
 
-    static exportActionControlsToResponse(actionControls) {
-        return `[web-forms]\n${actionControls}`;
+    static lineBreak(text, encodeLine = false) {
+        const encode = encodeLine ? "$[sln];" : "";
+        return text.replace(/\r\n/g, encode).replace(/\n/g, encode).replace(/\r/g, encode);
     }
 
-    static removeOuter(text, startString, endString) {
-        const start = text.indexOf(startString);
-        if (start === -1) return text;
+    // Converts Numbers to Strings
+    static toJSString(text) { return '"' + text + '"'; }
 
-        const end = text.indexOf(endString, start);
-        if (end === -1) return text;
+    // Get JS Object Momentary 
+    static toJSObject(text) { return "$" + text; }
 
-        const lengthToRemove = (end - start) + endString.length;
-        return text.substring(0, start) + text.substring(end + endString.length);
-    }
-
-    static lineBreak(text) {
-        return text.replace(/\n/g, "$[sln]");
-    }
+    // Get JS Object Returned Value Once
+    static toJSReturnObject(text) { return "$@" + text; }
 }
-
-export { WebForms, Security, InputPlace, OutputPlace, Fetch, WasmLanguage, HtmlEvent, HtmlEventListener, ExtensionWebFormsMethods };
