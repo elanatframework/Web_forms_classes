@@ -1,4 +1,4 @@
-# WebForms.py 2.1 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
+# WebForms.py 2.1.1 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
 # Compatible with WebFormsJS version 2.1
 
 from typing import Optional, Union, List, Callable
@@ -1536,14 +1536,14 @@ class WebForms:
     def update_variable(self, key: str, value: str) -> None:
         self._add(".u", key + self._GS + "v" + self._GS + value)
 
-    def increace_variable(self, key: str, value: str) -> None:
+    def increase_variable(self, key: str, value: str) -> None:
         self._add(".i", key + self._GS + "v" + self._GS + value)
 
-    def increace_variable_int(self, key: str, value: int) -> None:
-        self.increace_variable(key, str(value))
+    def increase_variable_int(self, key: str, value: int) -> None:
+        self.increase_variable(key, str(value))
 
     def decrease_variable(self, key: str, value: int) -> None:
-        self.increace_variable(key, str(value * -1))
+        self.increase_variable(key, str(value * -1))
 
     def delete_json(self, key: str, path: str) -> None:
         self._add(".d", key + self._GS + "j" + self._GS + path)
