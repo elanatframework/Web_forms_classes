@@ -1,4 +1,4 @@
-**WebForms.js** is an Isomorphic class that can be executed on both the server and client side.
+**WebForms.js** is an isomorphic class that can be executed on both the server and client side.
 
 This is the commander class and should not be confused with the client-only WebFormsJS Executor library.
 
