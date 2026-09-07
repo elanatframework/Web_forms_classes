@@ -1,16 +1,22 @@
-package WebFormsCore;
+// WebForms.java 2.1 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
+// Compatible with WebFormsJS version 2.1
 
-// WebForms.java 2.0 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
-// Compatible with WebFormsJS version 2.0
+package webformscore;
 
+// WebForms Place Criteria (WPC) DSL
 public class InputPlace {
-    public static final String Window = "`";
-    public static final String Root = "~";
-    public static final String Current = "$";
-    public static final String Target = "!";
-    public static final String Upper = "-";
-    public static final String Head = "^";
-    public static final String ScreenOrientation = "%";
+    public static final String DOCUMENT = ",";
+    public static final String WINDOW = "`";
+    // When Calling TransientDOM, Using Root will Result in the Selection of the Transient Tag.
+    public static final String ROOT = "~";
+    public static final String HTML = ".";
+    public static final String HEAD = "^";
+    public static final String SCREEN_ORIENTATION = "%";
+    public static final String ALL = "*";
+    public static final String PARENT = "/";
+    public static final String CURRENT = "$";
+    public static final String TARGET = "!";
+    public static final String UPPER = "-";
 
     public static String id(String id) {
         return id;
@@ -40,6 +46,18 @@ public class InputPlace {
         return "<" + tag + ">*";
     }
 
+    public static String child() {
+        return "<>";
+    }
+
+    public static String child(int index) {
+        return "<>" + index;
+    }
+
+    public static String allChild() {
+        return "<>*";
+    }
+
     public static String cssClass(String className) {
         return '{' + className + '}';
     }
@@ -48,15 +66,52 @@ public class InputPlace {
         return '{' + className + '}' + index;
     }
 
-    public static String allCssClasses(String className) {
+    public static String allClasses(String className) {
         return "{" + className + "}*";
     }
 
+    public static String attribute(String name) {
+        return '"' + name + '"';
+    }
+
+    public static String attribute(String name, int index) {
+        return '"' + name + '"' + index;
+    }
+
+    public static String allAttributes(String name) {
+        return "\"" + name + "\"*";
+    }
+
+    // Operator: '^', '$', '*', '~'
+    public static String attribute(String name, String value, char operator) {
+        return '"' + name + (operator != '\0' ? String.valueOf(operator) : "") + "'" + value + '"';
+    }
+
+    public static String attribute(String name, String value) {
+        return attribute(name, value, '\0');
+    }
+
+    public static String attribute(String name, String value, int index, char operator) {
+        return '"' + name + (operator != '\0' ? String.valueOf(operator) : "") + "'" + value + '"' + index;
+    }
+
+    public static String attribute(String name, String value, int index) {
+        return attribute(name, value, index, '\0');
+    }
+
+    public static String allAttributes(String name, String value, char operator) {
+        return "\"" + name + (operator != '\0' ? String.valueOf(operator) : "") + "'" + value + "\"*";
+    }
+
+    public static String allAttributes(String name, String value) {
+        return allAttributes(name, value, '\0');
+    }
+
     public static String query(String query) {
-        return "*" + query.replace("=", "$[eq];");
+        return "*" + query.replace("=", "$[eq];").replace("|", "$[vb];").replace("?", "$[qu];");
     }
 
     public static String queryAll(String query) {
-        return "[" + query.replace("=", "$[eq];");
+        return "[" + query.replace("=", "$[eq];").replace("|", "$[vb];").replace("?", "$[qu];");
     }
 }
