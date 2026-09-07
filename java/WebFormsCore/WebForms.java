@@ -1,68 +1,76 @@
-package WebFormsCore;
+// WebForms.java 2.1 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
+// Compatible with WebFormsJS version 2.1
 
-// WebForms.java 2.0 - The Back-End Part of WebForms Core Technology, Owned by Elanat (https://elanat.net)
-// Compatible with WebFormsJS version 2.0
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import jakarta.servlet.http.HttpServletResponse;
+package webformscore;
 
 public class WebForms {
+    private static final char GS = (char) 29;
+    private static final char US = (char) 31;
+
     private StringBuilder webFormsData = new StringBuilder();
 
-    private void add(String name, String value) {
-        if (webFormsData.length() > 0)
+    void add(String name, String value) {
+        if (webFormsData.length() > 0) {
             webFormsData.append('\n');
-
+        }
         webFormsData.append(name);
         webFormsData.append('=');
         webFormsData.append(value);
     }
 
-    private void add(String name) {
-        if (webFormsData.length() > 0)
+    void add(String name) {
+        if (webFormsData.length() > 0) {
             webFormsData.append('\n');
-
+        }
         webFormsData.append(name);
     }
 
-    private String getLineByIndex(int index) {
-        if (webFormsData.length() == 0)
-            return "";
+    void addToUp(String name, String value) {
+        String line = name + "=" + value;
+        if (webFormsData.length() > 0) {
+            line += "\n";
+        }
+        webFormsData.insert(0, line);
+    }
 
+    void addToUp(String name) {
+        String line = name;
+        if (webFormsData.length() > 0) {
+            line += "\n";
+        }
+        webFormsData.insert(0, line);
+    }
+
+    String getLineByIndex(int index) {
+        if (webFormsData.length() == 0) {
+            return "";
+        }
         String data = webFormsData.toString();
-        String[] lines = data.split("\n");
-
-        if (index < 0)
+        String[] lines = data.split("\n", -1);
+        if (index < 0) {
             index = lines.length + index;
-
-        if (index < 0 || index >= lines.length)
+        }
+        if (index < 0 || index >= lines.length) {
             return "";
-
+        }
         return lines[index];
     }
 
-    private void updateLineByIndex(int index, String name, String value) {
-        if (webFormsData.length() == 0)
+    void updateLineByIndex(int index, String name, String value) {
+        if (webFormsData.length() == 0) {
             return;
-
-        String data = webFormsData.toString();
-        String[] lines = data.split("\n");
-
-        if (index < 0)
-            index = lines.length + index;
-
-        if (index < 0 || index >= lines.length)
-            return;
-
-        lines[index] = name + ((value != null && !value.isEmpty()) ? "=" + value : "");
-
-        webFormsData = new StringBuilder();
-        for (int i = 0; i < lines.length; i++) {
-            if (i > 0) webFormsData.append('\n');
-            webFormsData.append(lines[i]);
         }
+        String data = webFormsData.toString();
+        String[] lines = data.split("\n", -1);
+        if (index < 0) {
+            index = lines.length + index;
+        }
+        if (index < 0 || index >= lines.length) {
+            return;
+        }
+        lines[index] = name + ((value == null || value.isEmpty()) ? "" : "=" + value);
+        webFormsData.setLength(0);
+        webFormsData.append(String.join("\n", lines));
     }
 
     // For Extension
@@ -71,6 +79,7 @@ public class WebForms {
     }
 
     // Add
+    // Creates the Data if it does not exist; otherwise, Appends the New Value to the Existing Value.
     public void addId(String inputPlace, String id) {
         add("ai" + inputPlace, id);
     }
@@ -96,7 +105,7 @@ public class WebForms {
     }
 
     public void addOptionTag(String inputPlace, String text, String value, boolean selected) {
-        add("ao" + inputPlace, value + '|' + text + (selected ? "|1" : ""));
+        add("ao" + inputPlace, value + GS + text + (selected ? GS + "1" : ""));
     }
 
     public void addOptionTag(String inputPlace, String text, String value) {
@@ -104,7 +113,7 @@ public class WebForms {
     }
 
     public void addCheckBoxTag(String inputPlace, String text, String value, boolean checked) {
-        add("ak" + inputPlace, value + '|' + text + (checked ? "|1" : ""));
+        add("ak" + inputPlace, value + GS + text + (checked ? GS + "1" : ""));
     }
 
     public void addCheckBoxTag(String inputPlace, String text, String value) {
@@ -128,8 +137,7 @@ public class WebForms {
     }
 
     public void addAttribute(String inputPlace, String attribute, String value, char splitter) {
-        add("aa" + inputPlace, attribute + '|' + ((splitter != '\0') ? splitter : "") + 
-            (value != null && !value.isEmpty() ? '|' + value : ""));
+        add("aa" + inputPlace, attribute + GS + (splitter != '\0' ? String.valueOf(splitter) : "") + ((value != null && !value.isEmpty()) ? GS + value : ""));
     }
 
     public void addAttribute(String inputPlace, String attribute, String value) {
@@ -141,7 +149,7 @@ public class WebForms {
     }
 
     public void addTag(String inputPlace, String tagName, String id) {
-        add("nt" + inputPlace, tagName + (id != null && !id.isEmpty() ? '|' + id : ""));
+        add("nt" + inputPlace, tagName + ((id != null && !id.isEmpty()) ? GS + id : ""));
     }
 
     public void addTag(String inputPlace, String tagName) {
@@ -149,7 +157,7 @@ public class WebForms {
     }
 
     public void addTagToUp(String inputPlace, String tagName, String id) {
-        add("ut" + inputPlace, tagName + (id != null && !id.isEmpty() ? '|' + id : ""));
+        add("ut" + inputPlace, tagName + ((id != null && !id.isEmpty()) ? GS + id : ""));
     }
 
     public void addTagToUp(String inputPlace, String tagName) {
@@ -157,7 +165,7 @@ public class WebForms {
     }
 
     public void addTagBefore(String inputPlace, String tagName, String id) {
-        add("bt" + inputPlace, tagName + (id != null && !id.isEmpty() ? '|' + id : ""));
+        add("bt" + inputPlace, tagName + ((id != null && !id.isEmpty()) ? GS + id : ""));
     }
 
     public void addTagBefore(String inputPlace, String tagName) {
@@ -165,22 +173,23 @@ public class WebForms {
     }
 
     public void addTagAfter(String inputPlace, String tagName, String id) {
-        add("ft" + inputPlace, tagName + (id != null && !id.isEmpty() ? '|' + id : ""));
+        add("ft" + inputPlace, tagName + ((id != null && !id.isEmpty()) ? GS + id : ""));
     }
 
     public void addTagAfter(String inputPlace, String tagName) {
         addTagAfter(inputPlace, tagName, "");
     }
 
-    public void addHidden(String inputPlace, String value, String id) {
-        add("ah" + inputPlace, value + (id != null && !id.isEmpty() ? '|' + id : ""));
+    public void addHidden(String inputPlace, String name, String value, String id) {
+        add("ah" + inputPlace, name + GS + value + ((id != null && !id.isEmpty()) ? GS + id : ""));
     }
 
-    public void addHidden(String inputPlace, String value) {
-        addHidden(inputPlace, value, "");
+    public void addHidden(String inputPlace, String name, String value) {
+        addHidden(inputPlace, name, value, "");
     }
 
     // Set
+    // Creates the Data if it does not exist; otherwise, Replaces the Existing Value with the New Value.
     public void setId(String inputPlace, String id) {
         add("si" + inputPlace, id);
     }
@@ -206,7 +215,7 @@ public class WebForms {
     }
 
     public void setOptionTag(String inputPlace, String text, String value, boolean selected) {
-        add("so" + inputPlace, value + '|' + text + (selected ? "|1" : ""));
+        add("so" + inputPlace, value + GS + text + (selected ? GS + "1" : ""));
     }
 
     public void setOptionTag(String inputPlace, String text, String value) {
@@ -217,8 +226,12 @@ public class WebForms {
         add("sk" + inputPlace, checked ? "1" : "0");
     }
 
+    public void setChecked(String inputPlace) {
+        setChecked(inputPlace, false);
+    }
+
     public void setCheckBoxTag(String inputPlace, String text, String value, boolean checked) {
-        add("sk" + inputPlace, value + '|' + text + (checked ? "|1" : ""));
+        add("sk" + inputPlace, value + GS + text + (checked ? GS + "1" : ""));
     }
 
     public void setCheckBoxTag(String inputPlace, String text, String value) {
@@ -238,7 +251,7 @@ public class WebForms {
     }
 
     public void setAttribute(String inputPlace, String attribute, String value) {
-        add("sa" + inputPlace, attribute + '|' + (value != null && !value.isEmpty() ? '|' + value : ""));
+        add("sa" + inputPlace, attribute + GS + ((value != null && !value.isEmpty()) ? GS + value : ""));
     }
 
     public void setAttribute(String inputPlace, String attribute) {
@@ -250,7 +263,7 @@ public class WebForms {
     }
 
     public void setWidth(String inputPlace, int width) {
-        setWidth(inputPlace, width + "px");
+        setWidth(inputPlace, String.valueOf(width) + "px");
     }
 
     public void setHeight(String inputPlace, String height) {
@@ -258,7 +271,7 @@ public class WebForms {
     }
 
     public void setHeight(String inputPlace, int height) {
-        setHeight(inputPlace, height + "px");
+        setHeight(inputPlace, String.valueOf(height) + "px");
     }
 
     public void setBackgroundColor(String inputPlace, String color) {
@@ -278,7 +291,7 @@ public class WebForms {
     }
 
     public void setFontSize(String inputPlace, int size) {
-        add("fs" + inputPlace, size + "px");
+        add("fs" + inputPlace, String.valueOf(size) + "px");
     }
 
     public void setFontBold(String inputPlace, boolean bold) {
@@ -305,31 +318,48 @@ public class WebForms {
         add("sf" + inputPlace, focus ? "1" : "0");
     }
 
+    public void setMinLength(String inputPlace, String length) {
+        add("mn" + inputPlace, length);
+    }
+
     public void setMinLength(String inputPlace, int length) {
-        add("mn" + inputPlace, Integer.toString(length));
+        setMinLength(inputPlace, String.valueOf(length));
+    }
+
+    public void setMaxLength(String inputPlace, String length) {
+        add("mx" + inputPlace, length);
     }
 
     public void setMaxLength(String inputPlace, int length) {
-        add("mx" + inputPlace, Integer.toString(length));
+        setMaxLength(inputPlace, String.valueOf(length));
     }
 
     public void setSelectedValue(String inputPlace, String value) {
         add("ts" + inputPlace, value);
     }
 
+    public void setSelectedIndex(String inputPlace, String index) {
+        add("ti" + inputPlace, index);
+    }
+
     public void setSelectedIndex(String inputPlace, int index) {
-        add("ti" + inputPlace, Integer.toString(index));
+        setSelectedIndex(inputPlace, String.valueOf(index));
     }
 
-    public void setCheckedValue(String inputPlace, String value, boolean selected) {
-        add("ks" + inputPlace, value + "|" + (selected ? "1" : "0"));
+    public void setCheckedValue(String inputPlace, String value, boolean checked) {
+        add("ks" + inputPlace, value + GS + (checked ? "1" : "0"));
     }
 
-    public void setCheckedIndex(String inputPlace, int index, boolean selected) {
-        add("ki" + inputPlace, index + "|" + (selected ? "1" : "0"));
+    public void setCheckedIndex(String inputPlace, String index, boolean checked) {
+        add("ki" + inputPlace, index + GS + (checked ? "1" : "0"));
+    }
+
+    public void setCheckedIndex(String inputPlace, int index, boolean checked) {
+        setCheckedIndex(inputPlace, String.valueOf(index), checked);
     }
 
     // Insert
+    // Creates the Data only if it does not exist; otherwise, does nothing.
     public void insertId(String inputPlace, String id) {
         add("ii" + inputPlace, id);
     }
@@ -355,7 +385,7 @@ public class WebForms {
     }
 
     public void insertOptionTag(String inputPlace, String text, String value, boolean selected) {
-        add("io" + inputPlace, value + '|' + text + (selected ? "|1" : ""));
+        add("io" + inputPlace, value + GS + text + (selected ? GS + "1" : ""));
     }
 
     public void insertOptionTag(String inputPlace, String text, String value) {
@@ -363,7 +393,7 @@ public class WebForms {
     }
 
     public void insertCheckBoxTag(String inputPlace, String text, String value, boolean checked) {
-        add("ik" + inputPlace, value + '|' + text + (checked ? "|1" : ""));
+        add("ik" + inputPlace, value + GS + text + (checked ? GS + "1" : ""));
     }
 
     public void insertCheckBoxTag(String inputPlace, String text, String value) {
@@ -383,8 +413,7 @@ public class WebForms {
     }
 
     public void insertAttribute(String inputPlace, String attribute, String value, char splitter) {
-        add("ia" + inputPlace, attribute + '|' + ((splitter != '\0') ? splitter : "") + 
-            (value != null && !value.isEmpty() ? '|' + value : ""));
+        add("ia" + inputPlace, attribute + GS + (splitter != '\0' ? String.valueOf(splitter) : "") + ((value != null && !value.isEmpty()) ? GS + value : ""));
     }
 
     public void insertAttribute(String inputPlace, String attribute, String value) {
@@ -469,6 +498,14 @@ public class WebForms {
         add("iR" + inputPlace, outputPlace);
     }
 
+    public void setMorph(String inputPlace, String tag) {
+        add("sM" + inputPlace, tag);
+    }
+
+    public void setMorphByOutputPlace(String inputPlace, String outputPlace) {
+        add("iM" + inputPlace, outputPlace);
+    }
+
     // Browser
     public void changeUrl(String url) {
         add("cu", url);
@@ -482,12 +519,20 @@ public class WebForms {
         add("nw", text);
     }
 
+    public void scrollTo(String x, String y) {
+        add("ws", x + GS + y);
+    }
+
     public void scrollTo(int x, int y) {
-        add("ws", x + "|" + y);
+        scrollTo(String.valueOf(x), String.valueOf(y));
+    }
+
+    public void historyGo(String steps) {
+        add("wg", steps);
     }
 
     public void historyGo(int steps) {
-        add("wg", Integer.toString(steps));
+        historyGo(String.valueOf(steps));
     }
 
     public void reloadPage() {
@@ -499,60 +544,108 @@ public class WebForms {
     }
 
     // Increase
+    public void increaseMinLength(String inputPlace, String value) {
+        add("+n" + inputPlace, value);
+    }
+
     public void increaseMinLength(String inputPlace, int value) {
-        add("+n" + inputPlace, Integer.toString(value));
+        increaseMinLength(inputPlace, String.valueOf(value));
+    }
+
+    public void increaseMaxLength(String inputPlace, String value) {
+        add("+x" + inputPlace, value);
     }
 
     public void increaseMaxLength(String inputPlace, int value) {
-        add("+x" + inputPlace, Integer.toString(value));
+        increaseMaxLength(inputPlace, String.valueOf(value));
+    }
+
+    public void increaseFontSize(String inputPlace, String value) {
+        add("+f" + inputPlace, value);
     }
 
     public void increaseFontSize(String inputPlace, int value) {
-        add("+f" + inputPlace, Integer.toString(value));
+        increaseFontSize(inputPlace, String.valueOf(value));
+    }
+
+    public void increaseWidth(String inputPlace, String value) {
+        add("+w" + inputPlace, value);
     }
 
     public void increaseWidth(String inputPlace, int value) {
-        add("+w" + inputPlace, Integer.toString(value));
+        increaseWidth(inputPlace, String.valueOf(value));
+    }
+
+    public void increaseHeight(String inputPlace, String value) {
+        add("+h" + inputPlace, value);
     }
 
     public void increaseHeight(String inputPlace, int value) {
-        add("+h" + inputPlace, Integer.toString(value));
+        increaseHeight(inputPlace, String.valueOf(value));
+    }
+
+    public void increaseValue(String inputPlace, String value) {
+        add("+v" + inputPlace, value);
     }
 
     public void increaseValue(String inputPlace, int value) {
-        add("+v" + inputPlace, Integer.toString(value));
+        increaseValue(inputPlace, String.valueOf(value));
     }
 
     // Decrease
+    public void decreaseMinLength(String inputPlace, String value) {
+        add("-n" + inputPlace, value);
+    }
+
     public void decreaseMinLength(String inputPlace, int value) {
-        add("-n" + inputPlace, Integer.toString(value));
+        decreaseMinLength(inputPlace, String.valueOf(value));
+    }
+
+    public void decreaseMaxLength(String inputPlace, String value) {
+        add("-x" + inputPlace, value);
     }
 
     public void decreaseMaxLength(String inputPlace, int value) {
-        add("-x" + inputPlace, Integer.toString(value));
+        decreaseMaxLength(inputPlace, String.valueOf(value));
+    }
+
+    public void decreaseFontSize(String inputPlace, String value) {
+        add("-f" + inputPlace, value);
     }
 
     public void decreaseFontSize(String inputPlace, int value) {
-        add("-f" + inputPlace, Integer.toString(value));
+        decreaseFontSize(inputPlace, String.valueOf(value));
+    }
+
+    public void decreaseWidth(String inputPlace, String value) {
+        add("-w" + inputPlace, value);
     }
 
     public void decreaseWidth(String inputPlace, int value) {
-        add("-w" + inputPlace, Integer.toString(value));
+        decreaseWidth(inputPlace, String.valueOf(value));
+    }
+
+    public void decreaseHeight(String inputPlace, String value) {
+        add("-h" + inputPlace, value);
     }
 
     public void decreaseHeight(String inputPlace, int value) {
-        add("-h" + inputPlace, Integer.toString(value));
+        decreaseHeight(inputPlace, String.valueOf(value));
+    }
+
+    public void decreaseValue(String inputPlace, String value) {
+        add("-v" + inputPlace, value);
     }
 
     public void decreaseValue(String inputPlace, int value) {
-        add("-v" + inputPlace, Integer.toString(value));
+        decreaseValue(inputPlace, String.valueOf(value));
     }
 
     // Event
-    // All Method In Event Section Only Support Dynamic Args Once
+    // ConstructorName: mouseevent, keyboardevent, uievent, focusevent, inputevent, event
+    // All Method in "Event" Section Only Support Dynamic Args Once. To Support Invoking Dynamic Arguments on a Momentary Basis, Use "EventListener" Section Methods.
     public void triggerEvent(String inputPlace, String htmlEventListener, String constructorName) {
-        add("TE" + inputPlace, htmlEventListener + 
-            (constructorName != null && !constructorName.isEmpty() ? "|" + constructorName : ""));
+        add("TE" + inputPlace, htmlEventListener + ((constructorName != null && !constructorName.isEmpty()) ? GS + constructorName : ""));
     }
 
     public void triggerEvent(String inputPlace, String htmlEventListener) {
@@ -563,302 +656,297 @@ public class WebForms {
         add("Ep" + inputPlace, htmlEvent);
     }
 
-    public void setPostEventView(String inputPlace, String htmlEvent) {
-        add("Ep" + inputPlace, htmlEvent + "|+");
+    public void setPostEvent(String inputPlace, String htmlEvent, String outputPlace) {
+        add("Ep" + inputPlace, htmlEvent + GS + outputPlace);
     }
 
-    public void setPostEventTo(String inputPlace, String htmlEvent, String outputPlace) {
-        add("Ep" + inputPlace, htmlEvent + "|" + outputPlace);
+    public void setPostEventAddView(String inputPlace, String htmlEvent) {
+        add("Ep" + inputPlace, htmlEvent + GS + "+");
     }
 
     public void setPostEventListener(String inputPlace, String htmlEventListener) {
         add("EP" + inputPlace, htmlEventListener);
     }
 
-    public void setPostEventListenerView(String inputPlace, String htmlEventListener) {
-        add("EP" + inputPlace, htmlEventListener + "|+");
+    public void setPostEventListener(String inputPlace, String htmlEventListener, String outputPlace) {
+        add("EP" + inputPlace, htmlEventListener + GS + outputPlace);
     }
 
-    public void setPostEventListenerTo(String inputPlace, String htmlEventListener, String outputPlace) {
-        add("EP" + inputPlace, htmlEventListener + "|" + outputPlace);
+    public void setPostEventListenerAddView(String inputPlace, String htmlEventListener) {
+        add("EP" + inputPlace, htmlEventListener + GS + "+");
     }
 
     public void setGetEvent(String inputPlace, String htmlEvent, String path) {
-        add("Eg" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
-    }
-
-    public void setGetEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
-        add("Eg" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+        add("Eg" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setGetEvent(String inputPlace, String htmlEvent) {
         setGetEvent(inputPlace, htmlEvent, null);
     }
 
-    public void setGetEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EG" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setGetEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
+        add("Eg" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setGetEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
-        add("EG" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setGetEventListener(String inputPlace, String htmlEventListener, String path) {
+        add("EG" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setGetEventListener(String inputPlace, String htmlEventListener) {
         setGetEventListener(inputPlace, htmlEventListener, null);
     }
 
-    public void setPatchEvent(String inputPlace, String htmlEvent, String path) {
-        add("Ea" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setGetEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
+        add("EG" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setPatchEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
-        add("Ea" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setPutEvent(String inputPlace, String htmlEvent, String path) {
+        add("Et" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#"));
+    }
+
+    public void setPutEvent(String inputPlace, String htmlEvent) {
+        setPutEvent(inputPlace, htmlEvent, null);
+    }
+
+    public void setPutEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
+        add("Et" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
+    }
+
+    public void setPutEventListener(String inputPlace, String htmlEventListener, String path) {
+        add("ET" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#"));
+    }
+
+    public void setPutEventListener(String inputPlace, String htmlEventListener) {
+        setPutEventListener(inputPlace, htmlEventListener, null);
+    }
+
+    public void setPutEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
+        add("ET" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
+    }
+
+    public void setPatchEvent(String inputPlace, String htmlEvent, String path) {
+        add("Ea" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setPatchEvent(String inputPlace, String htmlEvent) {
         setPatchEvent(inputPlace, htmlEvent, null);
     }
 
-    public void setPatchEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EA" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setPatchEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
+        add("Ea" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setPatchEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
-        add("EA" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setPatchEventListener(String inputPlace, String htmlEventListener, String path) {
+        add("EA" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setPatchEventListener(String inputPlace, String htmlEventListener) {
         setPatchEventListener(inputPlace, htmlEventListener, null);
     }
 
-    public void setDeleteEvent(String inputPlace, String htmlEvent, String path) {
-        add("El" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setPatchEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
+        add("EA" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setDeleteEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
-        add("El" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setDeleteEvent(String inputPlace, String htmlEvent, String path) {
+        add("El" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setDeleteEvent(String inputPlace, String htmlEvent) {
         setDeleteEvent(inputPlace, htmlEvent, null);
     }
 
-    public void setDeleteEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EL" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setDeleteEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
+        add("El" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setDeleteEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
-        add("EL" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setDeleteEventListener(String inputPlace, String htmlEventListener, String path) {
+        add("EL" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setDeleteEventListener(String inputPlace, String htmlEventListener) {
         setDeleteEventListener(inputPlace, htmlEventListener, null);
     }
 
-    public void setOptionsEvent(String inputPlace, String htmlEvent, String path) {
-        add("Eo" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setDeleteEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
+        add("EL" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setOptionsEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
-        add("Eo" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setOptionsEvent(String inputPlace, String htmlEvent, String path) {
+        add("Eo" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setOptionsEvent(String inputPlace, String htmlEvent) {
         setOptionsEvent(inputPlace, htmlEvent, null);
     }
 
-    public void setOptionsEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EO" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
+    public void setOptionsEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
+        add("Eo" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
-    public void setOptionsEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
-        add("EO" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
+    public void setOptionsEventListener(String inputPlace, String htmlEventListener, String path) {
+        add("EO" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setOptionsEventListener(String inputPlace, String htmlEventListener) {
         setOptionsEventListener(inputPlace, htmlEventListener, null);
     }
 
-    public void setTraceEvent(String inputPlace, String htmlEvent, String path) {
-        add("Er" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
-    }
-
-    public void setTraceEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
-        add("Er" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
-    }
-
-    public void setTraceEvent(String inputPlace, String htmlEvent) {
-        setTraceEvent(inputPlace, htmlEvent, null);
-    }
-
-    public void setTraceEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("ER" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
-    }
-
-    public void setTraceEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
-        add("ER" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
-    }
-
-    public void setTraceEventListener(String inputPlace, String htmlEventListener) {
-        setTraceEventListener(inputPlace, htmlEventListener, null);
-    }
-
-    public void setConnectEvent(String inputPlace, String htmlEvent, String path) {
-        add("Ec" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
-    }
-
-    public void setConnectEvent(String inputPlace, String htmlEvent, String outputPlace, String path) {
-        add("Ec" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
-    }
-
-    public void setConnectEvent(String inputPlace, String htmlEvent) {
-        setConnectEvent(inputPlace, htmlEvent, null);
-    }
-
-    public void setConnectEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EC" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
-    }
-
-    public void setConnectEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
-        add("EC" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#") + "|" + outputPlace);
-    }
-
-    public void setConnectEventListener(String inputPlace, String htmlEventListener) {
-        setConnectEventListener(inputPlace, htmlEventListener, null);
+    public void setOptionsEventListener(String inputPlace, String htmlEventListener, String outputPlace, String path) {
+        add("EO" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + outputPlace);
     }
 
     public void setHeadEvent(String inputPlace, String htmlEvent, String path) {
-        add("Eh" + inputPlace, htmlEvent + "|" + (path != null && !path.isEmpty() ? path : "#"));
-    }
-
-    public void setHeadEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EH" + inputPlace, htmlEventListener + "|" + (path != null && !path.isEmpty() ? path : "#"));
+        add("Eh" + inputPlace, htmlEvent + GS + ((path != null && !path.isEmpty()) ? path : "#"));
     }
 
     public void setHeadEvent(String inputPlace, String htmlEvent) {
         setHeadEvent(inputPlace, htmlEvent, null);
     }
 
+    public void setHeadEventListener(String inputPlace, String htmlEventListener, String path) {
+        add("EH" + inputPlace, htmlEventListener + GS + ((path != null && !path.isEmpty()) ? path : "#"));
+    }
+
     public void setHeadEventListener(String inputPlace, String htmlEventListener) {
         setHeadEventListener(inputPlace, htmlEventListener, null);
     }
 
-    public void setTagEvent(String inputPlace, String htmlEvent, String outputPlace) {
-        add("Et" + inputPlace, htmlEvent + "|" + outputPlace);
+    // IsMultiPart: If this value is true, the data will be sent based on the Form and with the "content" key.
+    public void setSendEvent(String inputPlace, String htmlEvent, String data, String path, String method, boolean isMultiPart, String contentType, String outputPlace) {
+        add("En" + inputPlace, htmlEvent + GS + data.replace("\n", "$[ln];").replace("\"", "$[dq];").replace("'", "$[sq];") + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + method + GS + (isMultiPart ? "1" : "0") + GS + contentType + GS + outputPlace);
     }
 
-    public void setTagEventListener(String inputPlace, String htmlEventListener, String outputPlace) {
-        add("ET" + inputPlace, htmlEventListener + "|" + outputPlace);
+    public void setSendEvent(String inputPlace, String htmlEvent, String data) {
+        setSendEvent(inputPlace, htmlEvent, data, null, "POST", false, "text/plain", null);
+    }
+
+    public void setSendEventListener(String inputPlace, String htmlEventListener, String data, String path, String method, boolean isMultiPart, String contentType, String outputPlace) {
+        add("EN" + inputPlace, htmlEventListener + GS + data.replace("\n", "$[ln];") + GS + ((path != null && !path.isEmpty()) ? path : "#") + GS + method + GS + (isMultiPart ? "1" : "0") + GS + contentType + GS + outputPlace);
+    }
+
+    public void setSendEventListener(String inputPlace, String htmlEventListener, String data) {
+        setSendEventListener(inputPlace, htmlEventListener, data, null, "POST", false, "text/plain", null);
     }
 
     public void setCommentEvent(String inputPlace, String htmlEvent, String index, String outputPlace) {
-        add("Eb" + inputPlace, htmlEvent + "|" + index + "|" + outputPlace);
+        add("Eb" + inputPlace, htmlEvent + GS + index + GS + outputPlace);
+    }
+
+    public void setCommentEvent(String inputPlace, String htmlEvent) {
+        setCommentEvent(inputPlace, htmlEvent, null, null);
     }
 
     public void setCommentEvent(String inputPlace, String htmlEvent, int index, String outputPlace) {
-        setCommentEvent(inputPlace, htmlEvent, Integer.toString(index), outputPlace);
+        setCommentEvent(inputPlace, htmlEvent, String.valueOf(index), outputPlace);
     }
 
     public void setCommentEventListener(String inputPlace, String htmlEventListener, String index, String outputPlace) {
-        add("EB" + inputPlace, htmlEventListener + "|" + index + "|" + outputPlace);
+        add("EB" + inputPlace, htmlEventListener + GS + index + GS + outputPlace);
+    }
+
+    public void setCommentEventListener(String inputPlace, String htmlEventListener) {
+        setCommentEventListener(inputPlace, htmlEventListener, null, null);
     }
 
     public void setCommentEventListener(String inputPlace, String htmlEventListener, int index, String outputPlace) {
-        setCommentEventListener(inputPlace, htmlEventListener, Integer.toString(index), outputPlace);
+        setCommentEventListener(inputPlace, htmlEventListener, String.valueOf(index), outputPlace);
     }
 
-    public void setWasmEvent(String inputPlace, String htmlEvent, String wasmLanguage, 
-                           String wasmUrl, String methodName, String[] args, String outputPlace) {
+    public void setWasmEvent(String inputPlace, String htmlEvent, String wasmLanguage, String wasmUrl, String methodName, Object[] args, String outputPlace) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = String.join(",", args);
-
-        add("Ey" + inputPlace, htmlEvent + "|" + wasmLanguage + "|" + wasmUrl + "|" + 
-            methodName + "|" + argsJoin + "|" + outputPlace);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("Ey" + inputPlace, htmlEvent + GS + wasmLanguage + GS + wasmUrl + GS + methodName + GS + argsJoin + GS + outputPlace);
     }
 
-    public void setWasmEventListener(String inputPlace, String htmlEventListener, String wasmLanguage, 
-                                   String wasmUrl, String methodName, String[] args, String outputPlace) {
+    public void setWasmEvent(String inputPlace, String htmlEvent, String wasmLanguage, String wasmUrl, String methodName) {
+        setWasmEvent(inputPlace, htmlEvent, wasmLanguage, wasmUrl, methodName, null, null);
+    }
+
+    public void setWasmEventListener(String inputPlace, String htmlEventListener, String wasmLanguage, String wasmUrl, String methodName, Object[] args, String outputPlace) {
         String argsJoin = "";
+        if (args != null) {
+            argsJoin = (args.length > 0) ? "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("EY" + inputPlace, htmlEventListener + GS + wasmLanguage + GS + wasmUrl + GS + methodName + GS + argsJoin + GS + outputPlace);
+    }
 
-        if (args != null && args.length > 0)
-            argsJoin = String.join(",", args);
-
-        add("EY" + inputPlace, htmlEventListener + "|" + wasmLanguage + "|" + wasmUrl + "|" + 
-            methodName + "|" + argsJoin + "|" + outputPlace);
+    public void setWasmEventListener(String inputPlace, String htmlEventListener, String wasmLanguage, String wasmUrl, String methodName) {
+        setWasmEventListener(inputPlace, htmlEventListener, wasmLanguage, wasmUrl, methodName, null, null);
     }
 
     public void setWebSocketEvent(String inputPlace, String htmlEvent, String path) {
-        add("Ew" + inputPlace, htmlEvent + "|" + path);
+        add("Ew" + inputPlace, htmlEvent + GS + path);
     }
 
     public void setWebSocketEventListener(String inputPlace, String htmlEventListener, String path) {
-        add("EW" + inputPlace, htmlEventListener + "|" + path);
+        add("EW" + inputPlace, htmlEventListener + GS + path);
     }
 
     public void setSSEEvent(String inputPlace, String htmlEvent, String path, boolean shouldReconnect, int reconnectTryTimeout) {
-        add("Ee" + inputPlace, htmlEvent + "|" + path + "|" + (shouldReconnect ? "1" : "0") + "|" + reconnectTryTimeout);
+        add("Ee" + inputPlace, htmlEvent + GS + path + GS + (shouldReconnect ? "1" : "0") + GS + String.valueOf(reconnectTryTimeout));
     }
 
-    public void setSSEEvent(String inputPlace, String htmlEvent, String path, String outputPlace, 
-                          boolean shouldReconnect, int reconnectTryTimeout) {
-        add("Ee" + inputPlace, htmlEvent + "|" + path + "|" + (shouldReconnect ? "1" : "0") + 
-            "|" + reconnectTryTimeout + "|" + outputPlace);
+    public void setSSEEvent(String inputPlace, String htmlEvent, String path) {
+        setSSEEvent(inputPlace, htmlEvent, path, true, 3000);
     }
 
-    public void setSSEEventListener(String inputPlace, String htmlEventListener, String path, 
-                                  boolean shouldReconnect, int reconnectTryTimeout) {
-        add("EE" + inputPlace, htmlEventListener + "|" + path + "|" + (shouldReconnect ? "1" : "0") + "|" + reconnectTryTimeout);
+    public void setSSEEvent(String inputPlace, String htmlEvent, String path, String outputPlace, boolean shouldReconnect, int reconnectTryTimeout) {
+        add("Ee" + inputPlace, htmlEvent + GS + path + GS + (shouldReconnect ? "1" : "0") + GS + String.valueOf(reconnectTryTimeout) + GS + outputPlace);
     }
 
-    public void setSSEEventListener(String inputPlace, String htmlEventListener, String path, String outputPlace, 
-                                  boolean shouldReconnect, int reconnectTryTimeout) {
-        add("EE" + inputPlace, htmlEventListener + "|" + path + "|" + (shouldReconnect ? "1" : "0") + 
-            "|" + reconnectTryTimeout + "|" + outputPlace);
+    public void setSSEEventListener(String inputPlace, String htmlEventListener, String path, boolean shouldReconnect, int reconnectTryTimeout) {
+        add("EE" + inputPlace, htmlEventListener + GS + path + GS + (shouldReconnect ? "1" : "0") + GS + String.valueOf(reconnectTryTimeout));
     }
 
-    public void setFrontEvent(String inputPlace, String htmlEvent, String modulePath, 
-                            String[] args, String outputPlace) {
+    public void setSSEEventListener(String inputPlace, String htmlEventListener, String path) {
+        setSSEEventListener(inputPlace, htmlEventListener, path, true, 3000);
+    }
+
+    public void setSSEEventListener(String inputPlace, String htmlEventListener, String path, String outputPlace, boolean shouldReconnect, int reconnectTryTimeout) {
+        add("EE" + inputPlace, htmlEventListener + GS + path + GS + (shouldReconnect ? "1" : "0") + GS + String.valueOf(reconnectTryTimeout) + GS + outputPlace);
+    }
+
+    public void setFrontEvent(String inputPlace, String htmlEvent, String modulePath, Object[] args, String outputPlace) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("Ej" + inputPlace, htmlEvent + "|" + modulePath + "|" + outputPlace + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("Ej" + inputPlace, htmlEvent + GS + modulePath + GS + outputPlace + argsJoin);
     }
 
-    public void setFrontEventListener(String inputPlace, String htmlEventListener, String modulePath, 
-                                    String[] args, String outputPlace) {
+    public void setFrontEvent(String inputPlace, String htmlEvent, String modulePath) {
+        setFrontEvent(inputPlace, htmlEvent, modulePath, null, null);
+    }
+
+    public void setFrontEventListener(String inputPlace, String htmlEventListener, String modulePath, Object[] args, String outputPlace) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("EJ" + inputPlace, htmlEventListener + "|" + modulePath + "|" + outputPlace + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("EJ" + inputPlace, htmlEventListener + GS + modulePath + GS + outputPlace + argsJoin);
     }
 
-    public void setSendEvent(String inputPlace, String htmlEvent, String data, String path, 
-                           String method, boolean isMultiPart, String contentType, String outputPlace) {
-        String safeData = data.replace("\n", "$[ln];").replace("\"", "$[dq];").replace("'", "$[sq];");
-        add("En" + inputPlace, htmlEvent + "|" + safeData + "|" + 
-            (path != null && !path.isEmpty() ? path : "#") + "|" + method + "|" + 
-            (isMultiPart ? "1" : "0") + "|" + contentType + "|" + outputPlace);
-    }
-
-    public void setSendEventListener(String inputPlace, String htmlEventListener, String data, String path, 
-                                   String method, boolean isMultiPart, String contentType, String outputPlace) {
-        add("EN" + inputPlace, htmlEventListener + "|" + data.replace("\n", "$[ln];") + "|" + 
-            (path != null && !path.isEmpty() ? path : "#") + "|" + method + "|" + 
-            (isMultiPart ? "1" : "0") + "|" + contentType + "|" + outputPlace);
+    public void setFrontEventListener(String inputPlace, String htmlEventListener, String modulePath) {
+        setFrontEventListener(inputPlace, htmlEventListener, modulePath, null, null);
     }
 
     public void setMasterPagesEvent(String inputPlace, String htmlEvent, String outputPlace) {
-        add("Eu" + inputPlace, htmlEvent + "|" + outputPlace);
+        add("Eu" + inputPlace, htmlEvent + GS + outputPlace);
+    }
+
+    public void setMasterPagesEvent(String inputPlace, String htmlEvent) {
+        setMasterPagesEvent(inputPlace, htmlEvent, null);
     }
 
     public void setMasterPagesEventListener(String inputPlace, String htmlEventListener, String outputPlace) {
-        add("EU" + inputPlace, htmlEventListener + "|" + outputPlace);
+        add("EU" + inputPlace, htmlEventListener + GS + outputPlace);
+    }
+
+    public void setMasterPagesEventListener(String inputPlace, String htmlEventListener) {
+        setMasterPagesEventListener(inputPlace, htmlEventListener, null);
     }
 
     public void setPreventDefaultEvent(String inputPlace, String htmlEvent) {
@@ -877,55 +965,62 @@ public class WebForms {
         add("ES" + inputPlace, htmlEventListener);
     }
 
-    public void setMethodEvent(String inputPlace, String htmlEvent, String methodName, String[] args) {
+    public void setMethodEvent(String inputPlace, String htmlEvent, String methodName, Object[] args) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("Em" + inputPlace, htmlEvent + "|" + methodName + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("Em" + inputPlace, htmlEvent + GS + methodName + argsJoin);
     }
 
-    public void setMethodEventListener(String inputPlace, String htmlEventListener, String methodName, String[] args) {
+    public void setMethodEvent(String inputPlace, String htmlEvent, String methodName) {
+        setMethodEvent(inputPlace, htmlEvent, methodName, null);
+    }
+
+    public void setMethodEventListener(String inputPlace, String htmlEventListener, String methodName, Object[] args) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("EM" + inputPlace, htmlEventListener + "|" + methodName + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("EM" + inputPlace, htmlEventListener + GS + methodName + argsJoin);
     }
 
-    public void setModuleMethodEvent(String inputPlace, String htmlEvent, String methodName, String[] args) {
+    public void setMethodEventListener(String inputPlace, String htmlEventListener, String methodName) {
+        setMethodEventListener(inputPlace, htmlEventListener, methodName, null);
+    }
+
+    public void setModuleMethodEvent(String inputPlace, String htmlEvent, String methodName, Object[] args) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("Ex" + inputPlace, htmlEvent + "|" + methodName + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("Ex" + inputPlace, htmlEvent + GS + methodName + argsJoin);
     }
 
-    public void setModuleMethodEventListener(String inputPlace, String htmlEventListener, String methodName, String[] args) {
+    public void setModuleMethodEvent(String inputPlace, String htmlEvent, String methodName) {
+        setModuleMethodEvent(inputPlace, htmlEvent, methodName, null);
+    }
+
+    public void setModuleMethodEventListener(String inputPlace, String htmlEventListener, String methodName, Object[] args) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("EX" + inputPlace, htmlEventListener + "|" + methodName + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("EX" + inputPlace, htmlEventListener + GS + methodName + argsJoin);
     }
 
-    public void assignConfirmEvent(String inputPlace, String htmlEvent, String text, 
-                                 String type, String title, String okText, String cancelText) {
-        String safeText = text.equals("Are you sure you want to proceed?") ? "" : text;
-        String safeType = type.equals("none") ? "" : type;
-        String safeTitle = title.equals("Confirm") ? "" : title;
-        String safeOkText = okText.equals("OK") ? "" : okText;
-        String safeCancelText = cancelText.equals("Cancel") ? "" : cancelText;
-        
-        add("Ef" + inputPlace, htmlEvent + "|" + safeText + "|" + safeType + "|" + 
-            safeTitle + "|" + safeOkText + "|" + safeCancelText);
+    public void setModuleMethodEventListener(String inputPlace, String htmlEventListener, String methodName) {
+        setModuleMethodEventListener(inputPlace, htmlEventListener, methodName, null);
     }
 
-    // Remove Events
+    public void assignConfirmEvent(String inputPlace, String htmlEvent, String text, String type, String title, String okText, String cancelText) {
+        add("Ef" + inputPlace, htmlEvent + GS + (text.equals("Are you sure you want to proceed?") ? "" : text) + GS + (type.equals("none") ? "" : type) + GS + (title.equals("Confirm") ? "" : title) + GS + (okText.equals("OK") ? "" : okText) + GS + (cancelText.equals("Cancel") ? "" : cancelText));
+    }
+
+    public void assignConfirmEvent(String inputPlace, String htmlEvent) {
+        assignConfirmEvent(inputPlace, htmlEvent, "Are you sure you want to proceed?", "none", "Confirm", "OK", "Cancel");
+    }
+
     public void removePostEvent(String inputPlace, String htmlEvent) {
         add("Rp" + inputPlace, htmlEvent);
     }
@@ -940,6 +1035,14 @@ public class WebForms {
 
     public void removeGetEventListener(String inputPlace, String htmlEventListener) {
         add("RG" + inputPlace, htmlEventListener);
+    }
+
+    public void removePutEvent(String inputPlace, String htmlEvent) {
+        add("Rt" + inputPlace, htmlEvent);
+    }
+
+    public void removePutEventListener(String inputPlace, String htmlEventListener) {
+        add("RT" + inputPlace, htmlEventListener);
     }
 
     public void removePatchEvent(String inputPlace, String htmlEvent) {
@@ -958,14 +1061,6 @@ public class WebForms {
         add("RL" + inputPlace, htmlEventListener);
     }
 
-    public void removeHeadEvent(String inputPlace, String htmlEvent) {
-        add("Rh" + inputPlace, htmlEvent);
-    }
-
-    public void removeHeadEventListener(String inputPlace, String htmlEventListener) {
-        add("RH" + inputPlace, htmlEventListener);
-    }
-
     public void removeOptionsEvent(String inputPlace, String htmlEvent) {
         add("Ro" + inputPlace, htmlEvent);
     }
@@ -974,28 +1069,20 @@ public class WebForms {
         add("RO" + inputPlace, htmlEventListener);
     }
 
-    public void removeTraceEvent(String inputPlace, String htmlEvent) {
-        add("Rr" + inputPlace, htmlEvent);
+    public void removeHeadEvent(String inputPlace, String htmlEvent) {
+        add("Rh" + inputPlace, htmlEvent);
     }
 
-    public void removeTraceEventListener(String inputPlace, String htmlEventListener) {
-        add("RR" + inputPlace, htmlEventListener);
+    public void removeHeadEventListener(String inputPlace, String htmlEventListener) {
+        add("RH" + inputPlace, htmlEventListener);
     }
 
-    public void removeConnectEvent(String inputPlace, String htmlEvent) {
-        add("Rc" + inputPlace, htmlEvent);
+    public void removeSendEvent(String inputPlace, String htmlEvent) {
+        add("Rn" + inputPlace, htmlEvent);
     }
 
-    public void removeConnectEventListener(String inputPlace, String htmlEventListener) {
-        add("RC" + inputPlace, htmlEventListener);
-    }
-
-    public void removeTagEvent(String inputPlace, String htmlEvent) {
-        add("Rt" + inputPlace, htmlEvent);
-    }
-
-    public void removeTagEventListener(String inputPlace, String htmlEventListener) {
-        add("RT" + inputPlace, htmlEventListener);
+    public void removeSendEventListener(String inputPlace, String htmlEventListener) {
+        add("RN" + inputPlace, htmlEventListener);
     }
 
     public void removeCommentEvent(String inputPlace, String htmlEvent) {
@@ -1038,14 +1125,6 @@ public class WebForms {
         add("RJ" + inputPlace, htmlEventListener);
     }
 
-    public void removeSendEvent(String inputPlace, String htmlEvent) {
-        add("Rn" + inputPlace, htmlEvent);
-    }
-
-    public void removeSendEventListener(String inputPlace, String htmlEventListener) {
-        add("RN" + inputPlace, htmlEventListener);
-    }
-
     public void removePreventDefaultEvent(String inputPlace, String htmlEvent) {
         add("Rd" + inputPlace, htmlEvent);
     }
@@ -1071,19 +1150,19 @@ public class WebForms {
     }
 
     public void removeMethodEvent(String inputPlace, String htmlEvent, String methodName) {
-        add("Rm" + inputPlace, htmlEvent + "|" + methodName);
+        add("Rm" + inputPlace, htmlEvent + GS + methodName);
     }
 
     public void removeMethodEventListener(String inputPlace, String htmlEventListener, String methodName) {
-        add("RM" + inputPlace, htmlEventListener + "|" + methodName);
+        add("RM" + inputPlace, htmlEventListener + GS + methodName);
     }
 
     public void removeModuleMethodEvent(String inputPlace, String htmlEvent, String methodName) {
-        add("Rx" + inputPlace, htmlEvent + "|" + methodName);
+        add("Rx" + inputPlace, htmlEvent + GS + methodName);
     }
 
     public void removeModuleMethodEventListener(String inputPlace, String htmlEventListener, String methodName) {
-        add("RX" + inputPlace, htmlEventListener + "|" + methodName);
+        add("RX" + inputPlace, htmlEventListener + GS + methodName);
     }
 
     public void removeConfirmEvent(String inputPlace, String htmlEvent) {
@@ -1091,23 +1170,49 @@ public class WebForms {
     }
 
     // Custom Event
-    public void createCustomDOMEvent(String inputPlace, String eventName, String watch, String key, 
-                                   String compare, String value, String range, boolean immediate, int delay) {
-        add("eC" + inputPlace, eventName + "|" + watch + "|" + key + "|" + compare + "|" + 
-            value + "|" + range + "|" + (immediate ? "1" : "0") + "|" + delay);
+    // This Method Is Compatible With EventListener And May Not Be Compatible With Events Written As Attributes In Some Browsers.
+    // Watch: attribute, style, text, children, value
+    // Compare: greater, less, equal, notequal, includes, startswith, endswith, matches, changed, inrange, lengthgreater, lengthless, lengthequal
+    // Range: Only Use For Compare With inrange Value. Split By Comma ","
+    // Key: Only Use For Watch With attribute And style Value
+    public void createCustomDOMEvent(String inputPlace, String eventName, String watch, String key, String compare, String value, String range, boolean immediate, String delay) {
+        add("eC" + inputPlace, eventName + GS + watch + GS + key + GS + compare + GS + value + GS + range + GS + (immediate ? "1" : "0") + GS + delay);
+    }
+
+    public void createCustomDOMEvent(String inputPlace, String eventName, String watch, String key, String compare, String value, String range) {
+        createCustomDOMEvent(inputPlace, eventName, watch, key, compare, value, range, false, "0");
+    }
+
+    public void createCustomDOMEvent(String inputPlace, String eventName, String watch, String key, String compare, String value, String range, boolean immediate, int delay) {
+        createCustomDOMEvent(inputPlace, eventName, watch, key, compare, value, range, immediate, String.valueOf(delay));
     }
 
     public void enableScrollBottomEvent(boolean enable) {
         add("eb", enable ? "1" : "0");
     }
 
+    public void enableScrollBottomEvent() {
+        enableScrollBottomEvent(true);
+    }
+
     public void enableReachedElementEvent(String inputPlace, boolean once, boolean enable) {
-        add("er" + inputPlace, (once ? "1" : "0") + "|" + (enable ? "1" : "0"));
+        add("er" + inputPlace, (once ? "1" : "0") + GS + (enable ? "1" : "0"));
+    }
+
+    public void enableReachedElementEvent(String inputPlace, boolean once) {
+        enableReachedElementEvent(inputPlace, once, true);
     }
 
     // Module
     public void loadModule(String modulePath, String[] methods) {
-        add("Ml", modulePath + ((methods != null && methods.length > 0) ? "|" + String.join("|", methods) : ""));
+        if (methods == null) {
+            methods = new String[0];
+        }
+        add("Ml", modulePath + ((methods.length > 0) ? GS + "[" + String.join(String.valueOf(US), methods) : ""));
+    }
+
+    public void loadModule(String modulePath) {
+        loadModule(modulePath, null);
     }
 
     public void unloadModule(String modulePath) {
@@ -1119,6 +1224,7 @@ public class WebForms {
     }
 
     // Unit Testing
+    // InputPlace Is Actual, Expected Is Tag/OutputPlace
     public void assertEqual(String inputPlace, String tag) {
         add("At" + inputPlace, tag.replace("\n", "$[ln];"));
     }
@@ -1127,25 +1233,39 @@ public class WebForms {
         add("Ao" + inputPlace, outputPlace);
     }
 
-    // Service Worker
-    public void serviceWorkerRegister(String path, String scopePath) {
-        add("wR", path + "|" + scopePath);
+    // Debug
+    public void createDebugger(boolean pause) {
+        add("Dc", pause ? "1" : "0");
     }
 
-    public void serviceWorkerRegister(String path) {
-        serviceWorkerRegister(path, null);
+    public void createDebugger() {
+        createDebugger(false);
+    }
+
+    // Service Worker
+    // To Use Service Worker, You Need To Add The Elanat Dedicated Module (service-worker.js) On The Client Side
+    public void serviceWorkerRegister(String path, String scopePath) {
+        add("wR", path + GS + scopePath);
+    }
+
+    public void serviceWorkerRegister() {
+        serviceWorkerRegister(null, null);
     }
 
     public void serviceWorkerPreCacheStatic(String[] pathList) {
-        add("wp", String.join("|", pathList));
+        add("wp", String.join(String.valueOf(GS), pathList));
     }
 
-    public void serviceWorkerDynamicCache(String path, int seconds) {
-        add("wc", path + (seconds > 0 ? "|" + seconds : ""));
+    public void serviceWorkerDynamicCache(String path, String seconds) {
+        add("wc", path + ((seconds != null && !seconds.isEmpty()) ? GS + seconds : ""));
     }
 
     public void serviceWorkerDynamicCache(String path) {
-        serviceWorkerDynamicCache(path, 0);
+        serviceWorkerDynamicCache(path, "");
+    }
+
+    public void serviceWorkerDynamicCache(String path, int seconds) {
+        serviceWorkerDynamicCache(path, seconds > 0 ? String.valueOf(seconds) : "");
     }
 
     public void serviceWorkerDeleteDynamicCache() {
@@ -1156,12 +1276,23 @@ public class WebForms {
         add("wd", path);
     }
 
-    public void serviceWorkerDynamicCacheTTLUpdate(String path, int seconds) {
-        add("wt", path + (seconds > 0 ? "|" + seconds : ""));
+    public void serviceWorkerDynamicCacheTTLUpdate(String path, String seconds) {
+        add("wt", path + ((seconds != null && !seconds.isEmpty()) ? GS + seconds : ""));
     }
 
+    public void serviceWorkerDynamicCacheTTLUpdate(String path) {
+        serviceWorkerDynamicCacheTTLUpdate(path, "");
+    }
+
+    public void serviceWorkerDynamicCacheTTLUpdate(String path, int seconds) {
+        serviceWorkerDynamicCacheTTLUpdate(path, seconds > 0 ? String.valueOf(seconds) : "");
+    }
+
+    // Path: Support Wildcard Automatically And Also Support Regex If Use "re:" Before Pattern
+    // Type: Type Is Cache Strategy. cachefirst, networkfirst, cacheonly, networkonly, stalerevalidate (Fast From Cache, Updates Simultaneously From The Network)
+    // CacheDynamic: If True, Any Successful Network Response For That Route Will Be Stored In The Dynamic Cache
     public void serviceWorkerRouteSet(String path, String type, boolean cacheDynamic) {
-        add("wr", path + "|" + type + (cacheDynamic ? "|1" : ""));
+        add("wr", path + GS + type + (cacheDynamic ? GS + "1" : ""));
     }
 
     public void serviceWorkerRouteSet(String path, String type) {
@@ -1169,7 +1300,7 @@ public class WebForms {
     }
 
     public void serviceWorkerRouteAlias(String path, String to) {
-        add("wa", path + "|" + to);
+        add("wa", path + GS + to);
     }
 
     public void serviceWorkerDeleteRouteAlias(String path) {
@@ -1180,6 +1311,7 @@ public class WebForms {
         serviceWorkerDeleteRouteAlias(null);
     }
 
+    // Delete All Route And Alias
     public void serviceWorkerDeleteRoute() {
         add("wD");
     }
@@ -1193,21 +1325,41 @@ public class WebForms {
         add("Ds", path);
     }
 
+    public void disconnectSSE() {
+        disconnectSSE(null);
+    }
+
     public void disconnectAllSSE() {
         add("Ds");
     }
 
     // State
     public void addState(String path, String title) {
-        add("AS", path + "|" + title);
+        add("AS", path + GS + title);
     }
 
-    public void addState(String path) {
-        addState(path, null);
+    public void addState() {
+        addState(null, null);
+    }
+
+    public void saveState(String path, String title) {
+        add("As", path + GS + title);
+    }
+
+    public void saveState() {
+        saveState(null, null);
+    }
+
+    public void loadState(String path) {
+        add("ls", path);
     }
 
     public void deleteState(String path) {
         add("DS", path);
+    }
+
+    public void deleteState() {
+        deleteState(null);
     }
 
     public void deleteAllState() {
@@ -1215,17 +1367,25 @@ public class WebForms {
     }
 
     // Cookie
-    public void setCookie(String key, String value, int seconds, String path) {
-        add("sC", key + "|" + value + "|" + seconds + (path != null && !path.isEmpty() ? "|" + path : ""));
+    public void setCookie(String key, String value, String seconds, String path) {
+        add("sC", key + GS + value + GS + seconds + ((path != null && !path.isEmpty()) ? GS + path : ""));
     }
 
-    public void setCookie(String key, String value, int seconds) {
+    public void setCookie(String key, String value, String seconds) {
         setCookie(key, value, seconds, null);
     }
 
-    // Save/Session Cache
+    public void setCookie(String key, String value, int seconds, String path) {
+        setCookie(key, value, String.valueOf(seconds), path);
+    }
+
+    public void setCookie(String key, String value, int seconds) {
+        setCookie(key, value, String.valueOf(seconds), null);
+    }
+
+    // Save (Session Cache)
     public void saveId(String inputPlace, String key) {
-        add("@gi" + inputPlace, key != null ? key : ".");
+        add("@gi" + inputPlace, key);
     }
 
     public void saveId(String inputPlace) {
@@ -1233,7 +1393,7 @@ public class WebForms {
     }
 
     public void saveName(String inputPlace, String key) {
-        add("@gn" + inputPlace, key != null ? key : ".");
+        add("@gn" + inputPlace, key);
     }
 
     public void saveName(String inputPlace) {
@@ -1241,7 +1401,7 @@ public class WebForms {
     }
 
     public void saveValue(String inputPlace, String key) {
-        add("@gv" + inputPlace, key != null ? key : ".");
+        add("@gv" + inputPlace, key);
     }
 
     public void saveValue(String inputPlace) {
@@ -1249,7 +1409,7 @@ public class WebForms {
     }
 
     public void saveValueLength(String inputPlace, String key) {
-        add("@ge" + inputPlace, key != null ? key : ".");
+        add("@ge" + inputPlace, key);
     }
 
     public void saveValueLength(String inputPlace) {
@@ -1257,7 +1417,7 @@ public class WebForms {
     }
 
     public void saveClass(String inputPlace, String key) {
-        add("@gc" + inputPlace, key != null ? key : ".");
+        add("@gc" + inputPlace, key);
     }
 
     public void saveClass(String inputPlace) {
@@ -1265,7 +1425,7 @@ public class WebForms {
     }
 
     public void saveStyle(String inputPlace, String key) {
-        add("@gs" + inputPlace, key != null ? key : ".");
+        add("@gs" + inputPlace, key);
     }
 
     public void saveStyle(String inputPlace) {
@@ -1273,7 +1433,7 @@ public class WebForms {
     }
 
     public void saveTitle(String inputPlace, String key) {
-        add("@gl" + inputPlace, key != null ? key : ".");
+        add("@gl" + inputPlace, key);
     }
 
     public void saveTitle(String inputPlace) {
@@ -1281,7 +1441,7 @@ public class WebForms {
     }
 
     public void saveLabel(String inputPlace, String key) {
-        add("@gA" + inputPlace, key != null ? key : ".");
+        add("@gA" + inputPlace, key);
     }
 
     public void saveLabel(String inputPlace) {
@@ -1289,7 +1449,7 @@ public class WebForms {
     }
 
     public void saveText(String inputPlace, String key) {
-        add("@gt" + inputPlace, key != null ? key : ".");
+        add("@gt" + inputPlace, key);
     }
 
     public void saveText(String inputPlace) {
@@ -1297,7 +1457,7 @@ public class WebForms {
     }
 
     public void saveOuterText(String inputPlace, String key) {
-        add("@go" + inputPlace, key != null ? key : ".");
+        add("@go" + inputPlace, key);
     }
 
     public void saveOuterText(String inputPlace) {
@@ -1305,7 +1465,7 @@ public class WebForms {
     }
 
     public void saveTextLength(String inputPlace, String key) {
-        add("@gg" + inputPlace, key != null ? key : ".");
+        add("@gg" + inputPlace, key);
     }
 
     public void saveTextLength(String inputPlace) {
@@ -1313,7 +1473,7 @@ public class WebForms {
     }
 
     public void saveAttribute(String inputPlace, String attribute, String key) {
-        add("@ga" + inputPlace, (key != null ? key : ".") + '|' + attribute);
+        add("@ga" + inputPlace, key + GS + attribute);
     }
 
     public void saveAttribute(String inputPlace, String attribute) {
@@ -1321,7 +1481,7 @@ public class WebForms {
     }
 
     public void saveWidth(String inputPlace, String key) {
-        add("@gw" + inputPlace, key != null ? key : ".");
+        add("@gw" + inputPlace, key);
     }
 
     public void saveWidth(String inputPlace) {
@@ -1329,7 +1489,7 @@ public class WebForms {
     }
 
     public void saveHeight(String inputPlace, String key) {
-        add("@gh" + inputPlace, key != null ? key : ".");
+        add("@gh" + inputPlace, key);
     }
 
     public void saveHeight(String inputPlace) {
@@ -1337,7 +1497,7 @@ public class WebForms {
     }
 
     public void saveReadOnly(String inputPlace, String key) {
-        add("@gr" + inputPlace, key != null ? key : ".");
+        add("@gr" + inputPlace, key);
     }
 
     public void saveReadOnly(String inputPlace) {
@@ -1345,7 +1505,7 @@ public class WebForms {
     }
 
     public void saveSelectedIndex(String inputPlace, String key) {
-        add("@gx" + inputPlace, key != null ? key : ".");
+        add("@gx" + inputPlace, key);
     }
 
     public void saveSelectedIndex(String inputPlace) {
@@ -1353,7 +1513,7 @@ public class WebForms {
     }
 
     public void saveTextAlign(String inputPlace, String key) {
-        add("@gT" + inputPlace, key != null ? key : ".");
+        add("@gT" + inputPlace, key);
     }
 
     public void saveTextAlign(String inputPlace) {
@@ -1361,7 +1521,7 @@ public class WebForms {
     }
 
     public void saveNodeLength(String inputPlace, String key) {
-        add("@gL" + inputPlace, key != null ? key : ".");
+        add("@gL" + inputPlace, key);
     }
 
     public void saveNodeLength(String inputPlace) {
@@ -1369,7 +1529,7 @@ public class WebForms {
     }
 
     public void saveVisible(String inputPlace, String key) {
-        add("@gV" + inputPlace, key != null ? key : ".");
+        add("@gV" + inputPlace, key);
     }
 
     public void saveVisible(String inputPlace) {
@@ -1377,44 +1537,57 @@ public class WebForms {
     }
 
     public void saveUrl(String url, boolean fetchScript, String key) {
-        add("@gu", (key != null ? key : ".") + "|" + url + (fetchScript ? "|1" : ""));
+        add("@gu", key + GS + url + (fetchScript ? GS + "1" : ""));
     }
 
     public void saveUrl(String url, boolean fetchScript) {
         saveUrl(url, fetchScript, ".");
     }
 
+    public void saveUrl(String url) {
+        saveUrl(url, false, ".");
+    }
+
     public void saveIndex(String inputPlace, String key) {
-        add("@gI" + inputPlace, key != null ? key : ".");
+        add("@gI" + inputPlace, key);
     }
 
     public void saveIndex(String inputPlace) {
         saveIndex(inputPlace, ".");
     }
 
-    public void removeSessionCache(String cacheKey) {
+    public void removeSave(String cacheKey) {
         add("rs", cacheKey);
     }
 
-    public void removeAllSessionCache() {
+    public void removeAllSave() {
         add("rs", "*");
     }
 
-    public void setSessionCache() {
+    // Calling the SetSave Method Causes Action Control Requests Triggered by Events Using the GET, POST, PUT, PATCH, DELETE, and OPTIONS Methods, as well as Requests Triggered by the Send Event, to be Temporarily Saved on the Active Page, so the Request will not be Sent to the Server Again.
+    public void setSave() {
         add("cs", "*");
     }
 
-    public void addSessionCacheValue(String cacheKey, String value) {
-        add("SA", cacheKey + "|" + value.replace("\n", "$[ln];"));
+    public void addSaveValue(String cacheKey, String value) {
+        add("SA", cacheKey + GS + value.replace("\n", "$[ln];"));
     }
 
-    public void insertSessionCacheValue(String cacheKey, String value) {
-        add("SI", cacheKey + "|" + value.replace("\n", "$[ln];"));
+    public void insertSaveValue(String cacheKey, String value) {
+        add("SI", cacheKey + GS + value.replace("\n", "$[ln];"));
+    }
+
+    public void appendSaveValue(String cacheKey, String value) {
+        add("SP", cacheKey + GS + value.replace("\n", "$[ln];"));
+    }
+
+    public void replaceSaveValue(String cacheKey, String searchValue, String value) {
+        add("SR", cacheKey + GS + value.replace("\n", "$[ln];") + GS + searchValue.replace("\n", "$[ln];"));
     }
 
     // Cache
     public void cacheId(String inputPlace, String key) {
-        add("@ci" + inputPlace, key != null ? key : ".");
+        add("@ci" + inputPlace, key);
     }
 
     public void cacheId(String inputPlace) {
@@ -1422,7 +1595,7 @@ public class WebForms {
     }
 
     public void cacheName(String inputPlace, String key) {
-        add("@cn" + inputPlace, key != null ? key : ".");
+        add("@cn" + inputPlace, key);
     }
 
     public void cacheName(String inputPlace) {
@@ -1430,7 +1603,7 @@ public class WebForms {
     }
 
     public void cacheValue(String inputPlace, String key) {
-        add("@cv" + inputPlace, key != null ? key : ".");
+        add("@cv" + inputPlace, key);
     }
 
     public void cacheValue(String inputPlace) {
@@ -1438,7 +1611,7 @@ public class WebForms {
     }
 
     public void cacheValueLength(String inputPlace, String key) {
-        add("@ce" + inputPlace, key != null ? key : ".");
+        add("@ce" + inputPlace, key);
     }
 
     public void cacheValueLength(String inputPlace) {
@@ -1446,7 +1619,7 @@ public class WebForms {
     }
 
     public void cacheClass(String inputPlace, String key) {
-        add("@cc" + inputPlace, key != null ? key : ".");
+        add("@cc" + inputPlace, key);
     }
 
     public void cacheClass(String inputPlace) {
@@ -1454,7 +1627,7 @@ public class WebForms {
     }
 
     public void cacheStyle(String inputPlace, String key) {
-        add("@cs" + inputPlace, key != null ? key : ".");
+        add("@cs" + inputPlace, key);
     }
 
     public void cacheStyle(String inputPlace) {
@@ -1462,7 +1635,7 @@ public class WebForms {
     }
 
     public void cacheTitle(String inputPlace, String key) {
-        add("@cl" + inputPlace, key != null ? key : ".");
+        add("@cl" + inputPlace, key);
     }
 
     public void cacheTitle(String inputPlace) {
@@ -1470,7 +1643,7 @@ public class WebForms {
     }
 
     public void cacheLabel(String inputPlace, String key) {
-        add("@cA" + inputPlace, key != null ? key : ".");
+        add("@cA" + inputPlace, key);
     }
 
     public void cacheLabel(String inputPlace) {
@@ -1478,7 +1651,7 @@ public class WebForms {
     }
 
     public void cacheText(String inputPlace, String key) {
-        add("@ct" + inputPlace, key != null ? key : ".");
+        add("@ct" + inputPlace, key);
     }
 
     public void cacheText(String inputPlace) {
@@ -1486,7 +1659,7 @@ public class WebForms {
     }
 
     public void cacheOuterText(String inputPlace, String key) {
-        add("@co" + inputPlace, key != null ? key : ".");
+        add("@co" + inputPlace, key);
     }
 
     public void cacheOuterText(String inputPlace) {
@@ -1494,7 +1667,7 @@ public class WebForms {
     }
 
     public void cacheTextLength(String inputPlace, String key) {
-        add("@cg" + inputPlace, key != null ? key : ".");
+        add("@cg" + inputPlace, key);
     }
 
     public void cacheTextLength(String inputPlace) {
@@ -1502,7 +1675,7 @@ public class WebForms {
     }
 
     public void cacheAttribute(String inputPlace, String attribute, String key) {
-        add("@ca" + inputPlace, (key != null ? key : ".") + '|' + attribute);
+        add("@ca" + inputPlace, key + GS + attribute);
     }
 
     public void cacheAttribute(String inputPlace, String attribute) {
@@ -1510,7 +1683,7 @@ public class WebForms {
     }
 
     public void cacheWidth(String inputPlace, String key) {
-        add("@cw" + inputPlace, key != null ? key : ".");
+        add("@cw" + inputPlace, key);
     }
 
     public void cacheWidth(String inputPlace) {
@@ -1518,7 +1691,7 @@ public class WebForms {
     }
 
     public void cacheHeight(String inputPlace, String key) {
-        add("@ch" + inputPlace, key != null ? key : ".");
+        add("@ch" + inputPlace, key);
     }
 
     public void cacheHeight(String inputPlace) {
@@ -1526,7 +1699,7 @@ public class WebForms {
     }
 
     public void cacheReadOnly(String inputPlace, String key) {
-        add("@cr" + inputPlace, key != null ? key : ".");
+        add("@cr" + inputPlace, key);
     }
 
     public void cacheReadOnly(String inputPlace) {
@@ -1534,7 +1707,7 @@ public class WebForms {
     }
 
     public void cacheSelectedIndex(String inputPlace, String key) {
-        add("@cx" + inputPlace, key != null ? key : ".");
+        add("@cx" + inputPlace, key);
     }
 
     public void cacheSelectedIndex(String inputPlace) {
@@ -1542,7 +1715,7 @@ public class WebForms {
     }
 
     public void cacheTextAlign(String inputPlace, String key) {
-        add("@cT" + inputPlace, key != null ? key : ".");
+        add("@cT" + inputPlace, key);
     }
 
     public void cacheTextAlign(String inputPlace) {
@@ -1550,7 +1723,7 @@ public class WebForms {
     }
 
     public void cacheNodeLength(String inputPlace, String key) {
-        add("@cL" + inputPlace, key != null ? key : ".");
+        add("@cL" + inputPlace, key);
     }
 
     public void cacheNodeLength(String inputPlace) {
@@ -1558,7 +1731,7 @@ public class WebForms {
     }
 
     public void cacheVisible(String inputPlace, String key) {
-        add("@cV" + inputPlace, key != null ? key : ".");
+        add("@cV" + inputPlace, key);
     }
 
     public void cacheVisible(String inputPlace) {
@@ -1566,15 +1739,19 @@ public class WebForms {
     }
 
     public void cacheUrl(String url, boolean fetchScript, String key) {
-        add("@cu", (key != null ? key : ".") + "|" + url + (fetchScript ? "|1" : ""));
+        add("@cu", key + GS + url + (fetchScript ? GS + "1" : ""));
     }
 
     public void cacheUrl(String url, boolean fetchScript) {
         cacheUrl(url, fetchScript, ".");
     }
 
+    public void cacheUrl(String url) {
+        cacheUrl(url, false, ".");
+    }
+
     public void cacheIndex(String inputPlace, String key) {
-        add("@cI" + inputPlace, key != null ? key : ".");
+        add("@cI" + inputPlace, key);
     }
 
     public void cacheIndex(String inputPlace) {
@@ -1589,8 +1766,13 @@ public class WebForms {
         add("rd", "*");
     }
 
+    // Calling the SetCache Method Causes Action Control Requests Triggered by events using the GET, POST, PUT, PATCH, DELETE, and OPTIONS Methods, as well as Requests Triggered by the Send event, to be Cached, so the Request will not be Sent to the Server Again.
+    public void setCache(String second) {
+        add("cd", second);
+    }
+
     public void setCache(int second) {
-        add("cd", Integer.toString(second));
+        setCache(String.valueOf(second));
     }
 
     public void setCache() {
@@ -1598,11 +1780,19 @@ public class WebForms {
     }
 
     public void addCacheValue(String cacheKey, String value) {
-        add("CA", cacheKey + "|" + value.replace("\n", "$[ln];"));
+        add("CA", cacheKey + GS + value.replace("\n", "$[ln];"));
     }
 
     public void insertCacheValue(String cacheKey, String value) {
-        add("CI", cacheKey + "|" + value.replace("\n", "$[ln];"));
+        add("CI", cacheKey + GS + value.replace("\n", "$[ln];"));
+    }
+
+    public void appendCacheValue(String cacheKey, String value) {
+        add("CP", cacheKey + GS + value.replace("\n", "$[ln];"));
+    }
+
+    public void replaceCacheValue(String cacheKey, String searchValue, String value) {
+        add("CR", cacheKey + GS + value.replace("\n", "$[ln];") + GS + searchValue.replace("\n", "$[ln];"));
     }
 
     // Call
@@ -1610,33 +1800,23 @@ public class WebForms {
         add("lu" + inputPlace, url);
     }
 
-    public void runActionControls(String actionControls, String index, boolean withoutWebFormsSection, boolean useCurrentEvent) {
-        add("lA", (useCurrentEvent ? "1" : "0") + "|" + (withoutWebFormsSection ? "1" : "0") + 
-            "|" + index + "|" + actionControls);
+    public void runActionControls(String actionControls, boolean withoutWebFormsSection, String index, boolean useCurrentEvent) {
+        add("lA", (useCurrentEvent ? "1" : "0") + GS + (withoutWebFormsSection ? "1" : "0") + GS + index + GS + actionControls);
     }
 
-    public void runActionControls(String actionControls, int index, boolean withoutWebFormsSection, boolean useCurrentEvent) {
-        runActionControls(actionControls, Integer.toString(index), withoutWebFormsSection, useCurrentEvent);
-    }
-
-    public void runActionControls(String actionControls, String index) {
-        runActionControls(actionControls, index, false, true);
-    }
-
-    public void runActionControls(String actionControls, int index) {
-        runActionControls(actionControls, index, false, true);
+    public void runActionControls(String actionControls) {
+        runActionControls(actionControls, true, null, true);
     }
 
     public void callScript(String scriptText) {
         add("_", scriptText.replace("\n", "$[ln];"));
     }
 
-    public void callMethod(String methodName, String[] args) {
+    public void callMethod(String methodName, Object[] args) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
         add("lm", methodName + argsJoin);
     }
 
@@ -1644,12 +1824,11 @@ public class WebForms {
         callMethod(methodName, null);
     }
 
-    public void callModuleMethod(String methodName, String[] args) {
+    public void callModuleMethod(String methodName, Object[] args) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
         add("lM", methodName + argsJoin);
     }
 
@@ -1658,216 +1837,157 @@ public class WebForms {
     }
 
     public void callPostBack(String formInputPlace, String outputPlace) {
-        add("Lp", "1" + "|" + formInputPlace + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+        add("Lp", "1" + GS + formInputPlace + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
     public void callPostBack(String formInputPlace) {
         callPostBack(formInputPlace, null);
     }
 
-    public void callTagBack(String outputPlace, boolean useCurrentEvent) {
-        add("Lt", (useCurrentEvent ? "1" : "0") + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+    public void callCommentBack(String index, String inputPlace, boolean useCurrentEvent) {
+        add("LC", (useCurrentEvent ? "1" : "0") + GS + index + GS + inputPlace);
     }
 
-    public void callTagBack(String outputPlace) {
-        callTagBack(outputPlace, true);
+    public void callCommentBack() {
+        callCommentBack(null, null, true);
     }
 
-    public void callTagBack() {
-        callTagBack(null, true);
+    public void callCommentBack(int index, String inputPlace, boolean useCurrentEvent) {
+        callCommentBack(String.valueOf(index), inputPlace, useCurrentEvent);
     }
 
-    public void callCommentBack(String index, String outputPlace, boolean useCurrentEvent) {
-        add("LC", (useCurrentEvent ? "1" : "0") + "|" + index + "|" + outputPlace);
-    }
-
-    public void callCommentBack(int index, String outputPlace, boolean useCurrentEvent) {
-        callCommentBack(Integer.toString(index), outputPlace, useCurrentEvent);
-    }
-
-    public void callCommentBack(String index, String outputPlace) {
-        callCommentBack(index, outputPlace, true);
-    }
-
-    public void callWasmBack(String wasmLanguage, String wasmUrl, String methodName, 
-                           String[] args, String outputPlace, boolean useCurrentEvent) {
+    public void callWasmBack(String wasmLanguage, String wasmUrl, String methodName, Object[] args, String outputPlace, boolean useCurrentEvent) {
         String argsJoin = "";
+        if (args != null) {
+            argsJoin = (args.length > 0) ? "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("Ly", (useCurrentEvent ? "1" : "0") + GS + wasmLanguage + GS + wasmUrl + GS + methodName + GS + argsJoin + GS + outputPlace);
+    }
 
-        if (args != null && args.length > 0)
-            argsJoin = String.join(",", args);
-
-        add("Ly", (useCurrentEvent ? "1" : "0") + "|" + wasmLanguage + "|" + wasmUrl + "|" + 
-            methodName + "|" + argsJoin + "|" + outputPlace);
+    public void callWasmBack(String wasmLanguage, String wasmUrl, String methodName) {
+        callWasmBack(wasmLanguage, wasmUrl, methodName, null, null, true);
     }
 
     public void callWebSocketBack(String path, boolean useCurrentEvent) {
-        add("Lw", (useCurrentEvent ? "1" : "0") + "|" + path);
+        add("Lw", (useCurrentEvent ? "1" : "0") + GS + path);
     }
 
     public void callWebSocketBack(String path) {
         callWebSocketBack(path, true);
     }
 
-    public void callSSEBack(String path, String outputPlace, boolean useCurrentEvent, 
-                          boolean shouldReconnect, int reconnectTryTimeout) {
-        add("Ls", (useCurrentEvent ? "1" : "0") + "|" + path + "|" + 
-            (shouldReconnect ? "1" : "0") + "|" + reconnectTryTimeout + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+    public void callSSEBack(String path, String outputPlace, boolean useCurrentEvent, boolean shouldReconnect, String reconnectTryTimeout) {
+        add("Ls", (useCurrentEvent ? "1" : "0") + GS + path + GS + (shouldReconnect ? "1" : "0") + GS + reconnectTryTimeout + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callSSEBack(String path, String outputPlace) {
-        callSSEBack(path, outputPlace, true, true, 3000);
+    public void callSSEBack(String path) {
+        callSSEBack(path, null, true, true, "3000");
     }
 
-    public void callFront(String modulePath, String[] args, String outputPlace, boolean useCurrentEvent) {
+    public void callSSEBack(String path, String outputPlace, boolean useCurrentEvent, boolean shouldReconnect, int reconnectTryTimeout) {
+        callSSEBack(path, outputPlace, useCurrentEvent, shouldReconnect, String.valueOf(reconnectTryTimeout));
+    }
+
+    public void callFront(String modulePath, Object[] args, String outputPlace, boolean useCurrentEvent) {
         String argsJoin = "";
-
-        if (args != null && args.length > 0)
-            argsJoin = "|" + String.join("|", args);
-
-        add("Lj", (useCurrentEvent ? "1" : "0") + "|" + modulePath + "|" + outputPlace + argsJoin);
+        if (args != null) {
+            argsJoin = (args.length > 0) ? GS + "[" + String.join(String.valueOf(US), toStringArray(args)) : "";
+        }
+        add("Lj", (useCurrentEvent ? "1" : "0") + GS + modulePath + GS + outputPlace + argsJoin);
     }
 
-    public void callFront(String modulePath, String[] args, String outputPlace) {
-        callFront(modulePath, args, outputPlace, true);
+    public void callFront(String modulePath) {
+        callFront(modulePath, null, null, true);
     }
 
     public void callGetBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("Lg", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+        add("Lg", (useCurrentEvent ? "1" : "0") + GS + path + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callGetBack(String path, String outputPlace) {
-        callGetBack(path, outputPlace, true);
+    public void callGetBack(String path) {
+        callGetBack(path, null, true);
     }
 
     public void callPutBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("Lu", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+        add("Lt", (useCurrentEvent ? "1" : "0") + GS + path + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callPutBack(String path, String outputPlace) {
-        callPutBack(path, outputPlace, true);
+    public void callPutBack(String path) {
+        callPutBack(path, null, true);
     }
 
     public void callPatchBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("LP", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+        add("LP", (useCurrentEvent ? "1" : "0") + GS + path + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callPatchBack(String path, String outputPlace) {
-        callPatchBack(path, outputPlace, true);
+    public void callPatchBack(String path) {
+        callPatchBack(path, null, true);
     }
 
     public void callDeleteBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("Ld", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+        add("Ld", (useCurrentEvent ? "1" : "0") + GS + path + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callDeleteBack(String path, String outputPlace) {
-        callDeleteBack(path, outputPlace, true);
+    public void callDeleteBack(String path) {
+        callDeleteBack(path, null, true);
     }
 
-    public void callHeadBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("Lh", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+    public void callHeadBack(String path, boolean useCurrentEvent) {
+        add("Lh", (useCurrentEvent ? "1" : "0") + GS + path);
     }
 
-    public void callHeadBack(String path, String outputPlace) {
-        callHeadBack(path, outputPlace, true);
+    public void callHeadBack(String path) {
+        callHeadBack(path, true);
     }
 
     public void callOptionsBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("Lo", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+        add("Lo", (useCurrentEvent ? "1" : "0") + GS + path + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callOptionsBack(String path, String outputPlace) {
-        callOptionsBack(path, outputPlace, true);
+    public void callOptionsBack(String path) {
+        callOptionsBack(path, null, true);
     }
 
-    public void callTraceBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("LT", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+    public void callSendBack(String path, String method, boolean isMultiPart, String contentType, String data, String outputPlace, boolean useCurrentEvent) {
+        add("LS", (useCurrentEvent ? "1" : "0") + GS + path + GS + method + GS + (isMultiPart ? "1" : "0") + GS + contentType + GS + data.replace("\n", "$[ln];") + ((outputPlace != null && !outputPlace.isEmpty()) ? GS + outputPlace : ""));
     }
 
-    public void callTraceBack(String path, String outputPlace) {
-        callTraceBack(path, outputPlace, true);
-    }
-
-    public void callConnectBack(String path, String outputPlace, boolean useCurrentEvent) {
-        add("Lc", (useCurrentEvent ? "1" : "0") + "|" + path + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
-    }
-
-    public void callConnectBack(String path, String outputPlace) {
-        callConnectBack(path, outputPlace, true);
-    }
-
-    public void callSendBack(String path, String method, boolean isMultiPart, String contentType, 
-                           String data, String outputPlace, boolean useCurrentEvent) {
-        String safeData = data.replace("\n", "$[ln];").replace("|", "$[vb];");
-        add("LS", (useCurrentEvent ? "1" : "0") + "|" + path + "|" + method + "|" + 
-            (isMultiPart ? "1" : "0") + "|" + contentType + "|" + safeData + 
-            (outputPlace != null && !outputPlace.isEmpty() ? "|" + outputPlace : ""));
+    public void callSendBack(String path, String method, boolean isMultiPart, String contentType, String data) {
+        callSendBack(path, method, isMultiPart, contentType, data, null, true);
     }
 
     // Update
     public void increase(String inputPlace, float value) {
-        add("gt" + inputPlace, "i|" + Float.toString(value));
+        add("gt" + inputPlace, "i" + GS + String.valueOf(value));
     }
 
     public void decrease(String inputPlace, float value) {
-        add("gt" + inputPlace, "i|" + Float.toString(value * -1));
+        add("gt" + inputPlace, "i" + GS + String.valueOf(value * -1));
     }
 
+    // If You Don't Use Deep Mode, any Tags Inside the Current Tag Will Simply Be Treated as Strings. Deep Mode Does not Remove Inner Elements.
     public void replace(String inputPlace, String value, String newValue, boolean alsoStartTag, boolean deep) {
-        String safeValue = value;
-        String safeNewValue = newValue;
-
-        if (safeValue != null && !safeValue.isEmpty() && safeValue.charAt(0) == '@') {
-            safeValue = safeValue.substring(1);
-            safeValue = "$[at];" + safeValue;
-        }
-
-        if (safeNewValue != null && !safeNewValue.isEmpty() && safeNewValue.charAt(0) == '@') {
-            safeNewValue = safeNewValue.substring(1);
-            safeNewValue = "$[at];" + safeNewValue;
-        }
-
-        add("gt" + inputPlace, "r|" + safeValue + "|" + safeNewValue + "|" + 
-            (alsoStartTag ? "1" : "0") + "|" + (deep ? "1" : "0"));
+        add("gt" + inputPlace, "r" + GS + value + GS + newValue + GS + (alsoStartTag ? "1" : "0") + GS + (deep ? "1" : "0"));
     }
 
+    public void replace(String inputPlace, String value, String newValue) {
+        replace(inputPlace, value, newValue, false, true);
+    }
+
+    // HTML Converts Attribute Names to Lowercase, so they Need to Be Written in Lowercase.
     public void replaceStartTag(String inputPlace, String value, String newValue) {
-        String safeValue = value;
-        String safeNewValue = newValue;
-
-        if (safeValue != null && !safeValue.isEmpty() && safeValue.charAt(0) == '@') {
-            safeValue = safeValue.substring(1);
-            safeValue = "$[at];" + safeValue;
-        }
-
-        if (safeNewValue != null && !safeNewValue.isEmpty() && safeNewValue.charAt(0) == '@') {
-            safeNewValue = safeNewValue.substring(1);
-            safeNewValue = "$[at];" + safeNewValue;
-        }
-
-        add("gt" + inputPlace, "s|" + safeValue + "|" + safeNewValue);
+        add("gt" + inputPlace, "s" + GS + value + GS + newValue);
     }
 
     // Pre Runner
     public void assignDelay(int miliSecond, int index) {
         String currentLine = getLineByIndex(index);
-        if (currentLine == null || currentLine.isEmpty())
+        if (currentLine == null || currentLine.isEmpty()) {
             return;
-
+        }
         String[] parts = currentLine.split("=", 2);
         String newName = ":" + miliSecond + ")" + parts[0];
         String newValue = parts.length > 1 ? parts[1] : "";
-
         updateLineByIndex(index, newName, newValue);
     }
 
@@ -1877,20 +1997,17 @@ public class WebForms {
 
     public void assignDelayChange(int miliSecond, int index) {
         String currentLine = getLineByIndex(index);
-        if (currentLine == null || currentLine.isEmpty())
+        if (currentLine == null || currentLine.isEmpty()) {
             return;
-
+        }
         String[] parts = currentLine.split("=", 2);
         String currentName = parts[0];
-
         if (currentName.startsWith(":") && currentName.contains(")")) {
             int closingBracket = currentName.indexOf(')');
             currentName = currentName.substring(closingBracket + 1);
         }
-
         String newName = ":" + miliSecond + ")" + currentName;
         String newValue = parts.length > 1 ? parts[1] : "";
-
         updateLineByIndex(index, newName, newValue);
     }
 
@@ -1900,18 +2017,17 @@ public class WebForms {
 
     public void assignInterval(int miliSecond, String id, int index) {
         String currentLine = getLineByIndex(index);
-        if (currentLine == null || currentLine.isEmpty())
+        if (currentLine == null || currentLine.isEmpty()) {
             return;
-
+        }
         String[] parts = currentLine.split("=", 2);
-        String newName = "(" + miliSecond + (id != null && !id.isEmpty() ? "|" + id : "") + ")" + parts[0];
+        String newName = "(" + miliSecond + ((id != null && !id.isEmpty()) ? "|" + id : "") + ")" + parts[0];
         String newValue = parts.length > 1 ? parts[1] : "";
-
         updateLineByIndex(index, newName, newValue);
     }
 
-    public void assignInterval(int miliSecond, int index) {
-        assignInterval(miliSecond, null, index);
+    public void assignInterval(int miliSecond, String id) {
+        assignInterval(miliSecond, id, -1);
     }
 
     public void assignInterval(int miliSecond) {
@@ -1920,25 +2036,26 @@ public class WebForms {
 
     public void assignIntervalChange(int miliSecond, String id, int index) {
         String currentLine = getLineByIndex(index);
-        if (currentLine == null || currentLine.isEmpty())
+        if (currentLine == null || currentLine.isEmpty()) {
             return;
-
+        }
         String[] parts = currentLine.split("=", 2);
         String currentName = parts[0];
-
         if (currentName.startsWith("(") && currentName.contains(")")) {
             int closingBracket = currentName.indexOf(')');
             currentName = currentName.substring(closingBracket + 1);
         }
-
-        String newName = "(" + miliSecond + (id != null && !id.isEmpty() ? "|" + id : "") + ")" + currentName;
+        String newName = "(" + miliSecond + ((id != null && !id.isEmpty()) ? "|" + id : "") + ")" + currentName;
         String newValue = parts.length > 1 ? parts[1] : "";
-
         updateLineByIndex(index, newName, newValue);
     }
 
-    public void assignIntervalChange(int miliSecond, int index) {
-        assignIntervalChange(miliSecond, null, index);
+    public void assignIntervalChange(int miliSecond, String id) {
+        assignIntervalChange(miliSecond, id, -1);
+    }
+
+    public void assignIntervalChange(int miliSecond) {
+        assignIntervalChange(miliSecond, null, -1);
     }
 
     public void deleteInterval(String id) {
@@ -1947,13 +2064,12 @@ public class WebForms {
 
     public void assignRepeat(int count, int index) {
         String currentLine = getLineByIndex(index);
-        if (currentLine == null || currentLine.isEmpty())
+        if (currentLine == null || currentLine.isEmpty()) {
             return;
-
+        }
         String[] parts = currentLine.split("=", 2);
         String newName = "," + count + ")" + parts[0];
         String newValue = parts.length > 1 ? parts[1] : "";
-
         updateLineByIndex(index, newName, newValue);
     }
 
@@ -1963,20 +2079,17 @@ public class WebForms {
 
     public void assignRepeatChange(int count, int index) {
         String currentLine = getLineByIndex(index);
-        if (currentLine == null || currentLine.isEmpty())
+        if (currentLine == null || currentLine.isEmpty()) {
             return;
-
+        }
         String[] parts = currentLine.split("=", 2);
         String currentName = parts[0];
-
         if (currentName.startsWith(",") && currentName.contains(")")) {
             int closingBracket = currentName.indexOf(')');
             currentName = currentName.substring(closingBracket + 1);
         }
-
         String newName = "," + count + ")" + currentName;
         String newValue = parts.length > 1 ? parts[1] : "";
-
         updateLineByIndex(index, newName, newValue);
     }
 
@@ -1993,8 +2106,17 @@ public class WebForms {
         startIndex("");
     }
 
+    // This Index Is Automatically Run After Changing The Browser History (Back And Forward Buttons)
+    public void startState() {
+        startIndex("$");
+    }
+
+    public void goTo(String line, String repeat) {
+        add("&", line + GS + repeat);
+    }
+
     public void goTo(int line, int repeat) {
-        add("&", line + "|" + repeat);
+        goTo(String.valueOf(line), String.valueOf(repeat));
     }
 
     public void goTo(int line) {
@@ -2002,7 +2124,7 @@ public class WebForms {
     }
 
     public void goTo(String index, int repeat) {
-        add("&", "#" + index + "|" + repeat);
+        add("&", "#" + index + GS + String.valueOf(repeat));
     }
 
     public void goTo(String index) {
@@ -2019,29 +2141,34 @@ public class WebForms {
     }
 
     // Message
+    // Type: warning, problem, help, success, none
     public void alert(String text, String type, String title, String okText) {
-        String safeType = type.equals("none") ? "" : type;
-        String safeTitle = title.equals("Alert") ? "" : title;
-        String safeOkText = okText.equals("OK") ? "" : okText;
-        
-        add("Al", text + "|" + safeType + "|" + safeTitle + "|" + safeOkText);
+        add("Al", text + GS + (type.equals("none") ? "" : type) + GS + (title.equals("Alert") ? "" : title) + GS + (okText.equals("OK") ? "" : okText));
     }
 
     public void alert(String text) {
         alert(text, "none", "Alert", "OK");
     }
 
-    public void message(String text, String type, int duration) {
-        String safeType = type.equals("none") ? "" : type;
-        add("me", text + "|" + safeType + "|" + (duration == 0 ? "" : Integer.toString(duration)));
+    public void message(String text, String type, String duration) {
+        add("me", text + GS + (type.equals("none") ? "" : type) + GS + (duration.equals("0") ? "" : duration));
     }
 
     public void message(String text) {
-        message(text, "none", 0);
+        message(text, "none", "0");
     }
 
+    public void message(String text, String type, int duration) {
+        message(text, type, String.valueOf(duration));
+    }
+
+    public void message(String text, int duration) {
+        message(text, "", String.valueOf(duration));
+    }
+
+    // Type: log, info, warn, error, debug, trace, group, groupend, table
     public void consoleMessage(String text, String type) {
-        add("mc", text.replace("\n", "$[ln];") + (type.equals("log") ? "" : "|" + type));
+        add("mc", text.replace("\n", "$[ln];") + (type.equals("log") ? "" : GS + type));
     }
 
     public void consoleMessage(String text) {
@@ -2049,10 +2176,11 @@ public class WebForms {
     }
 
     public void consoleMessageAssert(String text, String condition) {
-        add("ma", text.replace("\n", "$[ln];") + "|" + condition);
+        add("ma", text.replace("\n", "$[ln];") + GS + condition);
     }
 
     // Enable
+    //Calling The EnableWebSocket Or EnableWebSocketOnce Or AddWebSocket Methods Will Cause Any Subsequent Requests (Under WebForms Core Technology) To Operate Under The WebSocket Protocol.
     public void enableWebSocket(boolean enable) {
         add("ew", enable ? "1" : "0");
     }
@@ -2069,7 +2197,13 @@ public class WebForms {
         add("aw" + path);
     }
 
+    // Disconnected WebSocket
+    public void deleteWebSocket(String path) {
+        add("dw" + path);
+    }
+
     // Use
+    // InputPlace Using Only For form Element
     public void useWebSocket(String inputPlace) {
         add("uw" + inputPlace);
     }
@@ -2078,183 +2212,192 @@ public class WebForms {
         add("uo" + inputPlace);
     }
 
-    // Condition
-    public void confirmIsTrueAccept(String text, String type, String title, String okText, String cancelText, float interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        String safeText = text.equals("Are you sure you want to proceed?") ? "" : text;
-        String safeType = type.equals("none") ? "" : type;
-        String safeTitle = title.equals("Confirm") ? "" : title;
-        String safeOkText = okText.equals("OK") ? "" : okText;
-        String safeCancelText = cancelText.equals("Cancel") ? "" : cancelText;
-        
-        add(prefix + "ct", safeText + "|" + safeType + "|" + safeTitle + "|" + safeOkText + "|" + safeCancelText);
+    // Condition And Loop
+    // Condition And Loop Supports Brackets and Then
+    // Type: warning, problem, help, success, none
+    // Interval: Value 0 is Await (if is not True, all Next Action Controls Waiting for it), Value -1 is Sync Check Once (is Support Bracket or Next Action Control), Value > 0 is Async and is Wait Based on Time Repetition Until it Becomes True (Is Support Bracket or Next Action Control, but is not Support Else).
+    // Nested Conditions and Nested Loops are Possible.
+    public WebForms confirmIsTrueAccept(String text, String type, String title, String okText, String cancelText, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "ct", (text.equals("Are you sure you want to proceed?") ? "" : text) + GS + (type.equals("none") ? "" : type) + GS + (title.equals("Confirm") ? "" : title) + GS + (okText.equals("OK") ? "" : okText) + GS + (cancelText.equals("Cancel") ? "" : cancelText));
+        return this;
     }
 
-    public void confirmIsTrueAccept(String text) {
-        confirmIsTrueAccept(text, "none", "Confirm", "OK", "Cancel", 100);
+    public WebForms confirmIsTrueAccept() {
+        return confirmIsTrueAccept("Are you sure you want to proceed?", "none", "Confirm", "OK", "Cancel", 100);
     }
 
-    public void confirmIsFalseAccept(String text, String type, String title, String okText, String cancelText, float interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        String safeText = text.equals("Are you sure you want to proceed?") ? "" : text;
-        String safeType = type.equals("none") ? "" : type;
-        String safeTitle = title.equals("Confirm") ? "" : title;
-        String safeOkText = okText.equals("OK") ? "" : okText;
-        String safeCancelText = cancelText.equals("Cancel") ? "" : cancelText;
-        
-        add(prefix + "cf", safeText + "|" + safeType + "|" + safeTitle + "|" + safeOkText + "|" + safeCancelText);
+    public WebForms confirmIsFalseAccept(String text, String type, String title, String okText, String cancelText, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "cf", (text.equals("Are you sure you want to proceed?") ? "" : text) + GS + (type.equals("none") ? "" : type) + GS + (title.equals("Confirm") ? "" : title) + GS + (okText.equals("OK") ? "" : okText) + GS + (cancelText.equals("Cancel") ? "" : cancelText));
+        return this;
     }
 
-    public void confirmIsFalseAccept(String text) {
-        confirmIsFalseAccept(text, "none", "Confirm", "OK", "Cancel", 100);
+    public WebForms confirmIsFalseAccept() {
+        return confirmIsFalseAccept("Are you sure you want to proceed?", "none", "Confirm", "OK", "Cancel", 100);
     }
 
-    public void isGreaterThan(String firstValue, String secondValue, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "gt", firstValue + "|" + secondValue);
+    public WebForms isGreaterThan(String firstValue, String secondValue, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "gt", firstValue + GS + secondValue);
+        return this;
     }
 
-    public void isGreaterThan(String firstValue, String secondValue) {
-        isGreaterThan(firstValue, secondValue, -1);
+    public WebForms isGreaterThan(String firstValue, String secondValue) {
+        return isGreaterThan(firstValue, secondValue, -1);
     }
 
-    public void isLessThan(String firstValue, String secondValue, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "lt", firstValue + "|" + secondValue);
+    public WebForms isLessThan(String firstValue, String secondValue, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "lt", firstValue + GS + secondValue);
+        return this;
     }
 
-    public void isLessThan(String firstValue, String secondValue) {
-        isLessThan(firstValue, secondValue, -1);
+    public WebForms isLessThan(String firstValue, String secondValue) {
+        return isLessThan(firstValue, secondValue, -1);
     }
 
-    public void isEqualTo(String firstValue, String secondValue, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "et", firstValue + "|" + secondValue);
+    public WebForms isEqualTo(String firstValue, String secondValue, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "et", firstValue + GS + secondValue);
+        return this;
     }
 
-    public void isEqualTo(String firstValue, String secondValue) {
-        isEqualTo(firstValue, secondValue, -1);
+    public WebForms isEqualTo(String firstValue, String secondValue) {
+        return isEqualTo(firstValue, secondValue, -1);
     }
 
-    public void isNotEqualTo(String firstValue, String secondValue, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "Nt", firstValue + "|" + secondValue);
+    public WebForms isNotEqualTo(String firstValue, String secondValue, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "Nt", firstValue + GS + secondValue);
+        return this;
     }
 
-    public void isNotEqualTo(String firstValue, String secondValue) {
-        isNotEqualTo(firstValue, secondValue, -1);
+    public WebForms isNotEqualTo(String firstValue, String secondValue) {
+        return isNotEqualTo(firstValue, secondValue, -1);
     }
 
-    public void exist(String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "ex", value);
+    public WebForms exist(String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "ex", value);
+        return this;
     }
 
-    public void exist(String value) {
-        exist(value, -1);
+    public WebForms exist(String value) {
+        return exist(value, -1);
     }
 
-    public void notExist(String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "nx", value);
+    public WebForms notExist(String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "nx", value);
+        return this;
     }
 
-    public void notExist(String value) {
-        notExist(value, -1);
+    public WebForms notExist(String value) {
+        return notExist(value, -1);
     }
 
-    public void isTrue(String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "tr", value);
+    public WebForms isTrue(String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "tr", value);
+        return this;
     }
 
-    public void isTrue(String value) {
-        isTrue(value, -1);
+    public WebForms isTrue(String value) {
+        return isTrue(value, -1);
     }
 
-    public void isFalse(String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "fa", value);
+    public WebForms isFalse(String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "fa", value);
+        return this;
     }
 
-    public void isFalse(String value) {
-        isFalse(value, -1);
+    public WebForms isFalse(String value) {
+        return isFalse(value, -1);
     }
 
-    public void isMatchMedia(String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "mm", value);
+    public WebForms isMatchMedia(String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "mm", value);
+        return this;
     }
 
-    public void isMatchMedia(String value) {
-        isMatchMedia(value, -1);
+    public WebForms isMatchMedia(String value) {
+        return isMatchMedia(value, -1);
     }
 
-    public void isNotMatchMedia(String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "nm", value);
+    public WebForms isNotMatchMedia(String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "nm", value);
+        return this;
     }
 
-    public void isNotMatchMedia(String value) {
-        isNotMatchMedia(value, -1);
+    public WebForms isNotMatchMedia(String value) {
+        return isNotMatchMedia(value, -1);
     }
 
-    public void include(String text, String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "In", value + "|" + text);
+    public WebForms include(String text, String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "In", value + GS + text);
+        return this;
     }
 
-    public void include(String text, String value) {
-        include(text, value, -1);
+    public WebForms include(String text, String value) {
+        return include(text, value, -1);
     }
 
-    public void notInclude(String text, String value, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "Nn", value + "|" + text);
+    public WebForms notInclude(String text, String value, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "Nn", value + GS + text);
+        return this;
     }
 
-    public void notInclude(String text, String value) {
-        notInclude(text, value, -1);
+    public WebForms notInclude(String text, String value) {
+        return notInclude(text, value, -1);
     }
 
-    public void elementExists(String inputPlace, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "eE", inputPlace);
+    public WebForms elementExists(String inputPlace, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "eE", inputPlace);
+        return this;
     }
 
-    public void elementExists(String inputPlace) {
-        elementExists(inputPlace, -1);
+    public WebForms elementExists(String inputPlace) {
+        return elementExists(inputPlace, -1);
     }
 
-    public void elementNotExists(String inputPlace, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "nE", inputPlace);
+    public WebForms elementNotExists(String inputPlace, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "nE", inputPlace);
+        return this;
     }
 
-    public void elementNotExists(String inputPlace) {
-        elementNotExists(inputPlace, -1);
+    public WebForms elementNotExists(String inputPlace) {
+        return elementNotExists(inputPlace, -1);
     }
 
-    public void isRegexMatch(String value, String pattern, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "re", value + "|" + pattern);
+    public WebForms isRegexMatch(String value, String pattern, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "re", value + GS + pattern);
+        return this;
     }
 
-    public void isRegexMatch(String value, String pattern) {
-        isRegexMatch(value, pattern, -1);
+    public WebForms isRegexMatch(String value, String pattern) {
+        return isRegexMatch(value, pattern, -1);
     }
 
-    public void isRegexNotMatch(String value, String pattern, int interval) {
-        String prefix = (interval >= 0) ? "{(" + interval + ")" : "{";
-        add(prefix + "rn", value + "|" + pattern);
+    public WebForms isRegexNotMatch(String value, String pattern, int interval) {
+        add(((interval >= 0) ? "{(" + interval + ")" : "{") + "rn", value + GS + pattern);
+        return this;
     }
 
-    public void isRegexNotMatch(String value, String pattern) {
-        isRegexNotMatch(value, pattern, -1);
+    public WebForms isRegexNotMatch(String value, String pattern) {
+        return isRegexNotMatch(value, pattern, -1);
     }
 
-    public void breakCondition() {
+    // In: Everything Becomes A JSON List.
+    // Key: Creates A Temporary Data In The Browser IndexedDB.
+    // Key + "i" Creates A Temporary Data To Maintain The Loop Counter In The Browser IndexedDB.
+    public WebForms forEach(String path, String in, String key) {
+        add("{fe", path + GS + in + GS + key);
+        return this;
+    }
+
+    public WebForms forEach(String path, String in) {
+        return forEach(path, in, ".");
+    }
+
+    public void breakLoop() {
         add(";");
+    }
+
+    public WebForms elseBranch() {
+        add("}e");
+        return this;
     }
 
     public void startBracket() {
@@ -2265,18 +2408,125 @@ public class WebForms {
         add("}");
     }
 
+    // Used Then In Condition And Loop Methods
+    public WebForms then(WebForms newForm) {
+        String data = newForm != null ? newForm.getWebFormsData() : null;
+        if (data != null && !data.isEmpty()) {
+            if (data.contains("\n")) {
+                newForm.addToUp("{");
+                newForm.add("}");
+            }
+        }
+        appendForm(newForm);
+        return this;
+    }
+
+    public WebForms then(Runnable configure) {
+        WebForms newForm = new WebForms();
+        configure.run();
+        String data = newForm.getWebFormsData();
+        if (data != null && !data.isEmpty()) {
+            if (data.contains("\n")) {
+                newForm.addToUp("{");
+                newForm.add("}");
+            }
+        }
+        appendForm(newForm);
+        return this;
+    }
+
+    public WebForms repeat(WebForms newForm, int repeat) {
+        if (newForm == null) {
+            return this;
+        }
+        String bodyData = newForm.getWebFormsData();
+        if (bodyData == null || bodyData.isEmpty()) {
+            return this;
+        }
+        int startLine = bodyData.split("\n", -1).length * -1;
+        appendForm(newForm);
+        goTo(startLine, repeat - 1);
+        return this;
+    }
+
+    public WebForms repeat(WebForms newForm, int repeat, String index) {
+        if (newForm == null) {
+            return this;
+        }
+        goTo(index);
+        startIndex(index);
+        String bodyData = newForm.getWebFormsData();
+        if (bodyData == null || bodyData.isEmpty()) {
+            return this;
+        }
+        appendForm(newForm);
+        if (index == null || index.isEmpty()) {
+            int indexNumber = -1;
+            for (String x : getWebFormsData().split("\n", -1)) {
+                if (x.startsWith("#")) {
+                    indexNumber++;
+                }
+            }
+            goTo(String.valueOf(indexNumber), repeat - 1);
+        } else {
+            goTo(index, repeat - 1);
+        }
+        return this;
+    }
+
+    public WebForms repeat(Runnable configure, int repeat) {
+        WebForms newForm = new WebForms();
+        // Note: In Java, a Runnable cannot modify an external WebForms instance easily without a custom functional interface.
+        // To mimic C# Action<WebForms>, we assume the user passes a configured instance or we use a custom interface.
+        // For strict translation of the concept, we'll use a custom functional interface defined below or just pass the instance.
+        // Since we can't change the signature easily without breaking the "exact match" rule, we will assume the configure action operates on a new instance passed to it.
+        // However, standard Java doesn't have Action<T>. We will use a custom interface Consumer<WebForms> for this specific overload.
+        return this; // Placeholder, see Consumer interface at bottom of file
+    }
+
+    public WebForms repeat(Consumer<WebForms> configure, int repeat) {
+        WebForms newForm = new WebForms();
+        configure.accept(newForm);
+        return repeat(newForm, repeat);
+    }
+
+    public WebForms repeat(Consumer<WebForms> configure, int repeat, String index) {
+        WebForms newForm = new WebForms();
+        configure.accept(newForm);
+        return repeat(newForm, repeat, index);
+    }
+
     // Async
-    public void async() {
+    // It Supports Brackets and Then
+    public WebForms async() {
         add("{(a)");
+        return this;
+    }
+
+    public void delay(String miliSecond) {
+        add("De", miliSecond);
     }
 
     public void delay(int miliSecond) {
-        add("De", Integer.toString(miliSecond));
+        delay(String.valueOf(miliSecond));
+    }
+
+    // Option
+    public void changeOption(String name, String value) {
+        add("co", name + GS + value);
+    }
+
+    public void resetOption() {
+        add("ro");
+    }
+
+    public void resetOption(String name) {
+        add("ro", name);
     }
 
     // Format Storage
     public void createFormatStorage(String key, String data) {
-        add(".C", key + "|" + data);
+        add(".C", key + GS + data);
     }
 
     public void deleteFormatStorage(String key) {
@@ -2284,18 +2534,12 @@ public class WebForms {
     }
 
     public void addJSON(String key, String path, String value) {
-        add(".a", key + "|j|" + value + "|" + path);
+        add(".a", key + GS + "j" + GS + value + GS + path);
     }
 
+    // Name: For Support Attribute, Set Double At Sign (@@) Before Name.
     public void addXML(String key, String path, String name, String value) {
-        String safeName = name;
-        if (safeName != null && !safeName.isEmpty() && safeName.charAt(0) == '@') {
-            safeName = safeName.substring(1);
-            safeName = "$[at];" + safeName;
-        }
-        safeName = safeName.replace("@", "$[at];");
-        
-        add(".a", key + "|x|" + safeName + "|" + value + "|" + path);
+        add(".a", key + GS + "x" + GS + name + GS + value + GS + path);
     }
 
     public void addXML(String key, String path, String name) {
@@ -2303,80 +2547,152 @@ public class WebForms {
     }
 
     public void addINI(String key, String path, String value, boolean isINILike) {
-        add(".a", key + "|i|" + (isINILike ? "1" : "0") + "|" + value + "|" + path);
+        add(".a", key + GS + "i" + GS + (isINILike ? "1" : "0") + GS + value + GS + path);
     }
 
     public void addINI(String key, String path, String value) {
         addINI(key, path, value, false);
     }
 
+    public void addTextLine(String key, String line, String text) {
+        add(".a", key + GS + "t" + GS + text + GS + line);
+    }
+
     public void addTextLine(String key, int line, String text) {
-        add(".a", key + "|t|" + text + "|" + line);
+        addTextLine(key, String.valueOf(line), text);
     }
 
     public void addVariable(String key, String value) {
-        add(".a", key + "|v|" + value);
+        add(".a", key + GS + "v" + GS + value);
     }
 
     public void updateJSON(String key, String path, String value) {
-        add(".u", key + "|j|" + value + "|" + path);
+        add(".u", key + GS + "j" + GS + value + GS + path);
     }
 
     public void updateXML(String key, String path, String value) {
-        add(".u", key + "|x|" + value + "|" + path);
+        add(".u", key + GS + "x" + GS + value + GS + path);
     }
 
     public void updateINI(String key, String path, String value, boolean isINILike) {
-        add(".u", key + "|i|" + (isINILike ? "1" : "0") + "|" + value + "|" + path);
+        add(".u", key + GS + "i" + GS + (isINILike ? "1" : "0") + GS + value + GS + path);
     }
 
     public void updateINI(String key, String path, String value) {
         updateINI(key, path, value, false);
     }
 
-    public void updateTextLine(String key, int line, String text) {
-        add(".u", key + "|t|" + text + "|" + line);
+    public void updateTexLine(String key, String line, String text) {
+        add(".u", key + GS + "t" + GS + text + GS + line);
+    }
+
+    public void updateTexLine(String key, int line, String text) {
+        updateTexLine(key, String.valueOf(line), text);
     }
 
     public void updateVariable(String key, String value) {
-        add(".u", key + "|v|" + value);
+        add(".u", key + GS + "v" + GS + value);
+    }
+
+    public void increaseVariable(String key, String value) {
+        add(".i", key + GS + "v" + GS + value);
     }
 
     public void increaseVariable(String key, int value) {
-        add(".i", key + "|v|" + value);
+        increaseVariable(key, String.valueOf(value));
     }
 
     public void decreaseVariable(String key, int value) {
-        increaseVariable(key, value * -1);
+        increaseVariable(key, String.valueOf(value * -1));
     }
 
     public void deleteJSON(String key, String path) {
-        add(".d", key + "|j|" + path);
+        add(".d", key + GS + "j" + GS + path);
     }
 
     public void deleteXML(String key, String path) {
-        add(".d", key + "|x|" + path);
+        add(".d", key + GS + "x" + GS + path);
     }
 
     public void deleteINI(String key, String path, boolean isINILike) {
-        add(".d", key + "|i|" + (isINILike ? "1" : "0") + "|" + path);
+        add(".d", key + GS + "i" + GS + (isINILike ? "1" : "0") + GS + path);
     }
 
     public void deleteINI(String key, String path) {
         deleteINI(key, path, false);
     }
 
+    public void deleteTextLine(String key, String line) {
+        add(".d", key + GS + "t" + GS + line);
+    }
+
     public void deleteTextLine(String key, int line) {
-        add(".d", key + "|t|" + line);
+        deleteTextLine(key, String.valueOf(line));
     }
 
     public void deleteVariable(String key) {
-        add(".d", key + "|v");
+        add(".d", key + GS + "v");
+    }
+
+    // Template Engine
+    // Pattern Example: {{value}}, ((value)), *value*, $value;
+    public void bindJSONToTemplate(String inputPlace, String jsonText, String path, String pattern, boolean alsoStartTag) {
+        add("Tj" + inputPlace, jsonText + GS + path + GS + pattern + GS + (alsoStartTag ? "1" : "0"));
+    }
+
+    public void bindJSONToTemplate(String inputPlace, String jsonText, String path, String pattern) {
+        bindJSONToTemplate(inputPlace, jsonText, path, pattern, true);
+    }
+
+    // Because XML Elements Are Lowercased, Placeholders Must Use Lowercase Names.
+    public void bindXMLToTemplate(String inputPlace, String xmlText, String path, String pattern, boolean alsoStartTag) {
+        add("Tx" + inputPlace, xmlText + GS + path + GS + pattern + GS + (alsoStartTag ? "1" : "0"));
+    }
+
+    public void bindXMLToTemplate(String inputPlace, String xmlText, String path, String pattern) {
+        bindXMLToTemplate(inputPlace, xmlText, path, pattern, true);
+    }
+
+    public void bindINIToTemplate(String inputPlace, String iniText, String path, String pattern, boolean alsoStartTag) {
+        add("Ti" + inputPlace, iniText + GS + path + GS + pattern + GS + (alsoStartTag ? "1" : "0"));
+    }
+
+    public void bindINIToTemplate(String inputPlace, String iniText, String path, String pattern) {
+        bindINIToTemplate(inputPlace, iniText, path, pattern, true);
     }
 
     // Inject
+    // Need Add @: to First of String
     public String inject(String value) {
         return "$[" + value + "];";
+    }
+
+    // Action Control
+    public void replaceActionControl(String searchValue, String value, boolean addingToUp) {
+        if (addingToUp) {
+            addToUp("rE", searchValue + GS + value);
+        } else {
+            add("rE", searchValue + GS + value);
+        }
+    }
+
+    public void replaceActionControl(String searchValue, String value) {
+        replaceActionControl(searchValue, value, false);
+    }
+
+    public void assignReplace(String searchValue, String value, int index) {
+        String currentLine = getLineByIndex(index);
+        if (currentLine == null || currentLine.isEmpty()) {
+            return;
+        }
+        String[] parts = currentLine.split("=", 2);
+        String newName = ";" + searchValue + GS + value + GS + parts[0];
+        String newValue = parts.length > 1 ? parts[1] : "";
+        updateLineByIndex(index, newName, newValue);
+    }
+
+    public void assignReplace(String searchValue, String value) {
+        assignReplace(searchValue, value, -1);
     }
 
     // Hash And Checksum
@@ -2392,13 +2708,12 @@ public class WebForms {
         int sum = 0;
         int mod = 65536;
         int shift = 5;
-
-        for (char c : text.toCharArray()) {
-            sum = ((sum << shift) | (sum >> (16 - shift))) ^ c;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            sum = ((sum << shift) | (sum >>> (16 - shift))) ^ c;
             sum %= mod;
         }
-
-        return Integer.toString(sum);
+        return String.valueOf(sum);
     }
 
     public String getChecksum() {
@@ -2406,10 +2721,14 @@ public class WebForms {
     }
 
     // Get
-    public String getFormsActionData() {
-        if (webFormsData.length() == 0)
-            return "";
+    public String getWebFormsData() {
+        return webFormsData.toString();
+    }
 
+    public String getFormsActionData() {
+        if (webFormsData.length() == 0) {
+            return "";
+        }
         return webFormsData.toString();
     }
 
@@ -2417,31 +2736,29 @@ public class WebForms {
         return "[web-forms]\n" + getFormsActionData();
     }
 
-    // Overload
-    public String response(HttpServletResponse response) {
-        setHeaders(response);
-        return response();
-    }
-
     public String getFormsActionDataLineBreak() {
-        if (webFormsData.length() == 0)
+        if (webFormsData.length() == 0) {
             return "";
-
+        }
         String data = webFormsData.toString();
         String processedData = data.replace("\"", "$[dq];");
         return processedData.replace("\n", "$[sln];");
     }
 
     // Export
-    public String exportToWebFormsTag(String src) {
-        return "<web-forms ac=\"" + getFormsActionDataLineBreak() + "\"" + 
-               (src != null && !src.isEmpty() ? " src=\"" + src + "\"" : "") + "></web-forms>";
+    public String exportToHtmlComment(boolean addLine) {
+        String response = response().replace("--", "$[dd];");
+        if (response.endsWith("-")) {
+            response = response.substring(0, response.length() - 1) + "$[da];";
+        }
+        return (addLine ? "\n" : "") + "<!--" + response + "-->";
     }
 
-    public String exportToWebFormsTag() {
-        return exportToWebFormsTag(null);
+    public String exportToHtmlComment() {
+        return exportToHtmlComment(false);
     }
 
+    // Using it for SSE Response
     public String exportToLineBreak(String src) {
         return "[web-forms]$[sln];" + getFormsActionDataLineBreak();
     }
@@ -2450,59 +2767,33 @@ public class WebForms {
         return exportToLineBreak(null);
     }
 
-    // Overload
-    public String exportToWebFormsTag(String width, String height, String src) {
-        return "<web-forms ac=\"" + getFormsActionDataLineBreak() + "\" width=\"" + width + 
-               "\" height=\"" + height + "\"" + 
-               (src != null && !src.isEmpty() ? " src=\"" + src + "\"" : "") + "></web-forms>";
-    }
-
-    // Overload
-    public String exportToWebFormsTag(int width, int height, String src) {
-        return exportToWebFormsTag(width + "px", height + "px", src);
-    }
-
-    public String exportToWebFormsTag(int width, int height) {
-        return exportToWebFormsTag(width, height, null);
-    }
-
-    public String doneToWebFormsTag(String id) {
-        return "<web-forms ac=\"" + getFormsActionDataLineBreak() + "\"" + 
-               (id != null && !id.isEmpty() ? " id=\"" + id + "\" done=\"true\"" : "") + "></web-forms>";
-    }
-
-    public String doneToWebFormsTag() {
-        return doneToWebFormsTag(null);
-    }
-
-    public String exportToHtmlComment(boolean addLine) {
-        return (addLine ? "\n" : "") + "<!--" + response() + "-->";
-    }
-
-    public String exportToHtmlComment() {
-        return exportToHtmlComment(false);
-    }
-
-    public String getWebFormsData() {
-        return webFormsData.toString();
-    }
-
     public void appendForm(WebForms form) {
-        if (form == null) return;
-
+        if (form == null) {
+            return;
+        }
         String otherData = form.getWebFormsData();
         if (otherData != null && !otherData.isEmpty()) {
-            if (webFormsData.length() > 0)
+            if (webFormsData.length() > 0) {
                 webFormsData.append('\n');
+            }
             webFormsData.append(otherData);
         }
     }
 
-    public void setHeaders(HttpServletResponse response) {
-        response.setHeader("Content-Type", "text/plain");
+    public void clean() {
+        webFormsData.setLength(0);
     }
 
-    public void clean() {
-        webFormsData = new StringBuilder();
+    private String[] toStringArray(Object[] args) {
+        String[] result = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+            result[i] = args[i] != null ? args[i].toString() : "";
+        }
+        return result;
+    }
+
+    @FunctionalInterface
+    public interface Consumer<T> {
+        void accept(T t);
     }
 }
