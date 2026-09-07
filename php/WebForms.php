@@ -764,8 +764,8 @@ class WebForms
     public function updateINI(string $key, string $path, string $value, bool $isINILike = false): void { $this->add('.u', $key . self::GS . 'i' . self::GS . ($isINILike ? '1' : '0') . self::GS . $value . self::GS . $path); }
     public function updateTexLine(string $key, string|int $line, string $text): void { $this->add('.u', $key . self::GS . 't' . self::GS . $text . self::GS . (string)$line); }
     public function updateVariable(string $key, string $value): void { $this->add('.u', $key . self::GS . 'v' . self::GS . $value); }
-    public function increaceVariable(string $key, string|int $value): void { $this->add('.i', $key . self::GS . 'v' . self::GS . (string)$value); }
-    public function decreaseVariable(string $key, int $value): void { $this->increaceVariable($key, (string)($value * -1)); }
+    public function increaseVariable(string $key, string|int $value): void { $this->add('.i', $key . self::GS . 'v' . self::GS . (string)$value); }
+    public function decreaseVariable(string $key, int $value): void { $this->increaseVariable($key, (string)($value * -1)); }
     public function deleteJSON(string $key, string $path): void { $this->add('.d', $key . self::GS . 'j' . self::GS . $path); }
     public function deleteXML(string $key, string $path): void { $this->add('.d', $key . self::GS . 'x' . self::GS . $path); }
     public function deleteINI(string $key, string $path, bool $isINILike = false): void { $this->add('.d', $key . self::GS . 'i' . self::GS . ($isINILike ? '1' : '0') . self::GS . $path); }
