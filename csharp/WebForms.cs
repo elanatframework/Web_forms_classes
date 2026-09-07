@@ -968,9 +968,9 @@ namespace WebFormsCore
         public void UpdateTexLine(string Key, string Line, string Text) => Add(".u", Key + GS + "t" + GS + Text + GS + Line);
         public void UpdateTexLine(string Key, int Line, string Text) => UpdateTexLine(Key, Line.ToString(), Text);
         public void UpdateVariable(string Key, string Value) => Add(".u", Key + GS + "v" + GS + Value);
-        public void IncreaceVariable(string Key, string Value) => Add(".i", Key + GS + "v" + GS + Value);
-        public void IncreaceVariable(string Key, int Value) => IncreaceVariable(Key, Value.ToString());
-        public void DecreaseVariable(string Key, int Value) => IncreaceVariable(Key, Value * -1);
+        public void IncreaseVariable(string Key, string Value) => Add(".i", Key + GS + "v" + GS + Value);
+        public void IncreaseVariable(string Key, int Value) => IncreaseVariable(Key, Value.ToString());
+        public void DecreaseVariable(string Key, int Value) => IncreaseVariable(Key, Value * -1);
         public void DeleteJSON(string Key, string Path) => Add(".d", Key + GS + "j" + GS + Path);
         public void DeleteXML(string Key, string Path) => Add(".d", Key + GS + "x" + GS + Path);
         public void DeleteINI(string Key, string Path, bool IsINILike = false) => Add(".d", Key + GS + "i" + GS + IsINILike + GS + Path);
