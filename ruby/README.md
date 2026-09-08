@@ -4,7 +4,9 @@ To use WebForms Core, first copy the WebForms class file in this directory to yo
 
 ```ruby
 require 'sinatra'
-require_relative 'WebForms'
+require_relative 'web_forms'
+
+include WebFormsCore
 
 get '/' do
   erb :view
