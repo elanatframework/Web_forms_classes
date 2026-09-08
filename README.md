@@ -139,6 +139,13 @@ dependencies {
 }
 ```
 
+**JavaScript in npm** (https://www.npmjs.com/package/webformscore)
+
+CLI
+```bash
+npm install webformscore
+```
+
 ## Other programming languages 
 - **TypeScript:** You can easily use the JavaScript [WebForms.js](https://github.com/elanatframework/Web_forms_classes/blob/elanat_framework/nodejs/WebForms.js) NodeJS class for TypeScript programming language.
 - **Scala, Kotlin, Groovy, Clojure and ColdFusion:** By configuring the build tools (such as Gradle, Maven, or SBT), you can use the [Java WebForms classes](https://github.com/elanatframework/Web_forms_classes/tree/elanat_framework/java/WebFormsCore) for Scala, Kotlin, Groovy, Clojure and ColdFusion programming languages.
