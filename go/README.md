@@ -8,8 +8,8 @@ package main
 
 import (
 	"fmt"
-	"{your-project-name}/webforms"
 	"net/http"
+	"{your-project-name}/webformscore"
 )
 
 func main() {
@@ -24,15 +24,15 @@ func handleForm(w http.ResponseWriter, r *http.Request) {
 		backgroundColor := r.FormValue("txt_BackgroundColor")
 		fontSize := r.FormValue("txt_FontSize")
 
-		form := new(webforms.WebForms)
-		ip := &webforms.InputPlace{}
+		form := WebFormsCore.New()
+		var InputPlace = WebFormsCore.InputPlace
 
-		form.SetFontSize(ip.Tag("form"), fontSize+"px")
-		form.SetBackgroundColor(ip.Tag("form"), backgroundColor)
-		form.SetDisabled(ip.Name("btn_SetBodyValue"), true)
+		form.SetFontSize(InputPlace.Tag("form"), fontSize+"px")
+		form.SetBackgroundColor(InputPlace.Tag("form"), backgroundColor)
+		form.SetDisabled(InputPlace.Name("btn_SetBodyValue"), true)
 
-		form.AddTag(ip.Tag("form"), "h3", "p")
-		form.SetText(ip.Tag("h3"), "Welcome "+name+"!")
+		form.AddTag(InputPlace.Tag("form"), "h3", "p")
+		form.SetText(InputPlace.Tag("h3"), "Welcome "+name+"!")
 
 		fmt.Fprint(w, form.Response())
 		return
@@ -72,4 +72,3 @@ As you can see, the WebFormsJS script has been added in the header section of th
 The latest version of the WebFormsJS script is available through the link below.
 
 https://github.com/elanatframework/Web_forms/blob/elanat_framework/web-forms.js
-
