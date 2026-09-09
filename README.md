@@ -121,7 +121,7 @@ CLI
 composer require webforms-core/php
 ```
 
-**GO module repository**
+**GO module repository** (https://github.com/webforms-core/go)
 
 CLI
 ```bash
