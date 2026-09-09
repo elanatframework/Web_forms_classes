@@ -121,6 +121,13 @@ CLI
 composer require webforms-core/php
 ```
 
+**GO module repository**
+
+CLI
+```bash
+go get github.com/webforms-core/go
+```
+
 **Java in Maven Central** (https://central.sonatype.com/artifact/net.elanat/WFC)
 
 Project settings for Maven
