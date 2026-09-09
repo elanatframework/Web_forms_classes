@@ -95,6 +95,8 @@ st<h3>=Adriano! Your message was sent successfully.
 
 ## Installation via Package
 
+---
+
 **C# (.NET) in NuGet** (https://www.nuget.org/packages/WFC)
 
 CLI
@@ -107,12 +109,16 @@ Project settings
 <PackageReference Include="WFC" />
 ```
 
+---
+
 **Python in PyPi** (https://pypi.org/project/WFC/)
 
 CLI
 ```bash
 pip install WFC
 ```
+
+---
 
 **PHP in Packagist** (https://packagist.org/packages/webforms-core/php)
 
@@ -121,12 +127,16 @@ CLI
 composer require webforms-core/php
 ```
 
+---
+
 **GO module repository** (https://github.com/webforms-core/go)
 
 CLI
 ```bash
 go get github.com/webforms-core/go
 ```
+
+---
 
 **Java in Maven Central** (https://central.sonatype.com/artifact/net.elanat/WFC)
 
@@ -146,12 +156,16 @@ dependencies {
 }
 ```
 
+---
+
 **JavaScript in npm** (https://www.npmjs.com/package/webformscore)
 
 CLI
 ```bash
 npm install webformscore
 ```
+
+---
 
 ## Other programming languages 
 - **TypeScript:** You can easily use the JavaScript [WebForms.js](https://github.com/elanatframework/Web_forms_classes/blob/elanat_framework/nodejs/WebForms.js) NodeJS class for TypeScript programming language.
