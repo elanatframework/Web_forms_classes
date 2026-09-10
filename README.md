@@ -111,24 +111,6 @@ Project settings
 
 ---
 
-**Python in PyPi** (https://pypi.org/project/WFC/)
-
-CLI
-```bash
-pip install WFC
-```
-
----
-
-**PHP in Packagist** (https://packagist.org/packages/webforms-core/php)
-
-CLI
-```bash
-composer require webforms-core/php
-```
-
----
-
 **GO module repository** (https://github.com/webforms-core/go)
 
 CLI
@@ -163,6 +145,33 @@ dependencies {
 CLI
 ```bash
 npm install webformscore
+```
+
+---
+
+**PHP in Packagist** (https://packagist.org/packages/webforms-core/php)
+
+CLI
+```bash
+composer require webforms-core/php
+```
+
+---
+
+**Python in PyPi** (https://pypi.org/project/WFC/)
+
+CLI
+```bash
+pip install WFC
+```
+
+---
+
+**Ruby in RubyGems** (https://rubygems.org/gems/wfc)
+
+CLI
+```bash
+gem install wfc
 ```
 
 ---
