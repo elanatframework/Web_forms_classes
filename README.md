@@ -1,15 +1,23 @@
 ![ ](https://github.com/user-attachments/assets/164a7efc-66a2-494a-bc26-614c2c53ce00)
+
 # WebForms Classes
 
-WebForms Core technology was created by [Elanat](https://elanat.net). It is a two-way protocol between the WebForms class on the server side and the [web-forms.js](https://github.com/elanatframework/Web_forms/blob/elanat_framework/web-forms.js) library on the client side, where processing is done on the client side and the server sends Action Control commands to [WebFormsJS](https://github.com/elanatframework/Web_forms).
+**WebForms Classes are the server-side component of WebForms Core technology.**
 
-By using WebForms Core technology, HTML tags are managed server-side, eliminating the need for front-end development.
+A WebForms class allows server-side code to create, update, remove, and manipulate HTML elements by generating **Action Control commands** for [**WebFormsJS**](https://github.com/elanatframework/Web_forms), the client-side runtime.
+
+In the WebForms Core architecture, the WebForms class acts as the **Commander**, while WebFormsJS acts as the **Executor**:
+
+**Client → Server → WebForms → Commands → WebFormsJS → HTML DOM**
+
+[**WebForms Core**](https://github.com/webforms-core) is a server-driven web technology created by [**Elanat**](https://elanat.net). It allows developers to manage interactive HTML interfaces from server-side code without requiring a separate front-end layer.
 
 ## WebForms Core Example
 
-To use WebForms Core technology, you need to get the [WebFormsJS](https://github.com/elanatframework/Web_forms/blob/elanat_framework/web-forms.js) library and add it to the head section of your HTML page.
+To use WebForms Core technology, you need to get the [**WebFormsJS**](https://github.com/elanatframework/Web_forms) library and add it to the `<head>` section of your HTML page.
 
 **HTML page**
+
 ```diff
 <!DOCTYPE html>
 <html>
@@ -29,9 +37,10 @@ To use WebForms Core technology, you need to get the [WebFormsJS](https://github
 </html>
 ```
 
-On the server side, you also need to get the [WebForms class](https://github.com/elanatframework/Web_forms_classes) for the server programming language and implement it on your system.
+On the server side, you also need to get the [WebForms class](https://github.com/elanatframework/Web_forms_classes) for the server programming language and implement it in your system.
 
 **C# example in CodeBehind framework**
+
 ```csharp
 using CodeBehind;
 
@@ -39,7 +48,7 @@ public partial class ContactController : CodeBehindController
 {
     public void PageLoad(HttpContext context)
     {
-        if (context.Request.Form["button"].Has())
+        if (context.Request.IfForm["button"].Has())
             Button_Click(context);
     }
 
@@ -67,20 +76,21 @@ public partial class ContactController : CodeBehindController
 ```
 
 The GIF image below shows how the above code works.
-![WebForms Core example in web forms classes](https://github.com/user-attachments/assets/a4bc19eb-578b-42d0-b725-2ec28d16e3e5)
 
-In this example, after clicking the button, first an instance of the WebForms class is created. Then a new h3 tag is created and the submit text is successfully added in it and shown to the user for 3 seconds and then removed. The submit button will also be disabled and finally the response is sent to the client using the `Response` method.
+In this example, after clicking the button, an instance of the WebForms class is created first. Then, a new `h3` tag is created, the success message is added to it and displayed to the user for 3 seconds, and then the tag is removed. The submit button is also disabled. Finally, the response is sent to the client using the `Response` method.
 
 **What is sent from the client to the server?**
 
-In WebForms Core technology, data is sent as if it were an HTML page form submission.
+In WebForms Core technology, data is sent as an HTML form submission.
+
 ```
 message=Please send your product price list to my email account.&email=Adriano@gmail.com&name=Adriano&button=Submit
 ```
 
 **What does the server respond to the client?**
 
-The server response is also based on the INI pattern.
+The server response is based on the INI pattern.
+
 ```
 [web-forms]
 sd(button)=1
@@ -90,8 +100,9 @@ st<h3>=Adriano! Your message was sent successfully.
 :3000)de<h3>=1
 ```
 
-**Parent class:** WebForms classes in all programming languages ​​are built from the C# class. This class is the parent class of all WebForms classes.
-> Note: WebForms Core technology is a feature of the [CodeBehind framework](https://github.com/elanatframework/Code_behind), but at Elanat we provide WebForms Core for all programming languages.
+**Parent class:** WebForms classes in all programming languages are based on the C# WebForms class. The C# class is the parent implementation of all WebForms classes.
+
+> Note: WebForms Core technology was initially developed as a feature of the [CodeBehind framework](https://github.com/elanatframework/Code_behind). At Elanat, we provide WebForms Core implementations for multiple programming languages.
 
 ## Installation via Package
 
