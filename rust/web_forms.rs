@@ -4386,3 +4386,5 @@ pub mod web_forms_core {
         }
     }
 }
+
+pub use web_forms_core::*;
