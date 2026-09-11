@@ -2828,7 +2828,7 @@ pub mod web_forms_core {
             ok_text: Option<&str>,
             cancel_text: Option<&str>,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let text = text.unwrap_or("Are you sure you want to proceed?");
             let type_ = type_.unwrap_or("none");
             let title = title.unwrap_or("Confirm");
@@ -2862,6 +2862,7 @@ pub mod web_forms_core {
                     cancel_part
                 )),
             );
+			self
         }
         pub fn confirm_is_false_accept(
             &mut self,
@@ -2871,7 +2872,7 @@ pub mod web_forms_core {
             ok_text: Option<&str>,
             cancel_text: Option<&str>,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let text = text.unwrap_or("Are you sure you want to proceed?");
             let type_ = type_.unwrap_or("none");
             let title = title.unwrap_or("Confirm");
@@ -2905,13 +2906,14 @@ pub mod web_forms_core {
                     cancel_part
                 )),
             );
+			self
         }
         pub fn is_greater_than(
             &mut self,
             first_value: &str,
             second_value: &str,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -2922,13 +2924,14 @@ pub mod web_forms_core {
                 &format!("{}gt", prefix),
                 Some(&format!("{}{}{}", first_value, GS, second_value)),
             );
+			self
         }
         pub fn is_less_than(
             &mut self,
             first_value: &str,
             second_value: &str,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -2939,13 +2942,14 @@ pub mod web_forms_core {
                 &format!("{}lt", prefix),
                 Some(&format!("{}{}{}", first_value, GS, second_value)),
             );
+			self
         }
         pub fn is_equal_to(
             &mut self,
             first_value: &str,
             second_value: &str,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -2956,13 +2960,14 @@ pub mod web_forms_core {
                 &format!("{}et", prefix),
                 Some(&format!("{}{}{}", first_value, GS, second_value)),
             );
+			self
         }
         pub fn is_not_equal_to(
             &mut self,
             first_value: &str,
             second_value: &str,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -2973,8 +2978,9 @@ pub mod web_forms_core {
                 &format!("{}Nt", prefix),
                 Some(&format!("{}{}{}", first_value, GS, second_value)),
             );
+			self
         }
-        pub fn exist(&mut self, value: &str, interval: Option<i32>) {
+        pub fn exist(&mut self, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -2982,8 +2988,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}ex", prefix), Some(value));
+			self
         }
-        pub fn not_exist(&mut self, value: &str, interval: Option<i32>) {
+        pub fn not_exist(&mut self, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -2991,8 +2998,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}nx", prefix), Some(value));
+			self
         }
-        pub fn is_true(&mut self, value: &str, interval: Option<i32>) {
+        pub fn is_true(&mut self, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3000,8 +3008,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}tr", prefix), Some(value));
+			self
         }
-        pub fn is_false(&mut self, value: &str, interval: Option<i32>) {
+        pub fn is_false(&mut self, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3009,8 +3018,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}fa", prefix), Some(value));
+			self
         }
-        pub fn is_match_media(&mut self, value: &str, interval: Option<i32>) {
+        pub fn is_match_media(&mut self, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3018,8 +3028,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}mm", prefix), Some(value));
+			self
         }
-        pub fn is_not_match_media(&mut self, value: &str, interval: Option<i32>) {
+        pub fn is_not_match_media(&mut self, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3027,8 +3038,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}nm", prefix), Some(value));
+			self
         }
-        pub fn include(&mut self, text: &str, value: &str, interval: Option<i32>) {
+        pub fn include(&mut self, text: &str, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3039,8 +3051,9 @@ pub mod web_forms_core {
                 &format!("{}In", prefix),
                 Some(&format!("{}{}{}", value, GS, text)),
             );
+			self
         }
-        pub fn not_include(&mut self, text: &str, value: &str, interval: Option<i32>) {
+        pub fn not_include(&mut self, text: &str, value: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3051,8 +3064,9 @@ pub mod web_forms_core {
                 &format!("{}Nn", prefix),
                 Some(&format!("{}{}{}", value, GS, text)),
             );
+			self
         }
-        pub fn element_exists(&mut self, input_place: &str, interval: Option<i32>) {
+        pub fn element_exists(&mut self, input_place: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3060,8 +3074,9 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}eE", prefix), Some(input_place));
+			self
         }
-        pub fn element_not_exists(&mut self, input_place: &str, interval: Option<i32>) {
+        pub fn element_not_exists(&mut self, input_place: &str, interval: Option<i32>) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3069,13 +3084,14 @@ pub mod web_forms_core {
                 "{".to_string()
             };
             self.add(&format!("{}nE", prefix), Some(input_place));
+			self
         }
         pub fn is_regex_match(
             &mut self,
             value: &str,
             pattern: &str,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3086,13 +3102,14 @@ pub mod web_forms_core {
                 &format!("{}re", prefix),
                 Some(&format!("{}{}{}", value, GS, pattern)),
             );
+			self
         }
         pub fn is_regex_not_match(
             &mut self,
             value: &str,
             pattern: &str,
             interval: Option<i32>,
-        ) {
+        ) -> &mut Self {
             let interval = interval.unwrap_or(-1);
             let prefix = if interval >= 0 {
                 format!("{{({})", interval)
@@ -3103,22 +3120,25 @@ pub mod web_forms_core {
                 &format!("{}rn", prefix),
                 Some(&format!("{}{}{}", value, GS, pattern)),
             );
+			self
         }
         // In: Everything Becomes A JSON List.
         // Key: Creates A Temporary Data In The Browser IndexedDB.
         // Key + "i" Creates A Temporary Data To Maintain The Loop Counter In The Browser IndexedDB.
-        pub fn for_each(&mut self, path: &str, in_: &str, key: Option<&str>) {
+        pub fn for_each(&mut self, path: &str, in_: &str, key: Option<&str>) -> &mut Self {
             let key = key.unwrap_or(".");
             self.add(
                 "{fe",
                 Some(&format!("{}{}{}{}{}", path, GS, in_, GS, key)),
             );
+			self
         }
         pub fn break_(&mut self) {
             self.add(";", None);
         }
-        pub fn else_(&mut self) {
+        pub fn else_(&mut self) -> &mut Self {
             self.add("}e", None);
+			self
         }
         pub fn start_bracket(&mut self) {
             self.add("{", None);
@@ -3127,7 +3147,7 @@ pub mod web_forms_core {
             self.add("}", None);
         }
         // Used Then In Condition And Loop Methods
-        pub fn then(&mut self, new_form: WebForms) {
+        pub fn then(&mut self, new_form: WebForms) -> &mut Self {
             let data = new_form.get_web_forms_data();
             let mut new_form = new_form;
             if !data.is_empty() {
@@ -3137,8 +3157,9 @@ pub mod web_forms_core {
                 }
             }
             self.append_form(&new_form);
+			self
         }
-        pub fn then_with<F: FnOnce(&mut WebForms)>(&mut self, configure: F) {
+        pub fn then_with<F: FnOnce(&mut WebForms)>(&mut self, configure: F) -> &mut Self {
             let mut new_form = WebForms::new();
             configure(&mut new_form);
             let data = new_form.get_web_forms_data();
@@ -3149,62 +3170,69 @@ pub mod web_forms_core {
                 }
             }
             self.append_form(&new_form);
+			self
         }
-        pub fn repeat(&mut self, new_form: WebForms, repeat: i32) {
-            if repeat <= 0 {
-                return;
-            }
-            let body_data = new_form.get_web_forms_data();
-            if body_data.is_empty() {
-                return;
-            }
-            let start_line = body_data.split('\n').count() as i32 * -1;
-            self.append_form(&new_form);
-            self.go_to(&start_line.to_string(), &(repeat - 1).to_string());
-        }
-        pub fn repeat_with_index(&mut self, new_form: WebForms, repeat: i32, index: &str) {
-            if repeat <= 0 {
-                return;
-            }
-            self.go_to_index(index, Some(1));
-            self.start_index(index);
-            let body_data = new_form.get_web_forms_data();
-            if body_data.is_empty() {
-                return;
-            }
-            self.append_form(&new_form);
-            if index.is_empty() {
-                let mut index_number = -1;
-                for line in self.get_web_forms_data().split('\n') {
-                    if line.starts_with('#') {
-                        index_number += 1;
-                    }
-                }
-                self.go_to(&index_number.to_string(), &(repeat - 1).to_string());
-            } else {
-                self.go_to(index, &(repeat - 1).to_string());
-            }
-        }
-        pub fn repeat_with<F: FnOnce(&mut WebForms)>(&mut self, configure: F, repeat: i32) {
+		pub fn repeat(&mut self, new_form: WebForms, repeat: i32) -> &mut Self {
+			if repeat <= 0 {
+				return self;
+			}
+			let body_data = new_form.get_web_forms_data();
+			if body_data.is_empty() {
+				return self;
+			}
+			let start_line = body_data.split('\n').count() as i32 * -1;
+			self.append_form(&new_form);
+			self.go_to(&start_line.to_string(), &(repeat - 1).to_string());
+			self
+		}
+
+		pub fn repeat_with_index(&mut self, new_form: WebForms, repeat: i32, index: &str) -> &mut Self {
+			if repeat <= 0 {
+				return self;
+			}
+			self.go_to_index(index, Some(1));
+			self.start_index(index);
+			let body_data = new_form.get_web_forms_data();
+			if body_data.is_empty() {
+				return self;
+			}
+			self.append_form(&new_form);
+			if index.is_empty() {
+				let mut index_number = -1;
+				for line in self.get_web_forms_data().split('\n') {
+					if line.starts_with('#') {
+						index_number += 1;
+					}
+				}
+				self.go_to(&index_number.to_string(), &(repeat - 1).to_string());
+			} else {
+				self.go_to(index, &(repeat - 1).to_string());
+			}
+			self
+		}
+        pub fn repeat_with<F: FnOnce(&mut WebForms)>(&mut self, configure: F, repeat: i32) -> &mut Self {
             let mut new_form = WebForms::new();
             configure(&mut new_form);
             self.repeat(new_form, repeat);
+			self
         }
         pub fn repeat_with_index_with<F: FnOnce(&mut WebForms)>(
             &mut self,
             configure: F,
             repeat: i32,
             index: &str,
-        ) {
+        ) -> &mut Self {
             let mut new_form = WebForms::new();
             configure(&mut new_form);
             self.repeat_with_index(new_form, repeat, index);
+			self
         }
 
         // Async
         // It Supports Brackets and Then
-        pub fn async_(&mut self) {
+        pub fn async_(&mut self) -> &mut Self {
             self.add("{(a)", None);
+			self
         }
         pub fn delay(&mut self, mili_second: &str) {
             self.add("De", Some(mili_second));
@@ -4325,18 +4353,11 @@ pub mod web_forms_core {
             )
         }
 
-        fn append_fetch_replace(&self, search_value: &str, value: &str) -> String {
-            const FS: char = '\u{1c}';
-            let text = self.strip_prefix('@').unwrap_or(self);
-            format!(
-                "@;{}{}{}{}{}",
-                search_value,
-                FS,
-                value,
-                FS,
-                text
-            )
-        }
+		fn append_fetch_replace(&self, search_value: &str, value: &str) -> String {
+			const FS: char = '\u{1c}';
+			let text = if self.len() > 0 { &self[1..] } else { self };
+			format!("@;{}{}{}{}{}", search_value, FS, value, FS, text)
+		}
 
         fn line_break(&self, encode_line: Option<bool>) -> String {
             let encode = if encode_line.unwrap_or(false) {
